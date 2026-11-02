@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#06080D">
+<title>Gestionale del coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/sistema.css">
+<link rel="stylesheet" href="assets/css/coach.css">
+</head>
+<body>
+<div class="gestionale">
+  <aside class="laterale">
+    <div class="io"><img class="avatar" id="io-foto" src="assets/foto/coach-luca.webp" alt="" width="40" height="40"><div><b id="io-nome">Luca Ferri</b><span>Personal trainer</span></div></div>
+    <nav class="navigazione" aria-label="Sezioni">
+      <a class="attiva" href="#oggi" aria-current="page">Oggi<span class="conta" id="conta-oggi">13</span></a>
+      <a href="#atleti">Atleti<span class="conta">18</span></a>
+      <a href="#programmi">Programmi</a>
+      <a href="#revisioni">Revisioni video<span class="conta" id="conta-video">4</span></a>
+      <a href="#checkin">Check-in<span class="conta">7</span></a>
+      <a href="#messaggi">Messaggi</a>
+      <a href="#libreria">Libreria esercizi</a>
+    </nav>
+    <a class="impostazioni" href="#impostazioni">Impostazioni</a>
+  </aside>
+
+  <main class="principale">
+    <header class="intestazione">
+      <div class="titoli">
+        <span class="sopra" id="data-oggi"></span>
+        <h1 id="saluto">Buonasera, Luca</h1>
+        <span class="riassunto num" id="riassunto"></span>
+      </div>
+      <label class="cerca"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#7C8698" stroke-width="1.6"/><path d="M11 11l3 3" stroke="#7C8698" stroke-width="1.6" stroke-linecap="round"/></svg><span class="vh">Cerca</span><input type="search" placeholder="Cerca atleta o esercizio"></label>
+      <button class="btn-sec">Nuovo programma</button>
+    </header>
+
+    <div class="lavoro">
+      <section class="coda-blocco" aria-labelledby="t-coda">
+        <div class="riga-titolo">
+          <h2 id="t-coda" class="etichetta">Da rivedere · per priorità</h2>
+          <div class="filtri" role="group" aria-label="Filtra">
+            <button class="filtro attivo" data-f="tutto" aria-pressed="true">Tutto</button>
+            <button class="filtro" data-f="video" aria-pressed="false">Video</button>
+            <button class="filtro" data-f="check" aria-pressed="false">Check-in</button>
+          </div>
+        </div>
+        <ul class="coda card" id="coda"></ul>
+      </section>
+
+      <section class="revisione card-rilievo" id="revisione" aria-label="Revisione video"></section>
+    </div>
+
+    <section class="atleti-blocco" aria-labelledby="t-atleti">
+      <div class="riga-titolo"><h2 id="t-atleti" class="etichetta">Atleti · settimana in corso</h2><a class="link" href="#atleti">Tutti gli atleti</a></div>
+      <div class="tabella card" role="table" aria-label="Atleti">
+        <div class="tr th" role="row"><span role="columnheader">Atleta</span><span role="columnheader">Programma</span><span role="columnheader">Settimana</span><span role="columnheader">Ultimi 7 giorni</span><span role="columnheader">Esercizio chiave</span><span role="columnheader">6 sett.</span><span role="columnheader">Stato</span></div>
+        <div id="righe-atleti" role="rowgroup"></div>
+      </div>
+      <div class="legenda"><span><i class="q f"></i>Fatto</span><span><i class="q s"></i>Saltato</span><span><i class="q r"></i>Riposo</span><span><i class="q p"></i>Previsto</span></div>
+    </section>
+  </main>
+</div>
+
+<div class="avviso" id="avviso" role="status" aria-live="polite">
+  <span class="spunta"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#3DD68C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <div style="flex:1"><strong id="avviso-titolo"></strong><span id="avviso-testo"></span></div>
+  <button class="link" id="annulla">Annulla</button>
+</div>
+
+<script src="assets/js/dati.js"></script>
+<script src="assets/js/coach.js"></script>
+</body>
+</html>

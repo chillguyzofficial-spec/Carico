@@ -1,0 +1,135 @@
+/* App dell'atleta — iPhone first (393 pt). Su schermi larghi resta una colonna centrata. */
+body { background: var(--notte-0); }
+.app {
+  position: relative; max-width: 430px; min-height: 100dvh; margin: 0 auto;
+  background: linear-gradient(var(--fondo) 0, var(--fondo) 540px, var(--deriva) 100%);
+  overflow-x: hidden;
+}
+@media (min-width: 600px) {
+  .app { box-shadow: 0 0 0 1px rgba(255, 255, 255, .06), 0 30px 80px rgba(0, 0, 0, .5); }
+}
+.schermo { padding-bottom: calc(58px + 40px + env(safe-area-inset-bottom)); }
+
+/* ---------- HERO ---------- */
+.hero { position: relative; height: 528px; }
+.hero-foto { position: absolute; inset: 0; overflow: hidden; }
+.hero-foto img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 20%; filter: grayscale(1) contrast(1.06); }
+.hero-foto::before { /* il B/N vira al blu notte */
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: #0B2A6B; mix-blend-mode: color; opacity: .4;
+}
+.hero-foto::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(rgba(6, 8, 13, .75) 0%, rgba(6, 8, 13, 0) 20%, rgba(7, 11, 20, 0) 40%, rgba(7, 11, 20, .78) 68%, var(--fondo) 100%);
+}
+.hero.pull .hero-foto img { filter: grayscale(1) contrast(1.1) brightness(1.15); object-position: 70% 50%; }
+.hero.gambe .hero-foto img { filter: grayscale(1) contrast(1.1) brightness(1.2); object-position: 30% 40%; }
+.hero.riposo .hero-foto img { filter: grayscale(1) brightness(.85); object-position: 50% 50%; }
+.hero.riposo .hero-foto::before { opacity: .6; }
+.hero.riposo .hero-foto::after { background: linear-gradient(rgba(6, 8, 13, .7) 0%, rgba(7, 11, 20, .15) 25%, rgba(7, 11, 20, .55) 55%, var(--fondo) 92%); }
+
+.testata {
+  position: absolute; z-index: 2; top: calc(env(safe-area-inset-top) + 14px); left: 20px; right: 16px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.saluto { display: flex; flex-direction: column; gap: 2px; }
+.saluto b { font: 600 15px/20px var(--testo); }
+.saluto span { font: 500 13px/18px var(--testo); color: var(--ardesia); font-variant-numeric: tabular-nums; }
+.profilo { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; }
+.profilo img { width: 38px; height: 38px; box-shadow: 0 0 0 1.5px rgba(242, 244, 248, .35); }
+
+.hero-testo { position: absolute; z-index: 2; left: 20px; right: 20px; bottom: 0; display: flex; flex-direction: column; }
+.sopratitolo { font: 600 12px/16px var(--testo); letter-spacing: .16em; color: var(--voltaico-chiaro); text-transform: uppercase; }
+.titolone { font: 800 124px/.8 var(--display); letter-spacing: -.005em; margin: 10px 0 0; text-transform: uppercase; white-space: nowrap; }
+.muscoli { font: 500 17px/24px var(--testo); margin-top: 14px; }
+.durata-all { font: 500 15px/20px var(--testo); color: var(--ardesia); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.hero-testo .btn-primario { margin-top: 20px; }
+
+.riposo .sopratitolo { color: var(--ardesia); }
+.riposo .titolone { font-weight: 600; font-size: 104px; letter-spacing: .01em; margin-top: 12px; }
+.consiglio { font: 400 16px/23px var(--testo); color: var(--ardesia); margin-top: 16px; max-width: 320px; text-wrap: pretty; }
+.domani {
+  margin-top: 24px; padding: 14px 4px 14px 0; min-height: 64px; width: 100%; text-align: left;
+  border-top: 1px solid rgba(122, 162, 255, .18); display: flex; align-items: center; gap: 12px;
+}
+.domani .cosa { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.domani .quando { font: 600 11px/14px var(--testo); letter-spacing: .14em; color: var(--fumo); text-transform: uppercase; }
+.domani .riga { display: flex; align-items: baseline; gap: 10px; }
+.domani .nome { font: 700 28px/1 var(--display); text-transform: uppercase; }
+.domani .info { font: 500 13px/18px var(--testo); color: var(--ardesia); }
+.domani .vai { font: 600 15px/20px var(--testo); color: var(--voltaico-chiaro); }
+
+/* ---------- SETTIMANA ---------- */
+.blocco { padding: 32px 20px 0; display: flex; flex-direction: column; gap: 12px; }
+.blocco.settimana { padding-top: 28px; gap: 14px; }
+.riposo + .blocco.settimana { padding-top: 24px; }
+.intesta { display: flex; justify-content: space-between; }
+.intesta .num { letter-spacing: 0; font-weight: 500; text-transform: none; }
+.giorni { display: grid; grid-template-columns: repeat(7, 1fr); list-style: none; margin: 0; padding: 0; }
+.giorno { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.giorno .lettera { font: 600 12px/16px var(--testo); color: var(--fumo); }
+.giorno .cerchio {
+  width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
+  font: 500 14px/1 var(--testo); color: var(--ardesia); font-variant-numeric: tabular-nums;
+  border: 1.5px solid var(--linea-2);
+}
+.giorno .tipo { font: 500 11px/14px var(--testo); color: var(--fumo); }
+.giorno.fatto .cerchio { border: 0; background: rgba(37, 99, 255, .18); }
+.giorno.libero .cerchio { border: 1px dashed var(--linea-2); color: var(--fumo); }
+.giorno.oggi .lettera { font-weight: 700; color: var(--gesso); }
+.giorno.oggi .tipo { font-weight: 600; color: var(--gesso); }
+.giorno.oggi .cerchio { border: 0; background: var(--voltaico); color: #fff; font: 700 15px/1 var(--testo); box-shadow: 0 0 0 4px rgba(37, 99, 255, .2); }
+.giorno.oggi.libero .cerchio { background: none; border: 1.5px dashed var(--voltaico-chiaro); color: var(--gesso); box-shadow: 0 0 0 4px rgba(37, 99, 255, .12); }
+
+/* ---------- DAL TUO COACH ---------- */
+.coach-card { padding: 16px 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+.coach-card.card-rilievo { padding: 18px 16px 16px; }
+.chi { display: flex; align-items: center; gap: 10px; }
+.chi img { width: 32px; height: 32px; }
+.chi b { flex: 1; font: 600 15px/20px var(--testo); }
+.chi time { font: 500 13px/18px var(--testo); color: var(--fumo); font-variant-numeric: tabular-nums; }
+.carico { display: flex; flex-direction: column; gap: 2px; }
+.carico .cosa { font: 500 13px/18px var(--testo); color: var(--voltaico-chiaro); }
+.carico .valori { display: flex; align-items: baseline; gap: 10px; font: 700 44px/1 var(--display); font-variant-numeric: tabular-nums; }
+.carico .da { color: var(--fumo); }
+.carico .freccia { font: 500 24px/1 var(--testo); color: var(--fumo); }
+.carico .kg { font: 600 17px/1 var(--testo); color: var(--ardesia); }
+.nota { font: 400 15px/21px var(--testo); color: var(--ardesia); margin: 0; text-wrap: pretty; }
+.titolo-card { font: 700 34px/1 var(--display); text-transform: uppercase; margin: 0; }
+.feedback { display: flex; gap: 14px; }
+.feedback .mini-video { width: 84px; height: 108px; }
+.feedback .dettagli { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.feedback .esercizio { font: 700 26px/1 var(--display); text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.feedback .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.feedback .nota { font-size: 14px; line-height: 20px; }
+
+/* ---------- PROGRESSO (niente card: dato aperto su linea sottile) ---------- */
+.progresso { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding-top: 4px; border-top: 1px solid var(--linea-tenue); }
+.progresso .dato { display: flex; flex-direction: column; gap: 4px; padding-top: 12px; }
+.progresso .nome { font: 500 15px/20px var(--testo); color: var(--ardesia); }
+.progresso .valore { font: 700 48px/1 var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.progresso .delta { font: 600 13px/18px var(--testo); color: var(--voltaico-chiaro); font-variant-numeric: tabular-nums; }
+
+/* ---------- MENU IN BASSO ---------- */
+.menu {
+  position: fixed; z-index: 10; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 430px; height: calc(58px + env(safe-area-inset-bottom)); /* 86 pt su iPhone con l'indicatore home */
+  padding: 8px 0 env(safe-area-inset-bottom);
+  display: grid; grid-template-columns: repeat(4, 1fr); align-items: start;
+  background: rgba(6, 8, 13, .86); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, .06);
+}
+.voce {
+  position: relative; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  font: 500 11px/13px var(--testo); color: var(--fumo); text-decoration: none;
+}
+.voce.attiva { color: var(--voltaico-chiaro); font-weight: 600; }
+.voce.novita::after { content: ''; position: absolute; top: 4px; left: calc(50% + 9px); width: 7px; height: 7px; border-radius: 50%; background: var(--voltaico-chiaro); }
+
+/* Schermi molto stretti (iPhone SE / mini): il titolo grande si riduce */
+@media (max-width: 360px) {
+  .titolone { font-size: 104px; }
+  .riposo .titolone { font-size: 92px; }
+  .progresso .valore { font-size: 40px; }
+  .progresso svg { width: 96px; }
+}

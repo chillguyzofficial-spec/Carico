@@ -1,0 +1,112 @@
+/* Sistema visivo — dalla tavola «Design system» di Claude Design (variante blu).
+   Un solo accento (Voltaico) per azioni, stato attivo e dati. Tre livelli di profondità. */
+:root {
+  --notte-0: #06080D;   /* fondo app */
+  --notte-1: #0E1422;   /* superficie */
+  --notte-2: #171F30;   /* rilievo, campi */
+  --notte-3: #222C42;   /* pulsante secondario */
+  --deriva: #0A1429;    /* fine della sfumatura di fondo */
+  --fondo: #070B14;
+  --linea: #243049;
+  --linea-2: #2E3A55;
+  --linea-tenue: #1B2438;
+
+  --gesso: #F2F4F8;     /* testo primario */
+  --ardesia: #A3ACBD;   /* secondario */
+  --fumo: #7C8698;      /* terziario */
+
+  --voltaico: #2563FF;        /* azioni */
+  --voltaico-chiaro: #7AA2FF; /* dati, attivo */
+  --successo: #3DD68C;
+  --avviso: #F5B544;
+  --errore: #FF6166;
+
+  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --testo: 'Geist', system-ui, -apple-system, sans-serif;
+
+  --r-chip: 8px; --r-riga: 12px; --r-campo: 16px; --r-card: 22px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--notte-0);
+  color: var(--gesso);
+  font-family: var(--testo);
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+img { display: block; max-width: 100%; }
+.num { font-variant-numeric: tabular-nums; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Etichette di sezione: «DAL TUO COACH» */
+.etichetta { font: 600 12px/16px var(--testo); letter-spacing: .12em; color: var(--fumo); text-transform: uppercase; }
+
+/* Pulsanti — primario 58 · secondario 52 · un solo primario per schermata */
+.btn-primario {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  height: 58px; border-radius: var(--r-campo);
+  background: var(--voltaico); color: #fff; font: 600 17px/1 var(--testo);
+  box-shadow: 0 10px 30px rgba(37, 99, 255, .32), inset 0 1px 0 rgba(255, 255, 255, .18);
+  transition: transform .12s, background .12s;
+}
+.btn-primario:active { transform: scale(.98); background: #1D4FD9; }
+.btn-secondario {
+  display: flex; align-items: center; justify-content: center;
+  height: 52px; border-radius: var(--r-campo);
+  background: var(--notte-3); border: 1px solid var(--linea-2); color: var(--gesso);
+  font: 600 16px/1 var(--testo);
+  transition: transform .12s;
+}
+.btn-secondario:active { transform: scale(.98); }
+:focus-visible { outline: 2px solid var(--voltaico-chiaro); outline-offset: 3px; }
+
+/* Card: superficie (informativa) e rilievo (chiede un'azione) */
+.card { background: var(--notte-1); border: 1px solid var(--linea); border-radius: var(--r-card); }
+.card-rilievo {
+  background: var(--notte-2); border-radius: var(--r-card);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 12px 32px rgba(0, 0, 0, .45);
+}
+
+/* Chip di stato (informativi, non toccabili) */
+.chip { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; font: 600 12px/1 var(--testo); white-space: nowrap; }
+.chip-ok { background: rgba(61, 214, 140, .14); color: var(--successo); }
+.chip-avviso { background: rgba(245, 181, 68, .14); color: var(--avviso); }
+.chip-errore { background: rgba(255, 97, 102, .14); color: var(--errore); }
+.chip-info { background: rgba(122, 162, 255, .14); color: var(--voltaico-chiaro); }
+.chip-neutro { border: 1px solid var(--linea-2); color: var(--ardesia); }
+
+/* Avatar */
+.avatar { border-radius: 50%; object-fit: cover; background: var(--notte-2); flex: none; }
+.iniziali { display: grid; place-items: center; border-radius: 50%; background: var(--notte-2); border: 1px solid var(--linea); color: var(--ardesia); font: 600 13px/1 var(--testo); flex: none; }
+
+/* Miniatura video: foto B/N, sfumatura verso Notte 0, durata in cifre tabulari */
+.mini-video { position: relative; overflow: hidden; border-radius: var(--r-riga); flex: none; }
+.mini-video img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
+.mini-video::after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(7, 11, 20, 0) 40%, rgba(7, 11, 20, .85)); }
+.mini-video .play {
+  position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 1;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(6, 8, 13, .6); border: 1px solid rgba(255, 255, 255, .3);
+  display: grid; place-items: center;
+}
+.mini-video .durata { position: absolute; right: 6px; bottom: 6px; z-index: 1; font: 600 11px/1 var(--testo); font-variant-numeric: tabular-nums; }
+
+/* Conferma (toast) — dalla tavola: «Serie 2 salvata · Annulla» */
+.avviso {
+  position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); z-index: 50;
+  display: flex; align-items: center; gap: 12px; min-width: 300px; max-width: calc(100% - 32px);
+  padding: 14px 16px; border-radius: var(--r-campo);
+  background: var(--notte-2); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 12px 32px rgba(0, 0, 0, .5);
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+}
+.avviso.su { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.avviso .spunta { width: 28px; height: 28px; border-radius: 50%; background: rgba(61, 214, 140, .14); display: grid; place-items: center; flex: none; }
+.avviso strong { display: block; font: 600 15px/20px var(--testo); }
+.avviso span { display: block; font: 500 13px/18px var(--testo); color: var(--ardesia); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
