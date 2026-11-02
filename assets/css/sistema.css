@@ -27,6 +27,7 @@
   --r-chip: 8px; --r-riga: 12px; --r-campo: 16px; --r-card: 22px;
 }
 
+[hidden] { display: none !important; }
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {

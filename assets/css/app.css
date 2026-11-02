@@ -133,3 +133,7 @@ body { background: var(--notte-0); }
   .progresso .valore { font-size: 40px; }
   .progresso svg { width: 96px; }
 }
+
+/* Nell'app l'avviso sta in alto: in basso coprirebbe i pulsanti dove sta il pollice */
+.avviso { bottom: auto; top: calc(env(safe-area-inset-top) + 10px); transform: translate(-50%, -20px); }
+.avviso.su { transform: translate(-50%, 0); }

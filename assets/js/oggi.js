@@ -1,28 +1,11 @@
-// Schermata «Oggi» dell'atleta. Lo stato dipende dal giorno della settimana:
+// Schermata «Oggi». Lo stato dipende dal giorno della settimana:
 // allenamento (lun, mar, gio, ven), check-in (domenica, con allenamento), riposo (mer, sab).
-// Per vedere un giorno preciso: index.html?giorno=1 … 7 (1 = lunedì).
 (function () {
-  const D = window.DATI;
-  const GIORNI = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
-  const BREVI = ['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom'];
-  const LETTERE = ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
-  const MESI = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
-
-  const adesso = new Date();
-  const scelto = Number(new URLSearchParams(location.search).get('giorno'));
-  const oggi = scelto >= 1 && scelto <= 7 ? scelto - 1 : (adesso.getDay() + 6) % 7; // 0 = lunedì
-  const lunedi = new Date(adesso);
-  lunedi.setDate(adesso.getDate() - ((adesso.getDay() + 6) % 7) + 0);
-  const data = (i) => { const d = new Date(lunedi); d.setDate(lunedi.getDate() + i); return d; };
-
-  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const kg = (n) => String(n).replace('.', ',');
-
+  const A = window.APP, D = A.D, { esc, kg, oggi, data, GIORNI, BREVI, LETTERE, MESI } = A;
   const chiave = D.settimana[oggi];
-  const all = chiave ? D.allenamenti[chiave] : null;
+  const all = A.allenamentoDi(oggi);
 
-  // ---------- Hero ----------
-  function hero() {
+  function hero(sessione) {
     const testata = `
       <div class="testata">
         <div class="saluto"><b>Ciao ${esc(D.atleta.nome)}</b><span>Settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span></div>
@@ -30,20 +13,23 @@
       </div>`;
 
     if (all) {
-      const tipo = all.breve.toLowerCase();
+      const finito = sessione && sessione.finito;
+      const azione = finito
+        ? `<a class="btn-secondario" href="#allenamento">Completato · rivedi le serie</a>`
+        : `<a class="btn-primario" href="#allenamento">
+            <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><path d="M2 1.5v13l11-6.5z" fill="#fff"/></svg>
+            ${sessione ? 'Riprendi allenamento' : 'Inizia allenamento'}
+          </a>`;
       return `
-      <section class="hero ${tipo}" aria-label="Allenamento di oggi">
+      <section class="hero ${all.breve.toLowerCase()}" aria-label="Allenamento di oggi">
         <div class="hero-foto"><img src="assets/foto/${all.foto}.webp" alt="" fetchpriority="high"></div>
         ${testata}
         <div class="hero-testo">
-          <span class="sopratitolo">Oggi</span>
+          <span class="sopratitolo">${finito ? 'Oggi · fatto' : 'Oggi'}</span>
           <h1 class="titolone">${esc(all.nome)}</h1>
           <span class="muscoli">${esc(all.muscoli)}</span>
           <span class="durata-all">${all.esercizi} esercizi · ~${all.minuti} min</span>
-          <button class="btn-primario" id="inizia">
-            <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><path d="M2 1.5v13l11-6.5z" fill="#fff"/></svg>
-            Inizia allenamento
-          </button>
+          ${azione}
         </div>
       </section>`;
     }
@@ -61,20 +47,19 @@
           <span class="sopratitolo">Oggi · ${GIORNI[oggi]} ${data(oggi).getDate()}</span>
           <h1 class="titolone">Riposo</h1>
           <p class="consiglio">${esc(D.riposo)}</p>
-          <button class="domani">
+          <a class="domani" href="#programma/${D.settimana[(oggi + dopo) % 7]}">
             <span class="cosa">
               <span class="quando">${quando} · ${BREVI[(oggi + dopo) % 7]} ${data(oggi + dopo).getDate()}</span>
               <span class="riga"><span class="nome">${esc(prossimo.nome)}</span><span class="info num">${prossimo.esercizi} esercizi · ~${prossimo.minuti} min</span></span>
             </span>
             <span class="vai">Anteprima</span>
             <svg width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5" fill="none" stroke="#7AA2FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
+          </a>
         </div>
       </section>`;
   }
 
-  // ---------- Settimana ----------
-  function settimana() {
+  function settimana(sessione) {
     const inizio = data(0), fine = data(6);
     const periodo = inizio.getMonth() === fine.getMonth()
       ? `${inizio.getDate()}–${fine.getDate()} ${MESI[fine.getMonth()]}`
@@ -83,16 +68,19 @@
     const giorni = D.settimana.map((k, i) => {
       const cls = ['giorno'];
       if (!k) cls.push('libero');
-      if (i === oggi) cls.push('oggi');
-      const fatto = k && i < oggi;
+      const fatto = k && (i < oggi || (i === oggi && sessione && sessione.finito));
+      if (i === oggi && !fatto) cls.push('oggi');
+      if (i === oggi) cls.push('corrente');
       if (fatto) cls.push('fatto');
       const tipo = k ? D.allenamenti[k].breve : 'Riposo';
-      const stato = i === oggi ? 'oggi' : fatto ? 'fatto' : k ? 'previsto' : 'riposo';
-      return `<li class="${cls.join(' ')}" aria-label="${GIORNI[i]} ${data(i).getDate()}, ${tipo}, ${stato}">
-        <span class="lettera" aria-hidden="true">${LETTERE[i]}</span>
+      const stato = fatto ? 'fatto' : i === oggi ? 'oggi' : k ? 'previsto' : 'riposo';
+      const dentro = `<span class="lettera" aria-hidden="true">${LETTERE[i]}</span>
         <span class="cerchio" aria-hidden="true">${fatto ? spunta : data(i).getDate()}</span>
-        <span class="tipo" aria-hidden="true">${tipo}</span>
-      </li>`;
+        <span class="tipo" aria-hidden="true">${tipo}</span>`;
+      const etichetta = `${GIORNI[i]} ${data(i).getDate()}, ${tipo}, ${stato}`;
+      return `<li class="${cls.join(' ')}">${k
+        ? `<a href="#programma/${k}" aria-label="${etichetta}">${dentro}</a>`
+        : `<span aria-label="${etichetta}">${dentro}</span>`}</li>`;
     }).join('');
     return `
       <section class="blocco settimana" aria-labelledby="t-sett">
@@ -102,22 +90,18 @@
   }
 
   // ---------- Dal tuo coach: una sola cosa, la più importante ----------
-  function feedbackSalvato() {
-    try { return JSON.parse(localStorage.getItem(D.chiaveFeedback) || 'null'); } catch (e) { return null; }
-  }
-
   function quandoFeedback(f) {
     if (f.istante) {
       const t = new Date(f.istante);
       const ora = t.toTimeString().slice(0, 5);
-      return t.toDateString() === adesso.toDateString() ? `oggi ${ora}` : `${BREVI[(t.getDay() + 6) % 7]} ${ora}`;
+      return t.toDateString() === A.adesso.toDateString() ? `oggi ${ora}` : `${BREVI[(t.getDay() + 6) % 7]} ${ora}`;
     }
     return oggi - f.giorno === 1 ? `ieri ${f.ora}` : `${BREVI[f.giorno]} ${f.ora}`;
   }
 
   function cosaDalCoach() {
-    if (oggi === 6) return { tipo: 'checkin' };
-    const nuovo = feedbackSalvato();
+    if (oggi === 6) return { tipo: A.leggi(A.chiaveCheckin) ? 'checkin-fatto' : 'checkin' };
+    const nuovo = A.leggi(D.chiaveFeedback);
     if (nuovo) return { tipo: 'feedback', f: nuovo };
     if (chiave && D.carichi[chiave]) return { tipo: 'carico', c: D.carichi[chiave] };
     if (oggi > D.feedbackPredefinito.giorno) return { tipo: 'feedback', f: D.feedbackPredefinito };
@@ -132,11 +116,20 @@
       corpo = `
         <div class="coach-card card-rilievo">
           ${chi('08:00')}
-          <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="pila-6">
             <h3 class="titolo-card">Check-in settimana ${D.atleta.settimana}</h3>
-            <p class="nota" style="font-weight:500"><span style="color:var(--voltaico-chiaro)">1 minuto</span> · Allenamenti, energia, carichi e note. Lo leggo domattina e sistemo la settimana ${D.atleta.settimana + 1}.</p>
+            <p class="nota" style="font-weight:500"><span class="accento">1 minuto</span> · Allenamenti, energia, carichi e note. Lo leggo domattina e sistemo la settimana ${D.atleta.settimana + 1}.</p>
           </div>
-          <button class="btn-secondario">Fai il check-in</button>
+          <a class="btn-secondario" href="#checkin">Fai il check-in</a>
+        </div>`;
+    } else if (cosa.tipo === 'checkin-fatto') {
+      corpo = `
+        <div class="coach-card card">
+          ${chi('08:00')}
+          <div class="pila-6">
+            <span class="chip chip-ok" style="align-self:flex-start">Check-in inviato</span>
+            <p class="nota">Grazie. Lo leggo domattina e ti sistemo la settimana ${D.atleta.settimana + 1}.</p>
+          </div>
         </div>`;
     } else if (cosa.tipo === 'carico') {
       const c = cosa.c;
@@ -151,23 +144,22 @@
         </div>`;
     } else {
       const f = cosa.f, v = D.video;
-      const tecnicaOk = f.tecnica === 'Tecnica ottima';
       corpo = `
-        <div class="coach-card card">
+        <a class="coach-card card" href="#coach">
           ${chi(quandoFeedback(f))}
           <div class="feedback">
-            <button class="mini-video" aria-label="Rivedi il video: ${v.esercizio} ${v.kg} chili per ${v.reps}">
+            <span class="mini-video">
               <img src="${v.foto}" alt="">
               <span class="play"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M1 1v10l8-5z" fill="#fff"/></svg></span>
               <span class="durata">${v.durata}</span>
-            </button>
+            </span>
             <div class="dettagli">
               <span class="esercizio">${esc(v.esercizio)} ${v.kg} kg × ${v.reps}</span>
-              <span class="chips"><span class="chip ${tecnicaOk ? 'chip-ok' : 'chip-avviso'}">${esc(f.tecnica)}</span><span class="chip chip-neutro">${esc(f.carico)}</span></span>
+              <span class="chips"><span class="chip ${f.tecnica === 'Tecnica ottima' ? 'chip-ok' : 'chip-avviso'}">${esc(f.tecnica)}</span><span class="chip chip-neutro">${esc(f.carico)}</span></span>
               <p class="nota">${esc(f.nota)}</p>
             </div>
           </div>
-        </div>`;
+        </a>`;
     }
     return `
       <section class="blocco" aria-labelledby="t-coach">
@@ -183,7 +175,7 @@
     if (nomeCoach && D.progressi[k].nome.startsWith(nomeCoach)) k = 'panca';
     const p = D.progressi[k];
     const min = Math.min(...p.punti), max = Math.max(...p.punti);
-    const pts = p.punti.map((v, i) => [i * 120 / (p.punti.length - 1), 40 - (v - min) / (max - min || 1) * 34.7 + 0]);
+    const pts = p.punti.map((v, i) => [i * 120 / (p.punti.length - 1), 40 - (v - min) / (max - min || 1) * 34.7]);
     const linea = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
     const [ux, uy] = pts[pts.length - 1];
     return `
@@ -205,23 +197,27 @@
       </section>`;
   }
 
-  const cosa = cosaDalCoach();
-  document.getElementById('oggi').innerHTML = hero() + settimana() + coach(cosa) + progresso(cosa);
   // Il titolone resta su una riga: se il nome è lungo («GAMBE B») si riduce fino a starci
-  const adatta = () => {
-    const t = document.querySelector('.titolone');
+  function adatta() {
+    const t = document.querySelector('[data-vista="oggi"] .titolone');
+    if (!t || !t.offsetParent) return;
     t.style.fontSize = '';
     let size = parseFloat(getComputedStyle(t).fontSize);
     while (t.scrollWidth > t.clientWidth && size > 56) { size -= 2; t.style.fontSize = size + 'px'; }
-  };
-  adatta();
-  document.fonts && document.fonts.ready.then(adatta);
-  window.addEventListener('resize', adatta);
-
-  if (cosa && (cosa.tipo === 'checkin' || (cosa.tipo === 'feedback' && cosa.f.istante))) {
-    document.getElementById('voce-coach').classList.add('novita');
   }
+  window.addEventListener('resize', adatta);
+  document.fonts && document.fonts.ready.then(adatta);
+
+  A.viste.oggi = {
+    render() {
+      const sessione = A.leggi(A.chiaveSessione);
+      const cosa = cosaDalCoach();
+      document.querySelector('[data-vista="oggi"]').innerHTML = hero(sessione) + settimana(sessione) + coach(cosa) + progresso(cosa);
+      document.getElementById('voce-coach').classList.toggle('novita', !!(cosa && (cosa.tipo === 'checkin' || (cosa.tipo === 'feedback' && cosa.f.istante))));
+      adatta();
+    },
+  };
 
   // Se il coach invia un feedback dal gestionale in un'altra scheda, la Home si aggiorna da sola
-  window.addEventListener('storage', (e) => { if (e.key === D.chiaveFeedback) location.reload(); });
+  window.addEventListener('storage', (e) => { if (e.key === D.chiaveFeedback && !location.hash.match(/allenamento|checkin/)) A.viste.oggi.render(); });
 })();

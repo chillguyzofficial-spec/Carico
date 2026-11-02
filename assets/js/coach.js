@@ -32,7 +32,11 @@
 
   // ---------- Coda ----------
   function coda() {
-    const voci = D.coda.filter((v) => !(v.id === V.id && inviato))
+    // Il check-in mandato dall'app di Marco entra in cima alla coda
+    const ci = leggi('pt-checkin-s' + D.atleta.settimana);
+    const extra = ci ? [{ id: 'marco-checkin', nome: 'Marco Rossi', foto: D.atleta.foto, chip: ['neutro', 'Check-in'], quando: 'nuovo',
+      testo: `Check-in settimana ${D.atleta.settimana} · allenamenti ${ci.allenamenti}/5, energia ${ci.energia}/5, carichi ${ci.carichi.toLowerCase()}${ci.note ? ' · «' + ci.note + '»' : ''}` }] : [];
+    const voci = extra.concat(D.coda).filter((v) => !(v.id === V.id && inviato))
       .filter((v) => filtro === 'tutto' || tipoVoce(v) === filtro);
     $('#coda').innerHTML = voci.map((v) => {
       const marco = v.id === V.id;
@@ -230,6 +234,7 @@
   }));
 
   function tutto() { conteggi(); coda(); revisione(); }
+  window.addEventListener('storage', (e) => { if (e.key && e.key.startsWith('pt-checkin')) coda(); });
   tutto();
   tabella();
 })();
