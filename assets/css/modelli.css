@@ -50,3 +50,4 @@
   .profilo-nome .titolo-pagina { font-size: 64px; }
   .nome-prog { font-size: 30px; }
 }
+.indietro-profilo { position: absolute; z-index: 2; top: calc(env(safe-area-inset-top) + 10px); left: 10px; border-radius: 50%; background: rgba(0, 0, 0, .45); }

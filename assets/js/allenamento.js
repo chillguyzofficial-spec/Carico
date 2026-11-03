@@ -251,7 +251,7 @@
   // ---------- Disegno e azioni ----------
   function disegna() {
     const v = vista();
-    if (!all) { v.innerHTML = `<div class="corpo-es fine"><h1 class="nome-es">Riposo</h1><p class="nota-tua">Oggi niente allenamento.</p><div class="in-fondo"><a class="btn-secondario" href="#programma">Vedi il programma</a></div></div>`; return; }
+    if (!all) { v.innerHTML = `<header class="barra-top"><a class="icona-44" href="#oggi" aria-label="Chiudi"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A8A8A3" stroke-width="1.8" stroke-linecap="round"/></svg></a></header><div class="corpo-es fine"><h1 class="nome-es">Riposo</h1><p class="nota-tua">Oggi niente allenamento.</p><div class="in-fondo"><a class="btn-secondario" href="#programma">Vedi il programma</a></div></div>`; return; }
     v.innerHTML = S.finito ? schermoTotale() : scheda() + schermoFoglio();
     v.classList.toggle('con-foglio', !!foglio);
     if (foglio) { const f = v.querySelector('.foglio button, .foglio a'); f && f.focus({ preventScroll: true }); }

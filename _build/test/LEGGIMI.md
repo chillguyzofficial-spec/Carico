@@ -4,6 +4,7 @@ Si lanciano dalla cartella del progetto passando una cartella dove salvare gli s
 
     node _build/test/allenamento.js <cartella>   # scheda sul modello di Francesco: tabella, numeri scritti, serie/esercizi aggiunti, sostituzione, riepilogo (45)
     node _build/test/collegamento.js <cartella>  # app ↔ gestionale: allenamenti al coach, programma del coach all’app; Prima, PR, fatica, nota (25)
+    node _build/test/navigazione.js              # da ogni schermata si esce; il Profilo torna da dove vieni (16)
     node _build/test/novita.js <cartella>        # primo avvio, progressi, traguardi, profilo (31)
     node _build/test/coach-app.js <cartella>     # feedback dal gestionale alla Home (20)
     node _build/test/titoli.js                   # titoli su una riga, 4 larghezze x 7 giorni (28)

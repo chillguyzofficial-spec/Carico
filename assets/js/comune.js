@@ -68,13 +68,20 @@
   }
   // Il coach ha cambiato il programma dal gestionale (in un'altra scheda): si ridisegna la schermata aperta
   window.ARCHIVIO.ascolta(window.ARCHIVIO.CHIAVE_PROGRAMMA, () => { window.ARCHIVIO.applicaProgramma(D); mostra(); });
-  window.addEventListener('hashchange', mostra);
+  // Da dove si arriva: la freccia «indietro» delle schermate senza voce nel menu (Profilo) riporta lì
+  let provenienza = '#oggi';
+  window.addEventListener('hashchange', (e) => {
+    const da = new URL(e.oldURL).hash || '#oggi';
+    if (da !== location.hash && !/^#(profilo|benvenuto)/.test(da)) provenienza = da;
+    mostra();
+  });
   document.addEventListener('DOMContentLoaded', mostra);
 
   window.APP = {
     D, GIORNI, BREVI, LETTERE, MESI, adesso, oggi, lunedi, data, iso,
     esc, kg, mmss, leggi, scrivi, avviso, viste, chiaveSessione, chiaveCheckin, mostra,
     vai: (h) => { if (location.hash === h) mostra(); else location.hash = h; },
+    provenienza: () => provenienza,
     allenamentoDi: (i) => D.settimana[i] ? D.allenamenti[D.settimana[i]] : null,
     // «Adesso» nel giorno mostrato (con ?giorno= resta coerente con il resto della settimana)
     istante: () => { const d = data(oggi), n = new Date(); d.setHours(n.getHours(), n.getMinutes(), n.getSeconds()); return d.getTime(); },
