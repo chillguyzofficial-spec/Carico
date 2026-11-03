@@ -1,0 +1,60 @@
+/* Serie in corso, versione semplice (richiesta di Francesco 2026-11-03: «non si capisce molto»).
+   Una decisione per schermata: quanti kg, quante ripetizioni, «Serie fatta». */
+.corpo-es.semplice { gap: 18px; padding-top: 14px; }
+.testa-es { display: flex; flex-direction: column; gap: 6px; }
+.semplice .nome-es { font-size: 60px; line-height: .86; }
+.semplice .nome-es.lungo { font-size: 48px; }
+.obiettivo { margin: 0; font: 500 16px/22px var(--testo); color: var(--ardesia); }
+
+/* La serie di adesso */
+.serie-ora { padding: 18px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+.quale { font: 700 15px/20px var(--testo); color: var(--voltaico-chiaro); text-transform: uppercase; letter-spacing: .1em; }
+.quale span { color: var(--fumo); font-weight: 600; }
+.regolatore { display: grid; grid-template-columns: 64px 1fr 64px; align-items: center; gap: 8px; padding: 6px 0; }
+.regolatore + .regolatore { border-top: 1px solid var(--linea); }
+.tondo {
+  width: 64px; height: 64px; border-radius: 50%; background: var(--notte-3); border: 1px solid var(--linea-2);
+  font: 500 32px/1 var(--testo); color: var(--gesso); display: grid; place-items: center; transition: transform .1s, background .1s;
+}
+.tondo:active { transform: scale(.94); background: var(--linea-2); }
+.numero { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+.numero b { font: 800 72px/1 var(--display); color: var(--gesso); }
+.numero small { font: 600 17px/1 var(--testo); color: var(--ardesia); }
+.volta-scorsa { margin: 4px 0 0; text-align: center; font: 500 14px/20px var(--testo); color: var(--fumo); }
+
+.serie-fatta { height: 64px; font-size: 19px; }
+
+/* Pallini delle serie */
+.pallini { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; gap: 10px; }
+.pallino {
+  width: 60px; min-height: 60px; border-radius: 16px; border: 1.5px solid var(--linea-2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 2px;
+}
+.pallino b { font: 700 20px/1 var(--display); color: var(--fumo); }
+.pallino small { font: 600 11px/14px var(--testo); color: var(--fumo); min-height: 14px; }
+.pallino.adesso { border-color: var(--voltaico-chiaro); box-shadow: 0 0 0 3px rgba(37, 99, 255, .18); }
+.pallino.adesso b, .pallino.adesso small { color: var(--gesso); }
+.pallino.fatto { border-color: transparent; background: rgba(61, 214, 140, .12); }
+.pallino.fatto small { color: var(--successo); }
+.pallino.fatto svg { animation: scatto .32s cubic-bezier(.3, 1.6, .5, 1) both; }
+
+/* Consigli: nota del coach e video, in fondo e piccoli */
+.avviso-video { margin: 0; padding: 12px 14px; border-radius: 14px; background: rgba(122, 162, 255, .1); border: 1px solid rgba(122, 162, 255, .25); font: 500 14px/20px var(--testo); color: var(--voltaico-chiaro); }
+.consigli { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px solid var(--linea-tenue); }
+.consigli .nota-coach { margin: 0; padding: 8px 0; align-items: flex-start; font-size: 15px; line-height: 21px; color: var(--ardesia); }
+.consigli .nota-coach img { margin-top: -1px; }
+.consigli .da-chi { color: var(--gesso); font-weight: 600; }
+.demo-riga { display: flex; align-items: center; gap: 12px; min-height: 52px; font: 600 15px/1 var(--testo); color: var(--voltaico-chiaro); text-align: left; }
+.demo-riga .mini { position: relative; width: 56px; height: 36px; border-radius: 8px; overflow: hidden; flex: none; display: grid; place-items: center; }
+.demo-riga .mini img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.6); }
+.demo-riga .mini svg { position: relative; }
+.demo-riga .tenue { margin-left: auto; font-weight: 500; }
+
+@media (max-width: 360px) {
+  .semplice .nome-es { font-size: 48px; }
+  .semplice .nome-es.lungo { font-size: 40px; }
+  .regolatore { grid-template-columns: 56px 1fr 56px; }
+  .tondo { width: 56px; height: 56px; }
+  .numero b { font-size: 60px; }
+  .pallino { width: 52px; }
+}

@@ -12,9 +12,9 @@
   function storico(k) {
     const p = D.progressi[k], punti = p.punti.slice();
     const prima = [];
-    for (let s = 20; s >= 1; s--) {
-      const v = p.punti[0] * (1 - s * 0.006) - (s % 3 === 0 ? 2.5 : 0);
-      prima.push(Math.round(v / 2.5) * 2.5);
+    for (let s = 20; s >= 1; s--) { // blocco precedente: crescita lenta e regolare, con qualche settimana ferma
+      const v = p.punti[0] * (1 - s * 0.007);
+      prima.push(Math.floor(v / 2.5) * 2.5);
     }
     const tutto = prima.concat(punti);
     // un record fatto oggi in allenamento aggiorna l'ultimo punto
@@ -59,19 +59,63 @@
     const griglia = tacche.map((v) => `<g><line x1="0" x2="${W}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="#1B2438"/><text x="${W}" y="${(Y(v) - 4).toFixed(1)}" text-anchor="end">${kg(Math.round(v))}</text></g>`).join('');
     const ux = X(n - 1), uy = Y(reale[n - 1]);
     const etichette = `<text x="${px}" y="${H - 6}">${n >= tutto.length ? 'inizio' : n + ' sett. fa'}</text><text x="${ux.toFixed(1)}" y="${H - 6}" text-anchor="middle" fill="#7AA2FF">oggi</text><text x="${W - px}" y="${H - 6}" text-anchor="end">sett. ${D.atleta.settimane}</text>`;
+    // punti per la lettura col dito: x in %, etichetta della settimana, valore
+    const lettura = reale.map((v, i) => {
+      const sett = i - settimana1 + 1; // 1…6 nel blocco attuale, ≤0 nel blocco prima
+      return { x: X(i) / W * 100, y: Y(v) / H * 100, t: sett >= 1 ? `Settimana ${sett}` : `${n - 1 - i} sett. fa`, v: `${kg(v)} kg` };
+    });
     return `
-      <svg class="storico" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(NOME_ES[k])}: da ${kg(reale[0])} a ${kg(reale[n - 1])} chili; obiettivo del coach ${kg(ob)}">
-        <defs><linearGradient id="area-st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563FF" stop-opacity=".3"/><stop offset="1" stop-color="#2563FF" stop-opacity="0"/></linearGradient></defs>
-        ${griglia}
-        <line x1="0" x2="${W}" y1="${Y(ob).toFixed(1)}" y2="${Y(ob).toFixed(1)}" stroke="#7AA2FF" stroke-opacity=".35" stroke-dasharray="2 4"/>
-        <text x="0" y="${(Y(ob) - 5).toFixed(1)}" fill="#7AA2FF">Obiettivo ${kg(ob)} kg</text>
-        ${piano.length > 1 ? `<polyline points="${piano.join(' ')}" fill="none" stroke="#A3ACBD" stroke-width="1.5" stroke-dasharray="5 5" stroke-linecap="round"/>` : ''}
-        <path d="M${linea.replace(/ /g, 'L')}V${H - bot}H${px}Z" fill="url(#area-st)"/>
-        <polyline points="${linea}" fill="none" stroke="#7AA2FF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="5" fill="#070B14" stroke="#7AA2FF" stroke-width="2.5"/>
-        ${etichette}
-      </svg>
-      <div class="legenda-st"><span><i class="l-reale"></i>Reale</span><span><i class="l-piano"></i>Piano di ${esc(D.coach.breve)}</span></div>`;
+      <div class="storico-box" data-punti='${JSON.stringify(lettura)}'>
+        <svg class="storico" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(NOME_ES[k])}: da ${kg(reale[0])} a ${kg(reale[n - 1])} chili; obiettivo del coach ${kg(ob)}">
+          <defs>
+            <linearGradient id="area-st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563FF" stop-opacity=".45"/><stop offset="1" stop-color="#2563FF" stop-opacity="0"/></linearGradient>
+            <linearGradient id="linea-st" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2563FF" stop-opacity=".4"/><stop offset="1" stop-color="#9DBBFF"/></linearGradient>
+          </defs>
+          ${griglia}
+          <line x1="0" x2="${W}" y1="${Y(ob).toFixed(1)}" y2="${Y(ob).toFixed(1)}" stroke="#7AA2FF" stroke-opacity=".35" stroke-dasharray="2 4"/>
+          <text x="0" y="${(Y(ob) - 5).toFixed(1)}" fill="#7AA2FF">Obiettivo ${kg(ob)} kg</text>
+          <line x1="${ux.toFixed(1)}" x2="${ux.toFixed(1)}" y1="${top}" y2="${H - bot}" stroke="#7AA2FF" stroke-opacity=".25"/>
+          ${piano.length > 1 ? `<polyline points="${piano.join(' ')}" fill="none" stroke="#A3ACBD" stroke-width="1.5" stroke-dasharray="5 5" stroke-linecap="round"/>` : ''}
+          <path d="M${linea.replace(/ /g, 'L')}V${H - bot}H${px}Z" fill="url(#area-st)"/>
+          <polyline class="linea-viva" points="${linea}" fill="none" stroke="url(#linea-st)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="9" fill="#2563FF" opacity=".25" class="pulsa"/>
+          <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="5" fill="#070B14" stroke="#9DBBFF" stroke-width="2.5"/>
+          ${etichette}
+        </svg>
+        <span class="cursore" hidden><i class="riga"></i><i class="punto"></i><span class="fumetto"><b></b><small></small></span></span>
+      </div>
+      <div class="legenda-st"><span><i class="l-reale"></i>Reale</span><span><i class="l-piano"></i>Piano di ${esc(D.coach.breve)}</span><span class="tenue">Tocca il grafico per leggere i valori</span></div>`;
+  }
+
+  // Previsione: ritmo delle ultime 6 settimane → quando arriva all'obiettivo del coach
+  function previsione(k) {
+    const pt = storico(k).slice(-D.progressi[k].punti.length), ob = OBIETTIVO[k];
+    const n = pt.length, mx = (n - 1) / 2, my = pt.reduce((a, b) => a + b, 0) / n;
+    let num = 0, den = 0;
+    pt.forEach((v, i) => { num += (i - mx) * (v - my); den += (i - mx) * (i - mx); });
+    const passo = num / den; // kg a settimana
+    const ora = pt[n - 1];
+    if (ora >= ob) return { testo: 'Obiettivo raggiunto', sotto: `Hai superato i ${kg(ob)} kg del piano`, bene: true, passo };
+    if (passo <= 0) return { testo: 'Ritmo fermo', sotto: `Parlane con ${D.coach.breve}: servono ${kg(ob - ora)} kg`, bene: false, passo };
+    const sett = D.atleta.settimana + Math.ceil((ob - ora) / passo);
+    return { testo: `${kg(ob)} kg in settimana ${sett}`, sotto: sett <= D.atleta.settimane ? `Al ritmo di +${kg(Math.round(passo * 10) / 10)} kg a settimana: dentro il piano` : `Al ritmo attuale: ${sett - D.atleta.settimane} settimane oltre il piano`, bene: sett <= D.atleta.settimane, passo };
+  }
+
+  // Lettura col dito: il cursore segue il punto più vicino
+  function attivaLettura(box) {
+    const punti = JSON.parse(box.dataset.punti), c = box.querySelector('.cursore');
+    const muovi = (ev) => {
+      const r = box.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * 100;
+      const p = punti.reduce((m, q) => (Math.abs(q.x - x) < Math.abs(m.x - x) ? q : m));
+      c.hidden = false;
+      c.style.setProperty('--x', p.x + '%'); c.style.setProperty('--y', p.y + '%');
+      c.querySelector('b').textContent = p.v; c.querySelector('small').textContent = p.t;
+      c.classList.toggle('a-destra', p.x > 70);
+    };
+    box.addEventListener('pointerdown', (ev) => { box.setPointerCapture(ev.pointerId); muovi(ev); });
+    box.addEventListener('pointermove', (ev) => { if (ev.pointerType === 'mouse' || box.hasPointerCapture(ev.pointerId)) muovi(ev); });
+    box.addEventListener('pointerleave', () => { c.hidden = true; });
+    box.addEventListener('pointerup', (ev) => { if (ev.pointerType !== 'mouse') setTimeout(() => { c.hidden = true; }, 1500); });
   }
 
   // ---------- Dati generali ----------
@@ -100,7 +144,10 @@
     const delta = Math.round((attuale - s1) / s1 * 100);
     const r = riepilogo();
     const disponibili = settimaneTotali();
-    const chip = ESERCIZI.map((k) => `<button class="chip-scelta" data-es="${k}" aria-pressed="${k === scelto}">${esc(NOME_ES[k].split(' ')[0] === 'Stacco' ? 'Stacco' : NOME_ES[k].split(' con')[0])}</button>`).join('');
+    const BREVE = { panca: 'Panca', squat: 'Squat', stacco: 'Stacco', rematore: 'Rematore' };
+    const chip = ESERCIZI.map((k) => `<button class="seg-es" data-es="${k}" aria-pressed="${k === scelto}">${BREVE[k]}</button>`).join('');
+    const massimale = Math.round(attuale * (1 + p.reps / 30)); // formula di Epley
+    const pv = previsione(scelto);
     const intervalli = INTERVALLI.map(([n, w]) => `<button class="intervallo" data-int="${n}" aria-pressed="${n === intervallo}"${w !== 999 && w > disponibili ? ' disabled title="Non ci sono ancora abbastanza settimane"' : ''}>${n}</button>`).join('');
     const tr = traguardi().map((t) => `
       <li><a class="riga-traguardo${t.fatto ? '' : ' futuro'}" href="#traguardo/${t.id}">
@@ -114,13 +161,25 @@
         <span class="sopratitolo">Settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span>
         <h1 class="titolo-pagina">Progressi</h1>
       </header>
-      <div class="chips-scelta" role="group" aria-label="Esercizio">${chip}</div>
+      <div class="seg-esercizi" role="group" aria-label="Esercizio">${chip}</div>
       <section class="blocco pr" aria-live="polite">
-        <span class="etichetta">Record personale · ${esc(NOME_ES[scelto])}</span>
-        <span class="pr-valore num">${kg(attuale)} kg × ${p.reps}</span>
-        <span class="pr-delta num">+${delta}% dalla settimana 1 · ${kg(s1)} → ${kg(attuale)} kg</span>
+        <div class="kpi">
+          <div class="kpi-grande">
+            <span class="etichetta">Massimale stimato</span>
+            <span class="pr-valore num">${massimale}<small>kg</small></span>
+            <span class="pr-delta num">▲ ${delta}% dalla settimana 1</span>
+          </div>
+          <div class="kpi-lato num">
+            <span><small>Record</small><b>${kg(attuale)} × ${p.reps}</b></span>
+            <span><small>Settimana 1</small><b>${kg(s1)} × ${p.reps}</b></span>
+          </div>
+        </div>
         ${grafico(scelto)}
         <div class="intervalli" role="group" aria-label="Periodo">${intervalli}</div>
+        <div class="previsione ${pv.bene ? 'bene' : 'attenzione'}">
+          <span class="icona-prev" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 7-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 6h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="testi"><small>Previsione</small><b class="num">${esc(pv.testo)}</b><span class="num">${esc(pv.sotto)}</span></span>
+        </div>
       </section>
       <section class="blocco" aria-labelledby="t-blocco">
         <h2 id="t-blocco" class="etichetta" style="margin:0">Questo blocco</h2>
@@ -134,6 +193,7 @@
         <h2 id="t-trag" class="etichetta" style="margin:0">Traguardi</h2>
         <ul class="lista-traguardi">${tr}</ul>
       </section>`;
+    attivaLettura(document.querySelector('[data-vista="progressi"] .storico-box'));
   }
 
   // ---------- Card del traguardo (schermo + immagine) ----------

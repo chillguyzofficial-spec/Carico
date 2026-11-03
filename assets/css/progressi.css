@@ -1,0 +1,51 @@
+/* Progressi più tecnologica (richiesta di Francesco 2026-11-03) + riquadro «Dopo il recupero». */
+.prossima .chi-esercizio { font: 600 15px/20px var(--testo); color: var(--gesso); }
+.prossima .cosa small { font: 600 15px/1 var(--testo); color: var(--ardesia); text-transform: none; }
+
+/* Esercizi: una riga a segmenti */
+.seg-esercizi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin: 20px 20px 0; padding: 4px; border-radius: 16px; background: var(--notte-1); border: 1px solid var(--linea); }
+.seg-es { height: 44px; border-radius: 12px; font: 600 14px/1 var(--testo); color: var(--ardesia); }
+.seg-es[aria-pressed="true"] { background: var(--gesso); color: var(--notte-0); }
+
+/* Numeri principali */
+.kpi { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: end; }
+.kpi-grande { display: flex; flex-direction: column; gap: 4px; }
+.kpi .pr-valore { font-size: 88px; line-height: .85; }
+.kpi .pr-valore small { font: 600 20px/1 var(--testo); color: var(--ardesia); margin-left: 6px; }
+.kpi .pr-delta { color: var(--successo); }
+.kpi-lato { display: flex; flex-direction: column; gap: 10px; padding-left: 14px; border-left: 1px solid var(--linea); }
+.kpi-lato span { display: flex; flex-direction: column; gap: 2px; }
+.kpi-lato small { font: 600 11px/14px var(--testo); letter-spacing: .12em; text-transform: uppercase; color: var(--fumo); }
+.kpi-lato b { font: 700 24px/1 var(--display); }
+
+/* Grafico: linea luminosa, punto di oggi che pulsa, lettura col dito */
+.storico-box { position: relative; margin-top: 18px; touch-action: pan-y; cursor: crosshair; padding: 10px 0 0; border-radius: 18px; background: radial-gradient(120% 90% at 80% 0%, rgba(37, 99, 255, .1), transparent 60%); }
+.storico-box .storico { margin-top: 0; }
+.linea-viva { filter: drop-shadow(0 0 6px rgba(37, 99, 255, .7)); }
+.pulsa { transform-box: fill-box; transform-origin: center; animation: pulsa 2s ease-out infinite; }
+@keyframes pulsa { 0% { transform: scale(.6); opacity: .5; } 100% { transform: scale(2.2); opacity: 0; } }
+.cursore { position: absolute; inset: 10px 0 0; pointer-events: none; }
+.cursore .riga { position: absolute; left: var(--x); top: 0; bottom: 14%; width: 1px; background: rgba(157, 187, 255, .55); }
+.cursore .punto { position: absolute; left: var(--x); top: var(--y); width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: #9DBBFF; box-shadow: 0 0 0 4px rgba(37, 99, 255, .35); }
+.cursore .fumetto { position: absolute; left: var(--x); top: 0; transform: translateX(8px); padding: 6px 10px; border-radius: 10px; background: var(--notte-2); border: 1px solid var(--linea-2); display: flex; flex-direction: column; white-space: nowrap; }
+.cursore.a-destra .fumetto { transform: translateX(calc(-100% - 8px)); }
+.cursore .fumetto b { font: 700 18px/1.1 var(--display); }
+.cursore .fumetto small { font: 500 11px/14px var(--testo); color: var(--fumo); }
+.legenda-st { flex-wrap: wrap; row-gap: 4px; }
+.legenda-st .tenue { margin-left: auto; }
+
+/* Previsione */
+.previsione { display: flex; align-items: center; gap: 14px; margin-top: 14px; padding: 14px 16px; border-radius: 18px; background: var(--notte-1); border: 1px solid var(--linea); }
+.previsione .icona-prev { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex: none; }
+.previsione.bene .icona-prev { background: rgba(61, 214, 140, .14); color: var(--successo); }
+.previsione.attenzione .icona-prev { background: rgba(245, 181, 68, .14); color: var(--avviso); }
+.previsione .testi { display: flex; flex-direction: column; gap: 2px; }
+.previsione small { font: 600 11px/14px var(--testo); letter-spacing: .12em; text-transform: uppercase; color: var(--fumo); }
+.previsione b { font: 700 24px/1 var(--display); text-transform: uppercase; }
+.previsione .testi > span { font: 500 13px/18px var(--testo); color: var(--ardesia); }
+
+@media (prefers-reduced-motion: reduce) { .pulsa { animation: none; opacity: 0; } }
+@media (max-width: 360px) {
+  .kpi .pr-valore { font-size: 70px; }
+  .seg-es { font-size: 13px; }
+}

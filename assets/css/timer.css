@@ -1,0 +1,20 @@
+/* Timer: avvio dell'allenamento (riepilogo, riscaldamento, 3-2-1) e recupero regolabile. */
+.lista-pronto { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.lista-pronto li { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--linea-tenue); }
+.lista-pronto .n { width: 22px; font: 700 22px/1 var(--display); color: var(--fumo); }
+.lista-pronto .cosa { display: flex; flex-direction: column; gap: 2px; }
+.lista-pronto b { font: 600 16px/21px var(--testo); }
+.lista-pronto .cosa span { font: 500 14px/19px var(--testo); color: var(--ardesia); }
+
+/* 3-2-1 */
+.via { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; padding: 24px; }
+.cifra-via { font: 800 260px/.8 var(--display); color: var(--gesso); animation: battito 1s ease-out infinite; }
+@keyframes battito { 0% { transform: scale(1.12); opacity: .4; } 25% { transform: scale(1); opacity: 1; } }
+.via .primo { font: 500 16px/22px var(--testo); color: var(--ardesia); }
+
+.consiglio-risc { margin: 0; font: 500 16px/23px var(--testo); color: var(--ardesia); max-width: 330px; }
+
+/* Recupero: −15 · +15 · Salta */
+.tre-tasti { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 10px; margin-top: 8px; }
+.tasto-56.salta { background: var(--gesso); color: var(--notte-0); border-color: var(--gesso); }
+.nota-rec { margin: 0; font: 500 13px/18px var(--testo); color: var(--fumo); }
