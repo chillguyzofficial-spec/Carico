@@ -1,4 +1,4 @@
-/* Allenamento come scheda unica: esercizi in colonna, serie come riquadri da toccare, capsula del recupero. */
+/* Allenamento come scheda unica: esercizi in colonna, serie come riquadri da toccare. */
 .avanza { height: 3px; margin: 6px 20px 0; border-radius: 2px; background: var(--linea-tenue); overflow: hidden; }
 .avanza i { display: block; height: 100%; background: var(--voltaico-chiaro); transition: width .3s; }
 .corpo-scheda { padding: 14px 16px calc(120px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; }
@@ -36,23 +36,6 @@
 .nota-es .da-chi { color: var(--gesso); font-weight: 600; }
 #concludi { margin-top: 6px; }
 
-/* Capsula del recupero */
-.capsula {
-  position: fixed; z-index: 15; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 12px);
-  width: calc(100% - 24px); max-width: 406px; display: flex; align-items: center; gap: 6px; padding: 8px 8px 8px 18px; overflow: hidden;
-  border-radius: 24px; background: rgba(23, 31, 48, .9); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(122, 162, 255, .35); box-shadow: 0 14px 36px rgba(0, 0, 0, .55), 0 0 24px rgba(37, 99, 255, .25);
-  animation: sale .22s ease-out;
-}
-.capsula .testo { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.capsula small { font: 600 11px/14px var(--testo); letter-spacing: .1em; text-transform: uppercase; color: var(--voltaico-chiaro); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.capsula b { font: 800 40px/1 var(--display); }
-.tasto-cap { width: 52px; height: 52px; border-radius: 16px; background: var(--notte-3); font: 600 15px/1 var(--testo); display: grid; place-items: center; flex: none; }
-.tasto-cap.chiudi { background: rgba(255, 255, 255, .08); }
-.traccia-cap { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .06); }
-.traccia-cap i { display: block; height: 100%; width: 100%; background: var(--voltaico-chiaro); transition: width .25s linear; }
-@keyframes sale { from { transform: translate(-50%, 30px); opacity: 0; } }
-
 /* Foglio di modifica della serie */
 .foglio .regolatore { padding: 4px 0; }
 .foglio .btn-primario { margin-top: 10px; }
@@ -62,3 +45,29 @@
   .riquadro .v b { font-size: 20px; }
   .titoli-es h2 { font-size: 24px; }
 }
+
+/* Libertà dell'atleta: serie in più, esercizi aggiunti, peso scritto a mano */
+.riquadro.piu { border-style: dashed; background: transparent; align-items: center; opacity: 1; }
+.riquadro.piu .v { font: 600 15px/1 var(--testo); color: var(--ardesia); }
+.tuo { color: var(--voltaico-chiaro); font-weight: 600; }
+.carta-es.mia { border-style: dashed; }
+.aggiungi-es {
+  min-height: 72px; border-radius: 22px; border: 1.5px dashed var(--linea-2); padding: 12px 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center;
+}
+.aggiungi-es b { font: 600 16px/21px var(--testo); color: var(--gesso); }
+.aggiungi-es span { font: 500 13px/18px var(--testo); color: var(--fumo); }
+.aggiungi-es:active { transform: scale(.98); }
+.scrivi-numero {
+  width: 4.6ch; min-width: 0; padding: 0; border: 0; border-bottom: 2px dashed var(--linea-2); border-radius: 0; background: none; outline: 0;
+  font: 800 72px/1 var(--display); color: var(--gesso); text-align: center;
+}
+.scrivi-numero:focus { border-bottom-color: var(--voltaico); }
+.quando-foglio { padding: 2px 4px; font: 600 11px/14px var(--testo); letter-spacing: .1em; text-transform: uppercase; color: var(--fumo); }
+.lista-cerca { max-height: 38vh; overflow-y: auto; display: flex; flex-direction: column; margin: 6px -4px 0; }
+.voce-scelta { min-height: 48px; padding: 0 12px; border-radius: 12px; text-align: left; font: 500 16px/1.2 var(--testo); color: var(--gesso); flex: none; }
+.voce-scelta:active { background: var(--notte-3); }
+.voce-scelta.nuova { color: var(--voltaico-chiaro); font-weight: 600; }
+.chiudi-foglio.tenue { color: var(--ardesia); height: 44px; margin-top: 0; }
+@media (max-width: 360px) { .scrivi-numero { font-size: 60px; } }
+.scrivi-numero[data-scrivi="reps"] { width: 2.4ch; }

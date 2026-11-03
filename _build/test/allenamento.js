@@ -11,7 +11,7 @@ const out = process.argv[2];
   await p.goto(U + '?giorno=4'); await p.waitForTimeout(600);
   await p.click('[data-vista="oggi"] .btn-primario'); await p.waitForTimeout(500);
   v(await p.$$eval('.carta-es', a => a.length) === 6, '6 esercizi sulla scheda');
-  v(await p.$$eval('.riquadro', a => a.length) === 19, '19 serie (4+3+3+3+3+3)');
+  v(await p.$$eval(".riquadro:not(.piu)", a => a.length) === 19, '19 serie (4+3+3+3+3+3)');
   v(await p.isVisible('#tutto'), 'Fatto tutto come previsto');
   v(await p.isDisabled('#concludi'), 'Concludi disattivo all\u2019inizio');
   await p.screenshot({ path: out + '/k-inizio.png' }); await largo('inizio');
