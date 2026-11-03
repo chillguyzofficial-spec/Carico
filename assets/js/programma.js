@@ -36,7 +36,7 @@
         <section class="blocco" aria-labelledby="t-giorno">
           <div class="intesta"><h2 id="t-giorno" class="titolo-sezione">${esc(a.nome)}</h2><span class="etichetta num" style="letter-spacing:0">${a.esercizi} esercizi · ~${a.minuti} min</span></div>
           <ol class="lista-es">${esercizi}</ol>
-          ${oggiQuesto && !(sessione && sessione.finito) ? `<a class="btn-primario" href="#allenamento">${sessione ? 'Riprendi allenamento' : 'Inizia allenamento'}</a>` : ''}
+          ${oggiQuesto && !(sessione && sessione.finito) ? `<a class="btn-primario btn-scheda" href="#allenamento">${sessione ? 'Riprendi la scheda' : 'Apri scheda'} <svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><path d="M1 7h19M14 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : ''}
         </section>`;
     },
   };

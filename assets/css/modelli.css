@@ -51,3 +51,34 @@
   .nome-prog { font-size: 30px; }
 }
 .indietro-profilo { position: absolute; z-index: 2; top: calc(env(safe-area-inset-top) + 10px); left: 10px; border-radius: 50%; background: rgba(0, 0, 0, .45); }
+
+/* ---------- Grafica unificata sui modelli (2026-11-03, «in generale possiamo migliorare la grafica?») ---------- */
+/* Menu: barra piena in basso come nei modelli (non più capsula fluttuante), voce attiva in lime */
+.menu {
+  bottom: 0; width: 100%; max-width: 430px; height: calc(66px + env(safe-area-inset-bottom)); padding: 6px 6px env(safe-area-inset-bottom);
+  border-radius: 0; align-items: start; background: rgba(0, 0, 0, .94); border: 0; border-top: 1px solid rgba(255, 255, 255, .1); box-shadow: none;
+}
+.voce { height: 54px; border-radius: 0; font: 600 12px/14px var(--testo); color: var(--fumo); gap: 5px; }
+.voce.attiva { background: none; color: var(--voltaico); }
+.voce.attiva::before { content: ''; position: absolute; top: -7px; left: 30%; right: 30%; height: 2px; border-radius: 0 0 2px 2px; background: var(--voltaico); }
+.schermo { padding-bottom: calc(66px + 32px + env(safe-area-inset-bottom)); }
+
+/* Programma: righe divise da linee, giorno in grande, niente card */
+.settimana-prog { margin: 22px 20px 0; padding: 0; background: none; border: 0; border-top: 1px solid rgba(255, 255, 255, .12); border-radius: 0; }
+.giorno-prog { min-height: 76px; padding: 12px 0; border-radius: 0; gap: 16px; border-bottom: 1px solid rgba(255, 255, 255, .12); }
+.settimana-prog li + li .giorno-prog { box-shadow: none; }
+.giorno-prog.scelto { background: none; box-shadow: inset 3px 0 0 var(--voltaico) !important; padding-left: 12px; }
+.giorno-prog .quando { width: 40px; padding-right: 14px; box-sizing: content-box; border-right: 1px solid rgba(255, 255, 255, .2); }
+.giorno-prog .quando span { font-size: 30px; }
+.giorno-prog .cosa b { font: 800 24px/1 var(--display); text-transform: uppercase; }
+.giorno-prog.riposo .cosa b { font: 700 20px/1 var(--display); color: var(--fumo); }
+.lista-es { border-top: 1px solid rgba(255, 255, 255, .12); }
+.lista-es .riga-es { border-bottom: 1px solid rgba(255, 255, 255, .08); padding: 16px 0; }
+.lista-es .riga-es .n { width: 34px; font: 800 26px/1 var(--display); color: var(--voltaico); }
+.lista-es .riga-es .cosa b { font: 700 20px/1.05 var(--display); text-transform: uppercase; }
+
+/* Riepilogo di fine allenamento: numeri divisi da linee, esercizi in righe senza card */
+.corpo-es.fine .completato { color: var(--voltaico); }
+.riepilogo { background: none; border: 0; border-radius: 0; padding: 0; border-top: 1px solid rgba(255, 255, 255, .12); }
+.riga-riep { border-bottom: 1px solid rgba(255, 255, 255, .08); min-height: 62px; padding-top: 6px; }
+.riga-riep .nome { font: 700 20px/1.05 var(--display) !important; text-transform: uppercase; }

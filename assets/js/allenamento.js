@@ -258,7 +258,7 @@
       <header class="barra-top"><a class="icona-44" href="#oggi" aria-label="Torna a Oggi"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A8A8A3" stroke-width="1.8" stroke-linecap="round"/></svg></a><div class="centro"><b>${esc(all.nome)} · completato</b><span class="num">${durata} min</span></div><button class="icona-44" id="riapri" aria-label="Riapri la scheda"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z" fill="none" stroke="#A8A8A3" stroke-width="1.8" stroke-linejoin="round"/></svg></button></header>
       <div class="corpo-es fine">
         <div class="pila-10"><span class="completato">Allenamento completato</span><h1 class="nome-es">${esc(all.nome)}</h1></div>
-        <div class="tre-dati num">
+        <div class="tre-dati divisi num">
           <span><b>${durata}</b><small>minuti</small></span>
           <span><b>${fatte}/${contaTotali()}</b><small>serie</small></span>
           <span><b>${numIt(vol)}</b><small>kg di volume</small></span>
