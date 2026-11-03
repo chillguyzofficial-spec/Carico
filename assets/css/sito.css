@@ -8,6 +8,7 @@ body { background: var(--notte-0); }
 section { padding: 96px 0; }
 h1, h2 { margin: 0; font-family: var(--display); font-weight: 800; text-transform: uppercase; line-height: .94; letter-spacing: -.005em; } /* sotto .94 la virgola di «GIUSTO,» tocca la riga dopo */
 h1 { font-size: clamp(64px, 11vw, 132px); }
+.virgola { display: inline-block; transform: translateY(-.14em); } /* la coda della virgola toccava la «I» di GIORNO */
 h2 { font-size: clamp(48px, 7vw, 92px); margin-top: 14px; }
 .sopratitolo { display: block; font: 600 13px/16px var(--testo); letter-spacing: .16em; color: var(--voltaico-chiaro); text-transform: uppercase; }
 .testo-grande { font: 400 clamp(18px, 2vw, 21px)/1.5 var(--testo); color: var(--ardesia); margin: 22px 0 0; max-width: 640px; text-wrap: pretty; }
