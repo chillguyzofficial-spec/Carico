@@ -1,73 +1,122 @@
-/* Allenamento come scheda unica: esercizi in colonna, serie come riquadri da toccare. */
-.avanza { height: 3px; margin: 6px 20px 0; border-radius: 2px; background: var(--linea-tenue); overflow: hidden; }
-.avanza i { display: block; height: 100%; background: var(--voltaico-chiaro); transition: width .3s; }
-.corpo-scheda { padding: 14px 16px calc(120px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; }
-.aiuto-scheda { margin: 0 4px; font: 500 14px/20px var(--testo); color: var(--ardesia); }
+/* Allenamento come scheda unica, sul modello di Francesco (IMG_6458, 2026-11-03):
+   nero pieno, testata con foto, esercizi numerati divisi da linee, tabella SERIE · KG · REP con caselle. */
+[data-vista="allenamento"] { background: #000; }
 
-.carta-es { background: var(--notte-1); border: 1px solid var(--linea); border-radius: 22px; padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 12px; transition: border-color .2s; }
-.carta-es.completa { border-color: rgba(61, 214, 140, .35); }
-.carta-testa { display: flex; align-items: flex-start; gap: 10px; }
-.num-es { width: 28px; height: 28px; border-radius: 8px; background: var(--notte-3); display: grid; place-items: center; font: 700 16px/1 var(--display); color: var(--ardesia); flex: none; margin-top: 2px; }
-.carta-es.completa .num-es { background: rgba(61, 214, 140, .16); color: var(--successo); }
-.titoli-es { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.titoli-es h2 { margin: 0; font: 700 28px/1 var(--display); text-transform: uppercase; }
-.titoli-es > span { font: 500 13px/18px var(--testo); color: var(--fumo); }
-.menu-es { margin: -8px -6px 0 0; }
-.segni { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Testata */
+.testata-scheda { position: relative; min-height: 236px; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 20px; overflow: hidden; }
+.foto-scheda { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 30%; filter: grayscale(1) brightness(.62); }
+.testata-scheda::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .55) 55%, rgba(0, 0, 0, .1) 100%), linear-gradient(0deg, #000 0%, rgba(0, 0, 0, 0) 55%); }
+.chiudi-scheda { position: absolute; z-index: 1; top: calc(env(safe-area-inset-top) + 10px); left: 10px; border-radius: 50%; background: rgba(0, 0, 0, .45); }
+.testo-scheda { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 6px; padding-top: 70px; }
+.titolo-scheda { margin: 0; font: 800 72px/.86 var(--display); text-transform: uppercase; letter-spacing: -.01em; }
+.riga-scheda { display: flex; justify-content: space-between; align-items: baseline; font: 600 13px/18px var(--testo); letter-spacing: .08em; text-transform: uppercase; color: var(--ardesia); }
+.riga-scheda b { color: var(--gesso); }
+.barra-scheda { height: 5px; margin-top: 6px; border-radius: 3px; background: rgba(255, 255, 255, .14); overflow: hidden; }
+.barra-scheda i { display: block; height: 100%; border-radius: 3px; background: var(--voltaico); transition: width .3s; }
 
-/* Riquadri delle serie: due per riga, grandi per il pollice */
-.riquadri { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.riquadro {
-  min-height: 60px; border-radius: 16px; border: 1.5px solid var(--linea-2); background: var(--notte-0);
-  display: flex; align-items: center; gap: 10px; padding: 0 12px; text-align: left; transition: transform .1s, background .2s, border-color .2s;
+.corpo-scheda { padding: 10px 20px calc(120px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 16px; }
+.link-tutto { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font: 600 15px/1 var(--testo); color: var(--voltaico-chiaro); }
+
+/* Elenco esercizi: righe divise da linee, niente card */
+.elenco-es { border-top: 1px solid rgba(255, 255, 255, .12); }
+.es { border-bottom: 1px solid rgba(255, 255, 255, .12); scroll-margin-top: 8px; }
+.n-es { font: 800 30px/1 var(--display); color: var(--gesso); width: 44px; flex: none; }
+.sk-riga { width: 100%; min-height: 84px; display: flex; align-items: center; gap: 12px; padding: 14px 0; text-align: left; color: var(--ardesia); }
+.sk-riga .n-es { padding-right: 12px; border-right: 1px solid rgba(255, 255, 255, .2); width: 52px; }
+.nome-riga { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-left: 4px; }
+.nome-riga b { font: 700 26px/1 var(--display); text-transform: uppercase; color: var(--gesso); }
+.nome-riga small { font: 600 14px/18px var(--testo); letter-spacing: .04em; text-transform: uppercase; color: var(--ardesia); }
+.parziale { font: 700 18px/1 var(--display); color: var(--voltaico-chiaro); }
+.freccia { flex: none; color: var(--ardesia); margin-left: 4px; }
+
+/* Esercizio aperto */
+.es.aperto { padding: 18px 0 22px; display: flex; flex-direction: column; gap: 16px; }
+.sk-testa { display: grid; grid-template-columns: auto 1fr; gap: 0 10px; align-items: start; }
+.sk-testa.con-video { grid-template-columns: auto 1fr 112px; }
+.sk-testa .n-es { padding-top: 4px; }
+.titoli-es { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.titoli-es h2 { margin: 0; }
+.titoli-es h2 button { font: 800 36px/.92 var(--display); text-transform: uppercase; color: var(--gesso); text-align: left; overflow-wrap: anywhere; }
+.dati-es { grid-column: 2 / -1; margin-top: 14px; display: flex; align-items: center; gap: 14px; }
+.dati-es .schema { font: 800 32px/1 var(--display); padding-right: 12px; border-right: 1px solid rgba(255, 255, 255, .2); white-space: nowrap; }
+.dati-es .ultima { white-space: nowrap; display: flex; flex-direction: column; gap: 3px; font: 600 13px/16px var(--testo); letter-spacing: .06em; text-transform: uppercase; color: var(--ardesia); }
+.dati-es .target { color: var(--voltaico-chiaro); font-weight: 700; }
+.tecnica { position: relative; height: 104px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255, 255, 255, .16); }
+.tecnica img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.6); }
+.tecnica .play { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #fff; display: grid; place-items: center; padding-left: 2px; }
+.tecnica .etich { position: absolute; left: 0; right: 0; bottom: 9px; font: 700 11px/1 var(--testo); letter-spacing: .08em; text-transform: uppercase; color: #fff; text-align: center; }
+
+/* Tabella delle serie */
+.sk-tabella { display: flex; flex-direction: column; }
+.intest-serie, .riga-serie { display: grid; grid-template-columns: 52px 1fr 1fr 52px; gap: 10px; align-items: center; }
+.intest-serie { padding: 0 0 8px; border-bottom: 1px solid rgba(255, 255, 255, .12); font: 600 12px/16px var(--testo); letter-spacing: .1em; text-transform: uppercase; color: var(--fumo); }
+.intest-serie span:nth-child(2), .intest-serie span:nth-child(3) { text-align: center; }
+.riga-serie { min-height: 60px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.n-serie { display: flex; align-items: center; gap: 2px; font: 700 18px/1 var(--display); color: var(--ardesia); }
+.riga-serie.extra .n-serie { color: var(--voltaico-chiaro); }
+.togli-x { width: 26px; height: 26px; border-radius: 50%; font: 500 18px/1 var(--testo); color: var(--fumo); display: grid; place-items: center; }
+.cella {
+  width: 100%; min-width: 0; height: 44px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .1); background: #161616;
+  font: 700 24px/1 var(--display); color: var(--gesso); text-align: center; outline: 0; padding: 0;
 }
-.riquadro:active { transform: scale(.97); }
-.riquadro .n { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--linea-2); display: grid; place-items: center; font: 600 12px/1 var(--testo); color: var(--fumo); flex: none; }
-.riquadro .v { font: 500 14px/1 var(--testo); color: var(--ardesia); white-space: nowrap; }
-.riquadro .v b { font: 700 24px/1 var(--display); color: var(--gesso); }
-.riquadro .v small { font: 500 13px/1 var(--testo); color: var(--fumo); margin: 0 2px 0 1px; }
-.riquadro.fatta { background: rgba(61, 214, 140, .1); border-color: rgba(61, 214, 140, .45); }
-.riquadro.fatta .n { border: 0; background: rgba(61, 214, 140, .2); }
-.riquadro.fatta .n svg { animation: scatto .32s cubic-bezier(.3, 1.6, .5, 1) both; }
-.riquadro.record { background: rgba(37, 99, 255, .16); border-color: var(--voltaico-chiaro); box-shadow: 0 0 18px rgba(37, 99, 255, .35); }
-.riquadro.record .n { background: rgba(122, 162, 255, .25); }
-.nota-es { margin: 0; font: 500 14px/20px var(--testo); color: var(--ardesia); }
-.nota-es b { color: var(--voltaico-chiaro); }
-.nota-es .da-chi { color: var(--gesso); font-weight: 600; }
-#concludi { margin-top: 6px; }
+.cella:focus { border-color: var(--voltaico); box-shadow: 0 0 0 3px rgba(37, 99, 255, .25); }
+.cella::placeholder { color: var(--fumo); }
+.riga-serie.fatta .cella { background: transparent; border-color: transparent; color: var(--ardesia); }
+.sk-casella { justify-self: end; width: 44px; height: 44px; display: grid; place-items: center; position: relative; }
+.sk-casella::before { content: ''; position: absolute; inset: 7px; border-radius: 9px; border: 1.5px solid rgba(255, 255, 255, .45); }
+.sk-casella.piena::before { background: var(--successo); border-color: var(--successo); }
+.sk-casella svg { position: relative; animation: scatto .32s cubic-bezier(.3, 1.6, .5, 1) both; }
+.sk-riga .sk-casella { width: 36px; height: 36px; flex: none; }
+.sk-riga .sk-casella::before { inset: 3px; }
+.dischi-riga { margin: -6px 0 0; font: 500 13px/18px var(--testo); color: var(--fumo); }
+.dischi-riga:empty { display: none; }
+.dischi-riga b { color: var(--ardesia); font-weight: 600; }
 
-/* Foglio di modifica della serie */
-.foglio .regolatore { padding: 4px 0; }
-.foglio .btn-primario { margin-top: 10px; }
+/* Nota del coach */
+.sk-nota { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 16px; background: #111; border: 1px solid rgba(255, 255, 255, .1); }
+.sk-nota .avatar { width: 48px; height: 48px; filter: grayscale(1); }
+.sk-nota > div { flex: 1; min-width: 0; padding-left: 14px; border-left: 1px solid rgba(255, 255, 255, .2); display: flex; flex-direction: column; gap: 3px; }
+.sk-nota .sk-chi { font: 600 12px/16px var(--testo); letter-spacing: .08em; text-transform: uppercase; color: var(--fumo); }
+.sk-nota .sk-chi b { color: var(--gesso); }
+.sk-nota p { margin: 0; font: italic 500 15px/21px var(--testo); color: var(--gesso); }
+.sk-nota .chiede { font-style: normal; color: var(--voltaico-chiaro); font-weight: 600; }
 
-@media (max-width: 360px) {
-  .riquadro { padding: 0 8px; gap: 6px; }
-  .riquadro .v b { font-size: 20px; }
-  .titoli-es h2 { font-size: 24px; }
+/* Azioni dell'esercizio */
+.due-azioni { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-linea {
+  min-height: 52px; border-radius: 14px; border: 1.5px solid rgba(255, 255, 255, .7); padding: 6px 10px;
+  display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center;
+  font: 700 17px/1.05 var(--display); letter-spacing: .03em; text-transform: uppercase; color: var(--gesso);
 }
+.btn-linea:active { background: rgba(255, 255, 255, .08); }
+.btn-linea span { font-size: 22px; }
+.altre-azioni { display: flex; justify-content: center; gap: 28px; margin-top: -4px; }
+.altre-azioni button, .altre-azioni a { min-height: 44px; display: inline-flex; align-items: center; font: 600 14px/1 var(--testo); color: var(--ardesia); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255, 255, 255, .25); }
 
-/* Libertà dell'atleta: serie in più, esercizi aggiunti, peso scritto a mano */
-.riquadro.piu { border-style: dashed; background: transparent; align-items: center; opacity: 1; }
-.riquadro.piu .v { font: 600 15px/1 var(--testo); color: var(--ardesia); }
-.tuo { color: var(--voltaico-chiaro); font-weight: 600; }
-.carta-es.mia { border-style: dashed; }
+/* Aggiunte dell'atleta */
+.tuo { color: var(--voltaico-chiaro); font-weight: 700; }
 .aggiungi-es {
-  min-height: 72px; border-radius: 22px; border: 1.5px dashed var(--linea-2); padding: 12px 16px;
+  min-height: 72px; border-radius: 16px; border: 1.5px dashed rgba(255, 255, 255, .25); padding: 12px 16px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center;
 }
 .aggiungi-es b { font: 600 16px/21px var(--testo); color: var(--gesso); }
 .aggiungi-es span { font: 500 13px/18px var(--testo); color: var(--fumo); }
 .aggiungi-es:active { transform: scale(.98); }
-.scrivi-numero {
-  width: 4.6ch; min-width: 0; padding: 0; border: 0; border-bottom: 2px dashed var(--linea-2); border-radius: 0; background: none; outline: 0;
-  font: 800 72px/1 var(--display); color: var(--gesso); text-align: center;
-}
-.scrivi-numero:focus { border-bottom-color: var(--voltaico); }
+
+/* Fogli dal basso: sostituzione e ricerca */
 .quando-foglio { padding: 2px 4px; font: 600 11px/14px var(--testo); letter-spacing: .1em; text-transform: uppercase; color: var(--fumo); }
 .lista-cerca { max-height: 38vh; overflow-y: auto; display: flex; flex-direction: column; margin: 6px -4px 0; }
 .voce-scelta { min-height: 48px; padding: 0 12px; border-radius: 12px; text-align: left; font: 500 16px/1.2 var(--testo); color: var(--gesso); flex: none; }
 .voce-scelta:active { background: var(--notte-3); }
 .voce-scelta.nuova { color: var(--voltaico-chiaro); font-weight: 600; }
-.chiudi-foglio.tenue { color: var(--ardesia); height: 44px; margin-top: 0; }
-@media (max-width: 360px) { .scrivi-numero { font-size: 60px; } }
-.scrivi-numero[data-scrivi="reps"] { width: 2.4ch; }
+
+@media (max-width: 360px) {
+  .corpo-scheda, .testata-scheda { padding-left: 16px; padding-right: 16px; }
+  .titolo-scheda { font-size: 60px; }
+  .titoli-es h2 button { font-size: 34px; }
+  .sk-testa.con-video { grid-template-columns: auto 1fr 92px; }
+  .intest-serie, .riga-serie { grid-template-columns: 44px 1fr 1fr 48px; gap: 8px; }
+  .btn-linea { font-size: 15px; }
+  .n-es { width: 36px; font-size: 26px; }
+  .sk-riga .n-es { width: 44px; }
+}

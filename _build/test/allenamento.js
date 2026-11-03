@@ -1,3 +1,5 @@
+// Scheda d'allenamento sul modello di Francesco: esercizi numerati uno aperto alla volta, tabella SERIE · KG · REP,
+// caselle, numeri scrivibili, serie in più, esercizi aggiunti, sostituzione libera, riepilogo, riapri e ricomincia.
 const { chromium, devices } = require('C:/Users/Claude FK/.claude/projects/hedonè progetto serio/node_modules/playwright');
 const U = 'file:///C:/Users/Claude%20FK/.claude/projects/gym%20app/app.html';
 const out = process.argv[2];
@@ -8,56 +10,115 @@ const out = process.argv[2];
   await ctx.addInitScript(() => localStorage.setItem('pt-collegato', '{"quando":1}'));
   const p = await ctx.newPage(); p.on('pageerror', e => err.push(e.message)); p.on('console', m => { if (m.type() === 'error') err.push(m.text()); });
   const largo = async (n) => { const x = await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth); v(x <= 0, `sborda ${n}: +${x}`); };
+  const testo = async (s) => (await p.textContent(s)).replace(/\s+/g, ' ').trim();
+  const cella = (i, j, c) => `[data-cella="${c}"][data-i="${i}"][data-j="${j}"]`;
+
+  // ---------- Push A (giovedì) ----------
   await p.goto(U + '?giorno=4'); await p.waitForTimeout(600);
   await p.click('[data-vista="oggi"] .btn-primario'); await p.waitForTimeout(500);
-  v(await p.$$eval('.carta-es', a => a.length) === 6, '6 esercizi sulla scheda');
-  v(await p.$$eval(".riquadro:not(.piu)", a => a.length) === 19, '19 serie (4+3+3+3+3+3)');
+  v(await p.$$eval('.es', a => a.length) === 6, '6 esercizi');
+  v(await p.$$eval('.es.aperto', a => a.length) === 1, 'uno solo aperto');
+  v((await testo('.es.aperto h2')).includes('Panca piana'), 'aperto il primo');
+  v(await p.$$eval('.es.aperto .riga-serie', a => a.length) === 4, 'tabella con 4 serie');
+  v((await testo('.testata-scheda')).includes('0 / 19 serie'), 'testata 0 / 19 serie');
+  v((await testo('.dati-es')).includes('Ultima 70 kg') && (await testo('.dati-es')).includes('Target 72,5 kg'), 'ultima e target');
   v(await p.isVisible('#tutto'), 'Fatto tutto come previsto');
-  v(await p.isDisabled('#concludi'), 'Concludi disattivo all\u2019inizio');
+  v(await p.isDisabled('#concludi'), 'Concludi disattivo all’inizio');
   await p.screenshot({ path: out + '/k-inizio.png' }); await largo('inizio');
-  // tocca una serie del secondo esercizio (ordine libero)
-  await p.click('.riquadro[data-i="1"][data-j="0"]'); await p.waitForTimeout(300);
-  v(await p.$('.riquadro[data-i="1"][data-j="0"].fatta') !== null, 'serie segnata con un tocco');
-  v(!(await p.$('.capsula')), 'nessun timer dopo la serie');
-  await p.screenshot({ path: out + '/k-recupero.png' });
-  // modifica una serie fatta: panca 75
-  await p.click('.riquadro[data-i="0"][data-j="0"]'); await p.waitForTimeout(200);
-  await p.click('.riquadro[data-i="0"][data-j="0"]'); await p.waitForTimeout(300);
-  v(await p.isVisible('.foglio'), 'foglio di modifica');
-  await p.click('.foglio [data-campo="kg"][data-delta="1"]'); await p.waitForTimeout(200);
-  v((await p.textContent('.foglio .dischi')).includes('25 + 2,5'), 'dischi 75 kg = 25 + 2,5');
-  v((await p.textContent('.foglio .delta')).includes('+5 kg'), 'confronto +5 kg');
-  await p.screenshot({ path: out + '/k-modifica.png' }); await largo('modifica');
-  await p.click('#salva-serie'); await p.waitForTimeout(300);
-  for (const j of [1, 2, 3]) { await p.click('.riquadro[data-i="0"][data-j="' + j + '"]'); await p.waitForTimeout(150); if (await p.isVisible('#salta')) await p.click('#salta'); }
-  v((await p.textContent('#avviso strong')).includes('record personale'), 'record annunciato a esercizio finito');
-  v(await p.$('.riga-finito') !== null, 'esercizio finito chiuso in una riga');
-  v((await p.textContent('.riga-finito')).includes('75 kg'), 'le serie dopo hanno seguito il nuovo peso (75)');
-  // menu
-  await p.click('[data-menu="1"]'); await p.waitForTimeout(200);
-  v((await p.textContent('.foglio')).includes('Chiedi al coach') && (await p.textContent('.foglio')).includes('Guarda come si fa'), 'menu esercizio');
-  await p.click('.foglio [data-chiudi].chiudi-foglio'); await p.waitForTimeout(200);
+
+  // peso scritto a mano: 75 nella prima serie → le serie sotto seguono, dischi aggiornati
+  await p.fill(cella(0, 0, 'kg'), '75'); await p.waitForTimeout(150);
+  v((await p.inputValue(cella(0, 3, 'kg'))) === '75', 'le serie sotto seguono il peso scritto');
+  v((await testo('#dischi-0')).includes('25 + 2,5'), 'dischi 75 kg = 25 + 2,5');
+  await p.fill(cella(0, 0, 'reps'), '9');
+  await p.click('[data-spunta="0-0"]'); await p.waitForTimeout(250);
+  v(await p.$('[data-spunta="0-0"].piena') !== null, 'casella spuntata');
+  v((await p.inputValue(cella(0, 0, 'kg'))) === '75' && (await p.inputValue(cella(0, 0, 'reps'))) === '9', 'serie salvata 75 × 9');
+  v((await testo('.testata-scheda')).includes('1 / 19'), 'contatore aggiornato');
+  await p.click('[data-spunta="0-0"]'); await p.waitForTimeout(200);
+  v(await p.$('[data-spunta="0-0"].piena') === null, 'si toglie la spunta');
+  // campo vuoto: torna il numero salvato
+  await p.fill(cella(0, 1, 'kg'), ''); await p.click('.dati-es'); await p.waitForTimeout(150);
+  v((await p.inputValue(cella(0, 1, 'kg'))) === '75', 'campo vuoto torna al numero');
+
+  // serie in più e via
+  await p.click('[data-piu="0"]'); await p.waitForTimeout(200);
+  v(await p.$$eval('.es.aperto .riga-serie', a => a.length) === 5 && await p.$('.riga-serie.extra [data-togli="0-4"]') !== null, 'serie in più con ×');
+  await p.click('[data-togli="0-4"]'); await p.waitForTimeout(200);
+  v(await p.$$eval('.es.aperto .riga-serie', a => a.length) === 4, 'serie in più tolta');
+
+  // finendo l'esercizio si apre il successivo, con record
+  for (const j of [0, 1, 2, 3]) { await p.click(`[data-spunta="0-${j}"]`); await p.waitForTimeout(120); }
+  v((await testo('#avviso strong')).includes('record personale'), 'record a esercizio finito');
+  v((await testo('.es.aperto h2')).includes('Lento avanti'), 'si apre il prossimo esercizio');
+  v(await p.$('.es:first-child .sk-riga .sk-casella.piena') !== null, 'esercizio finito chiuso con la spunta');
+  await p.click('#avviso button'); await p.waitForTimeout(200);
+  v((await testo('.es.aperto h2')).includes('Panca piana') && await p.$('[data-spunta="0-3"].piena') === null, 'Annulla riapre la panca');
+  await p.click('[data-spunta="0-3"]'); await p.waitForTimeout(200);
+  // apri a mano un altro esercizio, poi richiudilo
+  await p.click('[data-apri="4"]'); await p.waitForTimeout(200);
+  v((await testo('.es.aperto h2')).includes('Alzate laterali'), 'apre l’esercizio toccato');
+  await p.click('.es.aperto h2 button'); await p.waitForTimeout(200);
+  v(await p.$$eval('.es.aperto', a => a.length) === 0, 'toccando il titolo si chiude');
+  await p.click('[data-apri="1"]'); await p.waitForTimeout(200);
+  v((await testo('.es.aperto')).includes('Vedi tecnica') && /Luca \/ coach/i.test(await testo('.es.aperto')), 'video tecnica e nota del coach');
+  await p.screenshot({ path: out + '/k-aperto.png' }); await largo('aperto');
+
+  // sostituzione libera (Croci ai cavi non ha alternative del coach)
+  await p.click('[data-apri="3"]'); await p.waitForTimeout(200);
+  await p.click('[data-sost="3"]'); await p.waitForTimeout(200);
+  await p.click('#altro-esercizio'); await p.waitForTimeout(200);
+  await p.click('[data-scegli="Pec deck"]'); await p.waitForTimeout(250);
+  v((await testo('.es.aperto h2')) === 'Pec deck' && (await testo('.es.aperto')).includes('Al posto di Croci ai cavi'), 'sostituito con Pec deck');
+
+  // esercizio aggiunto dalla lista e scritto a mano
+  await p.click('#aggiungi'); await p.waitForTimeout(200);
+  v(!(await p.$('[data-scegli="Panca piana"]')), 'la lista non ripete gli esercizi di oggi');
+  await p.fill('#cerca', 'leg ext'); await p.waitForTimeout(150);
+  v(await p.$$eval('[data-scegli]:not([hidden])', a => a.length) === 1, 'ricerca filtra');
+  await p.click('[data-scegli="Leg extension"]'); await p.waitForTimeout(300);
+  v((await testo('.es.aperto')).includes('Aggiunto da te') && (await p.inputValue(cella(6, 0, 'kg'))) === '', 'aggiunto e aperto, peso da scrivere');
+  await p.fill(cella(6, 0, 'kg'), '45'); await p.click('[data-spunta="6-0"]'); await p.waitForTimeout(200);
+  await p.click('#aggiungi'); await p.waitForTimeout(200);
+  await p.fill('#cerca', 'panca declinata'); await p.press('#cerca', 'Enter'); await p.waitForTimeout(300);
+  v((await testo('.es.aperto h2')) === 'Panca declinata', 'esercizio scritto a mano');
+  await p.click('[data-togli-es="7"]'); await p.waitForTimeout(200);
+  v(await p.$$eval('.es', a => a.length) === 7, 'esercizio tolto');
+  await p.click('#avviso button'); await p.waitForTimeout(200);
+  v(await p.$$eval('.es', a => a.length) === 8, 'Annulla lo rimette');
+  await p.screenshot({ path: out + '/k-aggiunti.png', fullPage: true }); await largo('aggiunti');
+
   // chiudi e riprendi
-  await p.click('a[aria-label^="Chiudi"]'); await p.waitForTimeout(300);
+  await p.click('.chiudi-scheda'); await p.waitForTimeout(300);
   await p.click('[data-vista="oggi"] .btn-primario'); await p.waitForTimeout(400);
-  v(await p.$$eval('.riga-finito', a => a.length) === 1 && await p.$$eval('.riquadro.fatta', a => a.length) === 1, 'scheda ripresa: panca chiusa + 1 serie fatta');
+  v(await p.$$eval('.es', a => a.length) === 8 && (await testo('.testata-scheda')).includes('5 / '), 'scheda ripresa uguale');
+
+  // riepilogo, riapri, ricomincia da zero
   await p.click('#concludi'); await p.waitForTimeout(300);
-  v((await p.textContent('[data-vista="allenamento"]')).includes('Allenamento completato') && (await p.textContent('.riepilogo')).includes('non fatto'), 'concludi con riepilogo parziale');
-  await p.click('#riapri'); await p.waitForTimeout(200);
-  v(await p.isVisible('.carta-es'), 'riapri la scheda');
-  // fatto tutto (nuovo giorno)
+  const riep = await testo('.riepilogo');
+  v(riep.includes('Leg extension') && riep.includes('Aggiunto') && riep.includes('Cambiato') && riep.includes('non fatto'), 'riepilogo con aggiunti, cambiati, non fatti');
+  await p.click('#riapri-sotto'); await p.waitForTimeout(250);
+  v(await p.isVisible('.elenco-es'), 'Riapri la scheda');
+  await p.click('#concludi'); await p.waitForTimeout(250);
+  p.once('dialog', d => d.accept());
+  await p.click('#da-zero'); await p.waitForTimeout(300);
+  v(await p.$$eval('.sk-casella.piena', a => a.length) === 0 && await p.$$eval('.es', a => a.length) === 6 && await p.isVisible('#tutto'), 'Ricomincia da zero');
+
+  // trazioni: zavorra
   await p.goto(U + '?giorno=2#allenamento'); await p.waitForTimeout(500);
+  v((await testo('.dati-es')).includes('Target +5 kg') && (await testo('.intest-serie')).includes('+Kg'), 'trazioni con zavorra');
   await p.click('#tutto'); await p.waitForTimeout(300);
-  v((await p.textContent('.tre-dati')).includes('20/20'), 'fatto tutto: riepilogo');
+  v((await testo('.tre-dati')).includes('20/20'), 'fatto tutto: riepilogo');
   v(await p.isVisible('#avviso.su'), 'avviso con Annulla');
+
   // 320
   const s = await b.newContext({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true });
   await s.addInitScript(() => localStorage.setItem('pt-collegato', '{"quando":1}'));
   const q = await s.newPage();
   await q.goto(U + '?giorno=5#allenamento'); await q.waitForTimeout(500);
-  await q.click('.riquadro[data-i="0"][data-j="0"]'); await q.waitForTimeout(300);
   const x = await q.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth); v(x <= 0, `320 +${x}`);
-  await q.screenshot({ path: out + '/k-320.png' });
-  v(err.length === 0, 'errori ' + err.join(' | '));
-  console.log(`${ok} ok, ${ko} ko`); await b.close();
+  v(await q.$eval('[data-cella="kg"][data-i="0"][data-j="0"]', (e) => e.scrollWidth <= e.clientWidth + 1), '122,5 entra nella cella a 320');
+  await q.screenshot({ path: out + '/k-320.png', fullPage: true });
+  v(err.length === 0, 'errori: ' + err.join(' | '));
+  console.log(ok + ' ok, ' + ko + ' ko'); await b.close(); process.exit(ko ? 1 : 0);
 })();
