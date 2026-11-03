@@ -235,33 +235,77 @@
       </section>`;
   }
 
-  // ---------- Progresso: un solo dato, diverso dall'esercizio di cui parla il coach ----------
-  function progresso(cosa) {
-    let k = D.progressoDelGiorno[chiave || 'riposo'];
-    const nomeCoach = cosa && (cosa.tipo === 'carico' ? cosa.c.esercizio : cosa.tipo === 'feedback' ? D.video.esercizio : '');
-    if (nomeCoach && D.progressi[k].nome.startsWith(nomeCoach)) k = 'panca';
-    const p = D.progressi[k];
+  // ---------- Progresso: tutto il corpo, una card per gruppo muscolare (a scorrimento) ----------
+  // Richiesta di Francesco 2026-11-03: la prima card resta quella del giorno, poi si scorre sugli altri gruppi;
+  // se non la tocchi scorre da sola e ricomincia, così vedi come stai andando in generale.
+  const GRUPPI = [
+    { id: 'panca', gruppo: 'Petto' }, { id: 'rematore', gruppo: 'Schiena' }, { id: 'squat', gruppo: 'Gambe' }, { id: 'stacco', gruppo: 'Femorali e glutei' },
+    { id: 'lento', gruppo: 'Spalle', nome: 'Lento avanti', kg: 40, reps: 8, punti: [35, 37.5, 40, 40, 40, 40] },
+    { id: 'curl', gruppo: 'Braccia', nome: 'Curl con bilanciere', kg: 27.5, reps: 10, punti: [25, 25, 27.5, 30, 27.5, 27.5] },
+  ].map((g) => ({ ...(D.progressi[g.id] || {}), ...g }));
+  // In calo: sotto il massimo delle 3 settimane prima · in salita: sopra 3 settimane fa · altrimenti stabile
+  function andamento(p) {
+    const u = p.punti[p.punti.length - 1], prima = p.punti.slice(-4, -1), picco = Math.max(...prima);
+    const perc = (a, b) => Math.round((a - b) / b * 100);
+    if (u < picco) return { tipo: 'calo', testo: `▼ ${perc(u, picco)}% dal massimo di ${kg(picco)} kg`, colore: '#FF6166' };
+    if (u > p.punti[p.punti.length - 4]) return { tipo: 'salita', testo: `▲ +${perc(u, p.punti[0])}% in ${p.punti.length} settimane`, colore: '#C8F03C' };
+    const ferme = p.punti.slice().reverse().findIndex((v) => v !== u);
+    return { tipo: 'stabile', testo: `= Stabile da ${ferme < 0 ? p.punti.length : ferme} settimane`, colore: '#A8A8A3' };
+  }
+  function cardProgresso(p, n, tot) {
+    const a = andamento(p);
     const min = Math.min(...p.punti), max = Math.max(...p.punti);
     const pts = p.punti.map((v, i) => [i * 120 / (p.punti.length - 1), 40 - (v - min) / (max - min || 1) * 34.7]);
     const linea = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
     const [ux, uy] = pts[pts.length - 1];
     return `
-      <section class="blocco" aria-labelledby="t-prog">
-        <h2 id="t-prog" class="etichetta" style="margin:0">Progresso</h2>
-        <div class="progresso">
+        <div class="progresso card-prog ${a.tipo}" role="group" aria-roledescription="scheda" aria-label="${n + 1} di ${tot}: ${esc(p.gruppo)}">
           <div class="dato">
+            <span class="gruppo">${esc(p.gruppo)}</span>
             <span class="nome">${esc(p.nome)}</span>
             <span class="valore">${kg(p.kg)} kg × ${p.reps}</span>
-            <span class="delta">${esc(p.delta)}</span>
+            <span class="delta">${a.testo}</span>
           </div>
           <svg width="124" height="56" viewBox="-4 -4 128 52" aria-hidden="true">
-            <defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C8F03C" stop-opacity=".35"/><stop offset="1" stop-color="#C8F03C" stop-opacity="0"/></linearGradient></defs>
-            <path d="M${linea.replace(/ /g, 'L')}V44H0Z" fill="url(#area)"/>
-            <polyline points="${linea}" fill="none" stroke="#DDF77A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            <circle cx="${ux}" cy="${uy.toFixed(1)}" r="4" fill="#000000" stroke="#DDF77A" stroke-width="2"/>
+            <defs><linearGradient id="area-${p.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a.colore}" stop-opacity=".3"/><stop offset="1" stop-color="${a.colore}" stop-opacity="0"/></linearGradient></defs>
+            <path d="M${linea.replace(/ /g, 'L')}V44H0Z" fill="url(#area-${p.id})"/>
+            <polyline points="${linea}" fill="none" stroke="${a.colore}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="${ux}" cy="${uy.toFixed(1)}" r="4" fill="#000000" stroke="${a.colore}" stroke-width="2"/>
           </svg>
-        </div>
+        </div>`;
+  }
+  function progresso(cosa) {
+    // Prima card: quella del giorno (diversa dall'esercizio di cui parla il coach), poi gli altri gruppi
+    let k = D.progressoDelGiorno[chiave || 'riposo'];
+    const nomeCoach = cosa && (cosa.tipo === 'carico' ? cosa.c.esercizio : cosa.tipo === 'feedback' ? D.video.esercizio : '');
+    if (nomeCoach && D.progressi[k].nome.startsWith(nomeCoach)) k = 'panca';
+    const ordine = [GRUPPI.find((g) => g.id === k)].concat(GRUPPI.filter((g) => g.id !== k));
+    const conta = { salita: 0, stabile: 0, calo: 0 };
+    GRUPPI.forEach((g) => conta[andamento(g).tipo]++);
+    return `
+      <section class="blocco" aria-labelledby="t-prog">
+        <div class="intesta"><h2 id="t-prog" class="etichetta" style="margin:0">Progresso</h2>
+          <span class="riassunto-corpo"><b class="salita">${conta.salita} in salita</b> · ${conta.stabile} stabil${conta.stabile === 1 ? 'e' : 'i'} · <b class="calo">${conta.calo} in calo</b></span></div>
+        <div class="carosello-prog" tabindex="0" aria-label="Progresso per gruppo muscolare: scorri per vederli tutti">${ordine.map((p, n) => cardProgresso(p, n, ordine.length)).join('')}</div>
+        <div class="puntini" aria-hidden="true">${ordine.map((p, n) => `<i${n === 0 ? ' class="on"' : ''}></i>`).join('')}</div>
       </section>`;
+  }
+  // Scorrimento automatico in loop finché non lo tocchi (niente se il telefono chiede meno movimento)
+  let giro = null, fermo = false;
+  function avviaGiro() {
+    clearInterval(giro);
+    const c = document.querySelector('[data-vista="oggi"] .carosello-prog');
+    if (!c) return;
+    const punti = c.parentNode.querySelectorAll('.puntini i');
+    const attuale = () => Math.round(c.scrollLeft / c.clientWidth);
+    c.addEventListener('scroll', () => punti.forEach((p, n) => p.classList.toggle('on', n === attuale())), { passive: true });
+    ['pointerdown', 'touchstart', 'wheel', 'focus'].forEach((ev) => c.addEventListener(ev, () => { fermo = true; clearInterval(giro); }, { passive: true }));
+    if (fermo || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    giro = setInterval(() => {
+      if (document.hidden || c.closest('.vista').hidden || !c.isConnected) return;
+      const dopo = (attuale() + 1) % punti.length;
+      c.scrollTo({ left: dopo * c.clientWidth, behavior: dopo === 0 ? 'auto' : 'smooth' });
+    }, 4000);
   }
 
   // Il titolone resta su una riga: se il nome è lungo («GAMBE B») si riduce fino a starci
@@ -282,6 +326,7 @@
       const v = document.querySelector('[data-vista="oggi"]');
       v.innerHTML = hero(sessione) + recupero() + settimana(sessione) + coach(cosa) + progresso(cosa) + schermoFoglio();
       v.classList.toggle('con-foglio', !!foglio);
+      avviaGiro();
       document.getElementById('voce-coach').classList.toggle('novita', !!(cosa && (cosa.tipo === 'checkin' || (cosa.tipo === 'feedback' && cosa.f.istante))));
       adatta();
     },

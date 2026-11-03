@@ -134,3 +134,19 @@
 .cal-legenda span { display: flex; align-items: center; gap: 6px; }
 .cal-legenda i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 .cal-nota { margin: 10px 2px 0; font: 500 12px/16px var(--testo); }
+
+/* Progresso a scorrimento: una card per gruppo muscolare, giro automatico finché non la tocchi (2026-11-03) */
+.riassunto-corpo { font: 500 12px/16px var(--testo); color: var(--fumo); letter-spacing: 0; text-transform: none; }
+.riassunto-corpo .salita { color: var(--voltaico); font-weight: 600; }
+.riassunto-corpo .calo { color: var(--errore); font-weight: 600; }
+.carosello-prog { display: flex; gap: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 18px; outline-offset: 4px; }
+.carosello-prog::-webkit-scrollbar { display: none; }
+.carosello-prog .card-prog { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+.card-prog .gruppo { font: 600 11px/14px var(--testo); letter-spacing: .14em; text-transform: uppercase; color: var(--voltaico); }
+.card-prog.stabile .delta { color: var(--ardesia); }
+.card-prog.calo .delta { color: var(--errore); }
+.card-prog.calo .gruppo { color: var(--errore); }
+.card-prog.stabile .gruppo { color: var(--ardesia); }
+.puntini { display: flex; justify-content: center; gap: 6px; margin-top: -2px; }
+.puntini i { width: 6px; height: 6px; border-radius: 3px; background: var(--linea-2); transition: width .25s, background .25s; }
+.puntini i.on { width: 18px; background: var(--voltaico); }
