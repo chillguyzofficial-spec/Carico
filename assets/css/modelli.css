@@ -82,3 +82,9 @@
 .riepilogo { background: none; border: 0; border-radius: 0; padding: 0; border-top: 1px solid rgba(255, 255, 255, .12); }
 .riga-riep { border-bottom: 1px solid rgba(255, 255, 255, .08); min-height: 62px; padding-top: 6px; }
 .riga-riep .nome { font: 700 20px/1.05 var(--display) !important; text-transform: uppercase; }
+
+/* Progressi: foto del disco in testata, a destra (il titolone resta a sinistra sul nero) */
+.testa-pagina.con-foto { position: relative; overflow: hidden; min-height: 200px; justify-content: flex-end; }
+.testa-pagina.con-foto > :not(.foto-testa) { position: relative; z-index: 1; }
+.foto-testa { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 75% 40%; filter: grayscale(1) brightness(.75); }
+.testa-pagina.con-foto::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .6) 45%, rgba(0, 0, 0, 0) 75%), linear-gradient(0deg, #000 0%, rgba(0, 0, 0, 0) 40%); }

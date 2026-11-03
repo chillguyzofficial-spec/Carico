@@ -35,7 +35,7 @@ window.DATI = {
   // demo = miniatura del video del coach (assets/foto/demo-*.webp) · rec = recupero in secondi
   esercizi: {
     'push-a': [
-      { nome: 'Panca piana', serie: 4, reps: 8, kg: 72.5, rec: 120, prec: [[70, 8], [70, 8], [70, 8], [70, 7]], best: 70, inizio: 62.5, nota: 'Scapole addotte, piedi fermi a terra.', alt: ['Panca piana con manubri', 'Chest press'], demo: null },
+      { nome: 'Panca piana', serie: 4, reps: 8, kg: 72.5, rec: 120, prec: [[70, 8], [70, 8], [70, 8], [70, 7]], best: 70, inizio: 62.5, nota: 'Scapole addotte, piedi fermi a terra.', alt: ['Panca piana con manubri', 'Chest press'], demo: 'demo-panca', durata: '0:21' },
       { nome: 'Lento avanti', serie: 3, reps: 8, kg: 42.5, rec: 90, prec: [[40, 8], [40, 8], [40, 8]], best: 40, inizio: 35, nota: 'Glutei contratti, niente arco nella schiena.', alt: ['Lento con manubri da seduto'], demo: 'demo-lento', durata: '0:22' },
       { nome: 'Spinte inclinate con manubri', serie: 3, reps: 10, kg: 26, rec: 90, prec: [[24, 10], [24, 10], [24, 9]], best: 24, inizio: 20, nota: '', demo: null },
       { nome: 'Croci ai cavi', serie: 3, reps: 12, kg: 15, rec: 60, prec: [[15, 12], [15, 12], [15, 11]], best: 15, inizio: 12.5, nota: 'Gomiti morbidi, chiudi lento.', demo: null },

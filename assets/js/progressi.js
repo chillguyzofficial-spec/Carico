@@ -134,7 +134,7 @@
       { id: 'mese', fatto: true, quando: 'Settimana 4', titolo: 'Primo mese', riga: '4 settimane senza mollare', dato: `${r.fatti - 5 > 18 ? 18 : r.fatti - 5} allenamenti`, foto: 'trag-notte' },
       { id: 'panca70', fatto: true, quando: 'Settimana 5', titolo: 'Panca piana', riga: '70 kg × 8 · +7,5 kg dall’inizio', dato: '70 KG × 8', foto: 'record-marco' },
       { id: 'stacco120', fatto: true, quando: 'Settimana 5', titolo: 'Stacco da terra', riga: '120 kg × 5 · +10 kg dall’inizio', dato: '120 KG × 5', foto: 'trag-piastra' },
-      { id: 'dodici', fatto: false, quando: `Mancano ${D.atleta.settimane - D.atleta.settimana} settimane`, titolo: `${D.atleta.settimane} settimane`, riga: `${r.fatti} / 60 allenamenti · ${r.aderenza}% costanza`, dato: `${D.atleta.settimane} SETTIMANE`, foto: 'hero-push' },
+      { id: 'dodici', fatto: false, quando: `Mancano ${D.atleta.settimane - D.atleta.settimana} settimane`, titolo: `${D.atleta.settimane} settimane`, riga: `${r.fatti} / 60 allenamenti · ${r.aderenza}% costanza`, dato: `${D.atleta.settimane} SETTIMANE`, foto: 'trag-dodici' },
     ];
   }
 
@@ -157,7 +157,8 @@
       </a></li>`).join('');
 
     document.querySelector('[data-vista="progressi"]').innerHTML = `
-      <header class="testa-pagina">
+      <header class="testa-pagina con-foto">
+        <img class="foto-testa" src="assets/foto/progressi-testa.webp" alt="">
         <span class="sopratitolo">Settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span>
         <h1 class="titolo-pagina">Progressi</h1>
       </header>

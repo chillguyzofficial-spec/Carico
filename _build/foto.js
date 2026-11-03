@@ -32,6 +32,10 @@ const FOTO = [
   { da: 'Rematore con bilanciere in palestra.png', a: 'demo-rematore', w: 480 },
   { da: 'Hip thrust in palestra industriale-1.png', a: 'demo-hip-thrust', w: 480 },
   { da: 'Affondo con manubri in palestra.png', a: 'demo-affondi', w: 480 },
+  // 2026-11-03 sera: testata di Progressi, card «12 settimane», video della panca piana (Luca)
+  { da: 'Bilanciere e ghisa nella penombra.png', a: 'progressi-testa', w: 1180 },
+  { da: "Pausa dopo l'allenamento.png", a: 'trag-dodici', w: 800 },
+  { da: 'Panca piana in palestra industriale.png', a: 'demo-panca', w: 480 },
 ];
 
 (async () => {
