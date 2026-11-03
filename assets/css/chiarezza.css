@@ -1,0 +1,29 @@
+/* Scheda più chiara (Francesco 2026-11-03: «così si capisce poco»):
+   verde = fatta, blu = adesso, grigio tenue = dopo. Esercizi finiti in una riga. */
+.carta-es { gap: 14px; }
+.carta-es:not(.attiva) { background: transparent; }
+.carta-es.attiva { border-color: rgba(122, 162, 255, .45); box-shadow: 0 0 0 4px rgba(37, 99, 255, .08); }
+.titoli-es h2 { font-size: 30px; }
+.confronto-riga { color: var(--ardesia) !important; }
+.confronto-riga b { font-weight: 700; }
+.confronto-riga b.su { color: var(--successo); }
+.confronto-riga b.giu { color: var(--errore); }
+.confronto-riga b.pari { color: var(--gesso); }
+
+.riquadro { flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; min-height: 68px; padding: 8px 14px; }
+.riquadro .etich { display: flex; align-items: center; gap: 5px; font: 600 11px/14px var(--testo); letter-spacing: .1em; text-transform: uppercase; color: var(--fumo); }
+.riquadro .v { font: 500 15px/1 var(--testo); color: var(--ardesia); }
+.riquadro .v b { font: 700 26px/1 var(--display); color: var(--gesso); }
+.riquadro.dopo { opacity: .55; }
+.riquadro.adesso { border-color: var(--voltaico); background: rgba(37, 99, 255, .14); box-shadow: 0 0 0 3px rgba(37, 99, 255, .2); opacity: 1; }
+.riquadro.adesso .etich { color: var(--voltaico-chiaro); }
+.riquadro.fatta { background: rgba(61, 214, 140, .1); border-color: rgba(61, 214, 140, .4); }
+.riquadro.fatta .etich { color: var(--successo); }
+.riquadro.fatta .v b { color: var(--ardesia); }
+
+.riga-finito { border-radius: 18px; background: rgba(61, 214, 140, .07); border: 1px solid rgba(61, 214, 140, .25); }
+.apri-finito { width: 100%; min-height: 60px; display: flex; align-items: center; gap: 12px; padding: 0 16px; text-align: left; }
+.apri-finito span:not(.tenue) { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.apri-finito b { font: 700 22px/1 var(--display); text-transform: uppercase; color: var(--ardesia); }
+.apri-finito small { font: 500 13px/16px var(--testo); color: var(--fumo); }
+.apri-finito .tenue { font: 600 13px/1 var(--testo); }

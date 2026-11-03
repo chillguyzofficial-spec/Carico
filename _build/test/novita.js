@@ -34,11 +34,11 @@ const U = 'http://localhost:8993/app.html';
   await p.screenshot({ path: out + '/n-profilo.png' }); await largo('profilo');
   // progressi
   await p.click('.menu a[href="#progressi"]'); await p.waitForTimeout(400);
-  v((await p.textContent('.pr-valore')).includes('70 kg × 8'), 'progressi: panca 70 × 8');
+  v((await p.textContent('.kpi-lato')).includes('70 × 8') && (await p.textContent('.pr-valore')).includes('89'), 'progressi: panca record 70 × 8, massimale 89');
   v(await p.isVisible('.storico'), 'grafico storico');
   await p.screenshot({ path: out + '/n-progressi.png', fullPage: true }); await largo('progressi');
-  await p.click('[data-es="stacco"]'); await p.waitForTimeout(200);
-  v((await p.textContent('.pr-valore')).includes('120 kg × 5'), 'progressi: stacco');
+  await p.click('.seg-es[data-es="stacco"]'); await p.waitForTimeout(200);
+  v((await p.textContent('.kpi-lato')).includes('120 × 5'), 'progressi: stacco');
   await p.click('[data-int="1M"]'); await p.waitForTimeout(200);
   v((await p.getAttribute('[data-int="1M"]', 'aria-pressed')) === 'true', 'intervallo 1M');
   v(await p.isDisabled('[data-int="1A"]'), '1A disattivo (meno di un anno)');
@@ -53,10 +53,9 @@ const U = 'http://localhost:8993/app.html';
   v(await p.isHidden('#condividi') && (await p.textContent('[data-vista="traguardo"]')).includes('si sblocca'), 'traguardo futuro bloccato');
   // record di oggi aggiorna Progressi
   await p.goto(U + '?giorno=4#allenamento'); await p.waitForTimeout(400);
-  await p.click('[data-delta="1"]'); await p.click('[data-delta="1"]');
-  for (let k = 0; k < 8; k++) { if (await p.isVisible('#fatta')) await p.click('#fatta'); if (await p.isVisible('#salta')) await p.click('#salta'); }
-  await p.goto(U + '?giorno=4#progressi'); await p.waitForTimeout(400); await p.click('[data-es="panca"]'); await p.waitForTimeout(200);
-  v((await p.textContent('.pr-valore')).includes('77,5 kg × 8'), 'record di oggi entra nei progressi');
+  await p.click('#tutto'); await p.waitForTimeout(300);
+  await p.goto(U + '?giorno=4#progressi'); await p.waitForTimeout(400); await p.click('.seg-es[data-es="panca"]'); await p.waitForTimeout(200);
+  v((await p.textContent('.kpi-lato')).includes('72,5 × 8'), 'record di oggi entra nei progressi');
   // ricomincia
   await p.goto(U + '?giorno=4#profilo'); await p.waitForTimeout(300);
   await p.click('#ricomincia'); await p.waitForTimeout(500);
