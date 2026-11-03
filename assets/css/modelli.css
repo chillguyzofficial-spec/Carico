@@ -88,3 +88,49 @@
 .testa-pagina.con-foto > :not(.foto-testa) { position: relative; z-index: 1; }
 .foto-testa { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 75% 40%; filter: grayscale(1) brightness(.75); }
 .testa-pagina.con-foto::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .6) 45%, rgba(0, 0, 0, 0) 75%), linear-gradient(0deg, #000 0%, rgba(0, 0, 0, 0) 40%); }
+
+/* ---------- Settimana non fissa: calendario, cambia giorno, allenamenti non fatti (2026-11-03) ---------- */
+.intesta .destra { display: flex; align-items: center; gap: 12px; }
+.link-calendario { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 10px; border-radius: 16px; border: 1px solid var(--linea-2); font: 600 12px/1 var(--testo); letter-spacing: .04em; text-transform: none; color: var(--gesso); }
+.link-sposta { align-self: flex-start; min-height: 40px; font: 500 14px/1 var(--testo); color: var(--ardesia); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255, 255, 255, .3); }
+.giorno.nonfatto .cerchio { border: 1.5px dashed var(--errore); color: var(--errore); background: rgba(255, 97, 102, .08); }
+.giorno.saltato .cerchio { border: 1px solid var(--linea-2); color: var(--fumo); background: var(--notte-2); }
+.giorno.nonfatto .tipo { color: var(--errore); }
+.giorno.saltato .tipo { text-decoration: line-through; }
+.recupero { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; border-color: rgba(255, 97, 102, .35); background: rgba(255, 97, 102, .05); }
+.recupero .sopra { font: 600 12px/16px var(--testo); letter-spacing: .12em; text-transform: uppercase; color: var(--errore); }
+.recupero h2 { margin: 0; font: 800 34px/.95 var(--display); text-transform: uppercase; }
+.recupero p { margin: 0; font: 500 14px/20px var(--testo); color: var(--ardesia); }
+.recupero .due { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+.recupero .due .btn-primario, .recupero .due .btn-secondario { height: 48px; font-size: 15px; }
+.recupero .due > :only-child { grid-column: 1 / -1; }
+.voce-giorno { display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 8px 6px; border-bottom: 1px solid rgba(255, 255, 255, .08); text-align: left; }
+.voce-giorno .g { width: 44px; display: flex; flex-direction: column; align-items: center; padding-right: 12px; box-sizing: content-box; border-right: 1px solid var(--linea-2); }
+.voce-giorno .g b { font: 600 12px/16px var(--testo); color: var(--fumo); text-transform: uppercase; }
+.voce-giorno .g span { font: 800 26px/1 var(--display); }
+.voce-giorno .testi { display: flex; flex-direction: column; gap: 2px; }
+.voce-giorno .testi b { font: 600 16px/21px var(--testo); }
+.voce-giorno .testi span { font: 500 13px/18px var(--testo); color: var(--ardesia); }
+.voce-giorno:active { background: var(--notte-3); }
+/* calendario */
+.cal-testa { display: flex; align-items: center; justify-content: space-between; padding: 6px 0 10px; }
+.cal-testa .titolo { font: 800 28px/1 var(--display); text-transform: uppercase; }
+.cal-testa .icona-44 { color: var(--gesso); }
+.cal-griglia { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px 4px; }
+.cal-lettera { text-align: center; font: 600 12px/20px var(--testo); color: var(--fumo); }
+.cal-g, .cal-vuoto { aspect-ratio: 1; max-height: 46px; display: grid; place-items: center; border-radius: 50%; font: 600 15px/1 var(--testo); color: var(--fumo); justify-self: center; width: 100%; max-width: 46px; }
+.cal-fatto { background: rgba(200, 240, 60, .2); color: var(--voltaico); }
+.cal-previsto { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .13); color: var(--gesso); }
+.cal-saltato { box-shadow: inset 0 0 0 1px var(--linea-2); background: var(--notte-2); color: var(--fumo); }
+.cal-nonfatto { box-shadow: inset 0 0 0 1.5px var(--errore); color: var(--errore); }
+.cal-oggi { background: var(--voltaico); color: var(--su-accento); box-shadow: none; }
+.cal-riposo { color: var(--fumo); }
+.cal-fuori { opacity: .3; }
+.cal-scelto:not(.cal-oggi) { outline: 2px solid var(--gesso); outline-offset: 2px; }
+.cal-dettaglio { margin: 14px 2px 0; min-height: 42px; font: 500 15px/21px var(--testo); color: var(--gesso); }
+.cal-dettaglio.tenue { color: var(--fumo); font-size: 14px; }
+.cal-stato-fatto { color: var(--voltaico); } .cal-stato-nonfatto { color: var(--errore); } .cal-stato-saltato { color: var(--fumo); }
+.cal-legenda { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; font: 500 12px/16px var(--testo); color: var(--fumo); }
+.cal-legenda span { display: flex; align-items: center; gap: 6px; }
+.cal-legenda i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.cal-nota { margin: 10px 2px 0; font: 500 12px/16px var(--testo); }

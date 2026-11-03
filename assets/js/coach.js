@@ -43,6 +43,12 @@
       extra.unshift({ id: 'marco-' + iso(d), nome: 'Marco Rossi', foto: D.atleta.foto, chip: note || limite ? ['avviso', note ? 'Nota' : 'Al limite'] : ['ok', 'Allenamento'], quando: 'oggi',
         testo: `Allenamento · ${D.allenamenti[k].nome} ${S.finito ? 'completato' : 'in corso'} · ${fatte}/${tot} serie${note ? ` · ${note === 1 ? '1 nota' : note + ' note'}` : ''}` });
     });
+    // Settimana cambiata dall'atleta: spostamenti e allenamenti saltati
+    const sett = window.ARCHIVIO.settimanaDi(D);
+    sett.saltati.forEach((i) => extra.unshift({ id: 'marco-saltato-' + i, nome: 'Marco Rossi', foto: D.atleta.foto, chip: ['avviso', 'Saltato'], quando: 'oggi',
+      testo: `Ha saltato ${D.allenamenti[sett.giorni[i]].nome} di ${GIORNI[i].toLowerCase()}` }));
+    sett.cambi.forEach((x) => extra.unshift({ id: 'marco-spostato-' + x.quando, nome: 'Marco Rossi', foto: D.atleta.foto, chip: ['neutro', 'Spostato'], quando: 'oggi',
+      testo: `Ha spostato ${D.allenamenti[x.k].nome} da ${GIORNI[x.da].toLowerCase()} a ${GIORNI[x.a].toLowerCase()}` }));
     const voci = extra.concat(D.coda).filter((v) => !(v.id === V.id && inviato))
       .filter((v) => filtro === 'tutto' || tipoVoce(v) === filtro);
     $('#coda').innerHTML = voci.map((v) => {
@@ -345,6 +351,7 @@
   function tutto() { conteggi(); coda(); revisione(); allenamentiMarco(); }
   window.addEventListener('storage', (e) => { if (e.key && e.key.startsWith('pt-checkin')) coda(); });
   window.ARCHIVIO.ascolta('pt-sessione-', () => { coda(); allenamentiMarco(); }); // Marco segna una serie nell'app
+  window.ARCHIVIO.ascolta('pt-settimana-', () => { window.ARCHIVIO.applicaSettimana(D); coda(); allenamentiMarco(); }); // Marco sposta o salta un allenamento
   tutto();
   tabella();
   programmaMarco();

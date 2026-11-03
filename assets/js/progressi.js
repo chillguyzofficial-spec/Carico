@@ -122,7 +122,7 @@
   function riepilogo() {
     const sess = A.leggi(A.chiaveSessione);
     let fattiSett = 0, previstiSett = 0;
-    D.settimana.forEach((k, i) => { if (!k) return; if (i < A.oggi || (i === A.oggi && sess && sess.finito)) { fattiSett++; previstiSett++; } else if (i < A.oggi) previstiSett++; });
+    D.settimana.forEach((k, i) => { const st = A.piano.stato(i); if (st === 'fatto') { fattiSett++; previstiSett++; } else if (st === 'nonfatto' || st === 'saltato') previstiSett++; });
     const fatti = 22 + fattiSett, previsti = 25 + previstiSett; // settimane 1–5: 22 su 25 (3 saltati)
     return { fatti, previsti, aderenza: Math.round(fatti / previsti * 100) };
   }

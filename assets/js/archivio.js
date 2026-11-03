@@ -26,6 +26,18 @@
     return modifiche;
   }
 
-  window.ARCHIVIO = { leggi, scrivi, chiavi, ascolta, CHIAVE_PROGRAMMA, applicaProgramma };
-  if (window.DATI) applicaProgramma(window.DATI);
+  // Settimana dell'atleta: i giorni del programma si possono spostare (imprevisti) e un allenamento si può saltare.
+  // Salvata per settimana (pt-settimana-<lunedì>): { giorni: [7 allenamenti o null], saltati: [indici], cambi: [{ k, da, a, quando }] }
+  const isoData = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const lunediDi = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7));
+  const chiaveSettimana = (d = new Date()) => 'pt-settimana-' + isoData(lunediDi(d));
+  function settimanaDi(D) { return leggi(chiaveSettimana()) || { giorni: D.settimanaBase.slice(), saltati: [], cambi: [] }; }
+  function applicaSettimana(D) {
+    if (!D.settimanaBase) D.settimanaBase = D.settimana.slice(); // il programma del coach, lunedì → domenica
+    const s = leggi(chiaveSettimana());
+    D.settimana = s && s.giorni ? s.giorni.slice() : D.settimanaBase.slice();
+  }
+
+  window.ARCHIVIO = { leggi, scrivi, chiavi, ascolta, CHIAVE_PROGRAMMA, applicaProgramma, isoData, chiaveSettimana, settimanaDi, applicaSettimana };
+  if (window.DATI) { applicaProgramma(window.DATI); applicaSettimana(window.DATI); }
 })();

@@ -30,14 +30,16 @@
           <span class="muscoli">${esc(all.muscoli)}</span>
           <span class="durata-all">${all.esercizi} esercizi · ~${all.minuti} min</span>
           ${azione}
+          ${finito ? '' : '<button class="link-sposta" data-sposta>Oggi non riesci? Cambia giorno</button>'}
         </div>
       </section>`;
     }
 
     // Riposo: anteprima del prossimo allenamento
     let dopo = 1;
-    while (!D.settimana[(oggi + dopo) % 7]) dopo++;
-    const prossimo = D.allenamenti[D.settimana[(oggi + dopo) % 7]];
+    while (dopo < 7 && !D.settimana[(oggi + dopo) % 7]) dopo++;
+    if (dopo === 7) dopo = 0;
+    const prossimo = dopo ? D.allenamenti[D.settimana[(oggi + dopo) % 7]] : null;
     const quando = dopo === 1 ? 'Domani' : GIORNI[(oggi + dopo) % 7];
     return `
       <section class="hero riposo" aria-label="Giorno di riposo">
@@ -47,14 +49,14 @@
           <span class="sopratitolo">Oggi · ${GIORNI[oggi]} ${data(oggi).getDate()}</span>
           <h1 class="titolone">Riposo</h1>
           <p class="consiglio">${esc(D.riposo)}</p>
-          <a class="domani" href="#programma/${D.settimana[(oggi + dopo) % 7]}">
+          ${prossimo ? `<a class="domani" href="#programma/${D.settimana[(oggi + dopo) % 7]}">
             <span class="cosa">
               <span class="quando">${quando} · ${BREVI[(oggi + dopo) % 7]} ${data(oggi + dopo).getDate()}</span>
               <span class="riga"><span class="nome">${esc(prossimo.nome)}</span><span class="info num">${prossimo.esercizi} esercizi · ~${prossimo.minuti} min</span></span>
             </span>
             <span class="vai">Anteprima</span>
             <svg width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5" fill="none" stroke="#DDF77A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
+          </a>` : ''}
         </div>
       </section>`;
   }
@@ -65,17 +67,20 @@
       ? `${inizio.getDate()}–${fine.getDate()} ${MESI[fine.getMonth()]}`
       : `${inizio.getDate()} ${MESI[inizio.getMonth()]} – ${fine.getDate()} ${MESI[fine.getMonth()]}`;
     const spunta = '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#DDF77A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const X = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    const NOMI = { fatto: 'fatto', oggi: 'oggi', previsto: 'previsto', riposo: 'riposo', nonfatto: 'non fatto', saltato: 'saltato' };
     const giorni = D.settimana.map((k, i) => {
+      const st = A.piano.stato(i), fatto = st === 'fatto';
       const cls = ['giorno'];
       if (!k) cls.push('libero');
-      const fatto = k && (i < oggi || (i === oggi && sessione && sessione.finito));
       if (i === oggi && !fatto) cls.push('oggi');
       if (i === oggi) cls.push('corrente');
       if (fatto) cls.push('fatto');
+      if (st === 'nonfatto' || st === 'saltato') cls.push(st);
       const tipo = k ? D.allenamenti[k].breve : 'Riposo';
-      const stato = fatto ? 'fatto' : i === oggi ? 'oggi' : k ? 'previsto' : 'riposo';
+      const stato = NOMI[st];
       const dentro = `<span class="lettera" aria-hidden="true">${LETTERE[i]}</span>
-        <span class="cerchio" aria-hidden="true">${fatto ? spunta : data(i).getDate()}</span>
+        <span class="cerchio" aria-hidden="true">${fatto ? spunta : st === 'nonfatto' || st === 'saltato' ? X : data(i).getDate()}</span>
         <span class="tipo" aria-hidden="true">${tipo}</span>`;
       const etichetta = `${GIORNI[i]} ${data(i).getDate()}, ${tipo}, ${stato}`;
       return `<li class="${cls.join(' ')}">${k
@@ -84,10 +89,72 @@
     }).join('');
     return `
       <section class="blocco settimana" aria-labelledby="t-sett">
-        <div class="intesta etichetta"><h2 id="t-sett" class="etichetta" style="margin:0">Questa settimana</h2><span class="num">${periodo}</span></div>
+        <div class="intesta etichetta"><h2 id="t-sett" class="etichetta" style="margin:0">Questa settimana</h2><span class="destra"><span class="num">${periodo}</span><button class="link-calendario" data-calendario aria-label="Apri il calendario del programma"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 10h16M9 3v4M15 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Calendario</button></span></div>
         <ul class="giorni">${giorni}</ul>
       </section>`;
   }
+
+  // ---------- Allenamento non fatto: «Fallo oggi» o «Lo salto» ----------
+  function recupero() {
+    const i = A.piano.daRecuperare();
+    if (i < 0) return '';
+    const k = D.settimana[i], dove = A.piano.dove();
+    let testo = '';
+    if (dove && dove.giorno === oggi) testo = dove.sposta >= 0 ? `Lo fai oggi e ${esc(D.allenamenti[D.settimana[oggi]].nome)} passa a ${GIORNI[dove.sposta]}.` : 'Oggi sei libero: puoi farlo adesso.';
+    else if (dove) testo = `Oggi hai già iniziato: lo sposti a ${GIORNI[dove.giorno]}.`;
+    else testo = 'Questa settimana non ci sono più giorni liberi.';
+    return `
+      <section class="blocco recupero-blocco" aria-labelledby="t-rec">
+        <div class="recupero card">
+          <span class="sopra">Non fatto · ${GIORNI[i]} ${data(i).getDate()}</span>
+          <h2 id="t-rec">${esc(D.allenamenti[k].nome)}</h2>
+          <p>${testo} ${esc(D.coach.breve)} vede cosa scegli.</p>
+          <div class="due">
+            ${dove ? `<button class="btn-primario" data-recupera="${i}">${dove.giorno === oggi ? 'Fallo oggi' : `Spostalo a ${GIORNI[dove.giorno]}`}</button>` : ''}
+            <button class="btn-secondario" data-salta="${i}">Lo salto</button>
+          </div>
+        </div>
+      </section>`;
+  }
+
+  let foglio = null, mese = 0, giornoCal = '';
+  function schermoFoglio() {
+    if (!foglio) return '';
+    let dentro;
+    if (foglio === 'calendario') {
+      dentro = A.calendario.html(mese, giornoCal) + '<button class="chiudi-foglio" data-chiudi>Chiudi</button>';
+    } else { // cambia giorno all'allenamento di oggi
+      const voci = D.settimana.map((k, j) => j > oggi ? `<button class="voce-giorno" data-sposta-a="${j}"><span class="g"><b>${BREVI[j]}</b><span class="num">${data(j).getDate()}</span></span><span class="testi"><b>${GIORNI[j][0].toUpperCase() + GIORNI[j].slice(1)}</b><span>${k ? `C'è ${esc(D.allenamenti[k].nome)}: si scambiano` : 'Libero'}</span></span></button>` : '').join('');
+      dentro = `
+        <div class="testa-foglio"><span class="titolo">Cambia giorno</span><span>${esc(all.nome)} si sposta nel giorno che scegli. ${esc(D.coach.breve)} lo vede nel gestionale.</span></div>
+        ${voci || '<p class="nota-tua">Oggi è l’ultimo giorno della settimana: non ci sono altri giorni.</p>'}
+        <button class="chiudi-foglio" data-chiudi>Annulla</button>`;
+    }
+    return `<div class="velo-foglio" data-chiudi></div><div class="foglio" role="dialog" aria-modal="true" aria-label="${foglio === 'calendario' ? 'Calendario' : 'Cambia giorno'}"><span class="maniglia" aria-hidden="true"></span>${dentro}</div>`;
+  }
+  function ridisegna() { const y = scrollY; A.viste.oggi.render(); scrollTo(0, y); }
+  window.addEventListener('hashchange', () => { foglio = null; }); // un foglio non resta aperto tornando su Oggi
+  document.addEventListener('DOMContentLoaded', () => {
+    const v = document.querySelector('[data-vista="oggi"]');
+    v.addEventListener('click', (ev) => {
+      const t = ev.target.closest('button, [data-chiudi]');
+      if (!t) return;
+      const d = t.dataset;
+      if (t.matches('[data-chiudi]')) { foglio = null; ridisegna(); return; }
+      if (d.calendario !== undefined) { foglio = 'calendario'; mese = 0; giornoCal = A.iso(data(oggi)); ridisegna(); return; }
+      if (d.calMese !== undefined) { mese = Number(d.calMese); giornoCal = ''; ridisegna(); return; }
+      if (d.calGiorno) { giornoCal = d.calGiorno; ridisegna(); return; }
+      if (d.sposta !== undefined) { foglio = 'sposta'; ridisegna(); return; }
+      if (d.spostaA !== undefined) { A.piano.sposta(oggi, Number(d.spostaA)); return; }
+      if (d.recupera !== undefined) { A.piano.recupera(Number(d.recupera)); return; }
+      if (d.salta !== undefined) {
+        const i = Number(d.salta);
+        A.piano.salta(i); ridisegna();
+        A.avviso(`${D.allenamenti[D.settimana[i]].nome} saltato`, `${D.coach.breve} lo vede nel gestionale`, () => { A.piano.annullaSalto(i); ridisegna(); });
+      }
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && foglio && !v.hidden) { foglio = null; ridisegna(); } });
+  });
 
   // ---------- Dal tuo coach: una sola cosa, la più importante ----------
   function quandoFeedback(f) {
@@ -212,7 +279,9 @@
     render() {
       const sessione = A.leggi(A.chiaveSessione);
       const cosa = cosaDalCoach();
-      document.querySelector('[data-vista="oggi"]').innerHTML = hero(sessione) + settimana(sessione) + coach(cosa) + progresso(cosa);
+      const v = document.querySelector('[data-vista="oggi"]');
+      v.innerHTML = hero(sessione) + recupero() + settimana(sessione) + coach(cosa) + progresso(cosa) + schermoFoglio();
+      v.classList.toggle('con-foglio', !!foglio);
       document.getElementById('voce-coach').classList.toggle('novita', !!(cosa && (cosa.tipo === 'checkin' || (cosa.tipo === 'feedback' && cosa.f.istante))));
       adatta();
     },

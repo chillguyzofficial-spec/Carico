@@ -8,8 +8,8 @@
       const sessione = A.leggi(A.chiaveSessione);
       const giorni = D.settimana.map((k, i) => {
         const a = k ? D.allenamenti[k] : null;
-        const fatto = k && (i < A.oggi || (i === A.oggi && sessione && sessione.finito));
-        const stato = fatto ? '<span class="chip chip-ok">Fatto</span>' : i === A.oggi ? '<span class="chip chip-info">Oggi</span>' : '';
+        const st = A.piano.stato(i); // fatto, oggi, non fatto, saltato (piano.js)
+        const stato = st === 'fatto' ? '<span class="chip chip-ok">Fatto</span>' : st === 'oggi' ? '<span class="chip chip-info">Oggi</span>' : st === 'nonfatto' ? '<span class="chip chip-errore">Non fatto</span>' : st === 'saltato' ? '<span class="chip chip-neutro">Saltato</span>' : '';
         const dentro = `<span class="quando num"><b>${BREVI[i]}</b><span>${A.data(i).getDate()}</span></span>
           <span class="cosa"><b>${a ? esc(a.nome) : 'Riposo'}</b><span>${a ? `${esc(a.muscoli)}` : 'Camminata e mobilità'}</span></span>${stato}`;
         return k
