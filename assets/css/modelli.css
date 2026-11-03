@@ -19,7 +19,7 @@
 
 /* Profilo */
 .profilo-foto { position: relative; height: 430px; display: flex; align-items: flex-end; padding: 0 20px 6px; overflow: hidden; }
-.profilo-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 65% 20%; filter: grayscale(1) contrast(1.05); }
+.profilo-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.05); }
 .profilo-foto::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0, 0, 0, .7) 0%, rgba(0, 0, 0, 0) 60%), linear-gradient(0deg, #000 0%, rgba(0, 0, 0, 0) 45%); }
 .profilo-nome { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
 .profilo-nome .titolo-pagina { font-size: 80px; line-height: .86; }

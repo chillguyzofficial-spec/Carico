@@ -36,6 +36,8 @@ const FOTO = [
   { da: 'Bilanciere e ghisa nella penombra.png', a: 'progressi-testa', w: 1180 },
   { da: "Pausa dopo l'allenamento.png", a: 'trag-dodici', w: 800 },
   { da: 'Panca piana in palestra industriale.png', a: 'demo-panca', w: 480 },
+  // Profilo: foto grande e nitida di Marco (prima era l'avatar da 240 px allargato, sfocato)
+  { da: 'Squat con bilanciere in palestra.png', a: 'profilo-marco', w: 900, crop: [0, 230, 941, 1000] },
 ];
 
 (async () => {
