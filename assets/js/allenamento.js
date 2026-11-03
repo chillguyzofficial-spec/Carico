@@ -60,6 +60,7 @@
   const zavorra = (i) => /^Trazioni/.test(nomeDi(i));
   const pesoTesto = (i, v) => (zavorra(i) ? (v ? `+${kg(v)} kg` : 'corpo libero') : `${kg(v)} kg`);
   const SPUNTA = (c, w = 16) => `<svg width="${w}" height="${w}" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const GUIDA = window.GUIDA || {}; // spiegazioni degli esercizi (guida.js)
   const FATICA = { facile: 'Facile', giusto: 'Giusto', limite: 'Al limite' }; // «Com'è andata?» dell'esercizio, la legge il coach
   // Record: più chili del miglior carico alle ripetizioni del programma (non per esercizi cambiati o aggiunti)
   const eRecord = (i, r) => !S.es[i].nome && !ex(i).mio && r.reps >= ex(i).reps && r.kg > ex(i).best;
@@ -148,6 +149,7 @@
           <span class="n-es num">${e.mio ? '+' : due(i + 1)}</span>
           <div class="titoli-es">
             <h2><button id="es-${i}" data-apri="${i}" aria-expanded="true">${esc(nomeDi(i))}</button></h2>
+            ${GUIDA[nomeDi(i)] ? `<button class="come-si-fa" data-spiega="${i}"><span aria-hidden="true">i</span>Come si fa</button>` : ''}
           </div>
           ${e.demo && !s.nome ? `<button class="tecnica" data-demo="${i}" aria-label="Guarda come si fa: video di ${esc(D.coach.breve)}, ${e.durata}"><img src="assets/foto/${e.demo}.webp" alt=""><span class="play" aria-hidden="true"><svg width="12" height="14" viewBox="0 0 10 12"><path d="M1 1v10l8-5z" fill="#fff"/></svg></span><span class="etich">Vedi tecnica</span></button>` : ''}
           <div class="dati-es num"><span class="schema">${s.serie.length} × ${e.reps}</span><span class="ultima">${dati}</span><button class="chiudi-es" data-apri="${i}" aria-label="Chiudi ${esc(nomeDi(i))}">${FRECCIA}</button></div>
@@ -197,6 +199,19 @@
         <button class="voce-foglio" id="altro-esercizio"><span class="testi"><b>Un altro esercizio…</b><span>Scegli dalla lista o scrivi il nome</span></span></button>
         ${s.nome ? `<button class="voce-foglio" data-alt=""><span class="testi"><b>Torna a ${esc(e.nome)}</b></span></button>` : ''}
         <button class="chiudi-foglio" data-chiudi>Indietro</button>`;
+    } else if (foglio.tipo === 'spiega') {
+      const g = GUIDA[nomeDi(i)], video = e.demo && !s.nome;
+      dentro = `
+        <div class="testa-foglio"><span class="titolo">${esc(nomeDi(i))}</span><span>${esc(g.muscoli)}</span></div>
+        ${video ? `<button class="voce-foglio card" data-demo="${i}"><span class="icona-tonda"><svg width="14" height="16" viewBox="0 0 10 12"><path d="M1 1v10l8-5z" fill="#F4F4F0"/></svg></span><span class="testi"><b>Guarda il video di ${esc(D.coach.breve)}</b><span>${e.durata}</span></span></button>` : ''}
+        <div class="guida">
+          <h3>Come si fa</h3>
+          <ol>${g.passi.map((p) => `<li>${esc(p)}</li>`).join('')}</ol>
+          <h3>Da evitare</h3>
+          <ul>${g.errori.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
+          ${e.nota && !s.nome ? `<p class="guida-coach"><b>${esc(D.coach.breve)}:</b> «${esc(e.nota)}»</p>` : ''}
+        </div>
+        <button class="chiudi-foglio" data-chiudi>Chiudi</button>`;
     } else if (foglio.tipo === 'nota') {
       dentro = `
         <div class="testa-foglio"><span class="titolo">Nota per ${esc(D.coach.breve)}</span><span>${esc(nomeDi(i))} · la legge nel gestionale insieme alle tue serie.</span></div>
@@ -375,6 +390,7 @@
       return;
     }
     if (d.fatica) { const [i, k] = d.fatica.split('-'); const s = S.es[Number(i)]; s.fatica = s.fatica === k ? null : k; salva(); ridisegnaTenendoPosizione(); return; }
+    if (d.spiega !== undefined) { foglio = { tipo: 'spiega', i: Number(d.spiega) }; ridisegnaTenendoPosizione(); return; }
     if (d.nota !== undefined) { foglio = { tipo: 'nota', i: Number(d.nota) }; ridisegnaTenendoPosizione(); setTimeout(() => { const t = document.getElementById('testo-nota'); t && t.focus(); }, 50); return; }
     switch (t.id) {
       case 'salva-nota': case 'togli-nota': {

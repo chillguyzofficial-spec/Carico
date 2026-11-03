@@ -139,3 +139,14 @@ button.prima-cella:active { background: var(--notte-2); color: var(--gesso); }
 .nota-tua-es { margin: 0; font: 500 14px/20px var(--testo); color: var(--ardesia); }
 .nota-tua-es b { color: var(--gesso); font-weight: 600; }
 .foglio textarea.campo-testo { min-height: 110px; }
+
+/* «Come si fa»: spiegazione dell'esercizio in un foglio dal basso (richiesta di Francesco 2026-11-03) */
+.come-si-fa { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px 0 6px; border-radius: 18px; border: 1px solid var(--linea-2); font: 600 14px/1 var(--testo); color: var(--gesso); }
+.come-si-fa span { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--voltaico); color: var(--su-accento); font: italic 800 14px/1 Georgia, serif; }
+.foglio { max-height: 88vh; overflow-y: auto; }
+.guida h3 { margin: 10px 4px 6px; font: 600 12px/16px var(--testo); letter-spacing: .1em; text-transform: uppercase; color: var(--fumo); }
+.guida ol, .guida ul { margin: 0; padding: 0 4px 0 26px; display: flex; flex-direction: column; gap: 8px; font: 500 16px/23px var(--testo); color: var(--gesso); }
+.guida ol li::marker { font-weight: 700; color: var(--voltaico); }
+.guida ul li::marker { color: var(--errore); }
+.guida-coach { margin: 14px 4px 0; padding: 10px 12px; border-radius: 12px; background: var(--notte-1); font: 500 15px/21px var(--testo); color: var(--ardesia); }
+.guida-coach b { color: var(--gesso); }

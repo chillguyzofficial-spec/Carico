@@ -1,0 +1,43 @@
+// «Come si fa»: ogni esercizio (programma, alternative, lista «aggiungi») ha la spiegazione; il foglio si apre e si chiude.
+const { chromium, devices } = require('C:/Users/Claude FK/.claude/projects/hedonè progetto serio/node_modules/playwright');
+const U = 'file:///C:/Users/Claude%20FK/.claude/projects/gym%20app/app.html';
+const out = process.argv[2];
+(async () => {
+  const b = await chromium.launch(); let ok = 0, ko = 0; const err = [];
+  const v = (c, m) => { if (c) ok++; else { ko++; console.log('KO', m); } };
+  const ctx = await b.newContext({ ...devices['iPhone 13'] });
+  await ctx.addInitScript(() => localStorage.setItem('pt-collegato', '{"quando":1}'));
+  const p = await ctx.newPage(); p.on('pageerror', e => err.push(e.message));
+  await p.goto(U + '?giorno=4#allenamento'); await p.waitForTimeout(500);
+  const mancano = await p.evaluate(() => {
+    const nomi = new Set();
+    Object.values(DATI.esercizi).flat().forEach((e) => { nomi.add(e.nome); (e.alt || []).forEach((a) => nomi.add(a)); });
+    document.querySelector('#aggiungi').click();
+    document.querySelectorAll('[data-scegli]').forEach((x) => nomi.add(x.dataset.scegli));
+    return [...nomi].filter((n) => !GUIDA[n] || GUIDA[n].passi.length < 3 || !GUIDA[n].errori.length || !GUIDA[n].muscoli);
+  });
+  v(mancano.length === 0, 'spiegazione mancante: ' + mancano.join(', '));
+  await p.click('[data-chiudi].chiudi-foglio'); await p.waitForTimeout(200);
+  v(await p.isVisible('.es.aperto .come-si-fa'), 'pulsante «Come si fa» nell’esercizio aperto');
+  await p.click('.es.aperto .come-si-fa'); await p.waitForTimeout(300);
+  const t = (await p.textContent('.foglio')).replace(/\s+/g, ' ');
+  v(t.includes('Panca piana') && t.includes('Come si fa') && t.includes('Da evitare') && t.includes('Petto'), 'foglio con muscoli, passi, errori');
+  v(t.includes('Scapole addotte'), 'nota del coach nel foglio');
+  await p.screenshot({ path: out + '/g-panca.png' });
+  await p.click('.velo-foglio', { position: { x: 20, y: 20 } }); await p.waitForTimeout(200);
+  v(!(await p.$('.foglio')), 'si chiude toccando fuori');
+  await p.click('[data-apri="1"]'); await p.waitForTimeout(200);
+  await p.click('.es.aperto .come-si-fa'); await p.waitForTimeout(300);
+  v((await p.textContent('.foglio')).includes('Guarda il video di Luca'), 'Lento avanti: c’è il video del coach');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200);
+  v(!(await p.$('.foglio')), 'si chiude con Esc');
+  const q = await b.newContext({ viewport: { width: 320, height: 568 }, isMobile: true, hasTouch: true });
+  await q.addInitScript(() => localStorage.setItem('pt-collegato', '1'));
+  const r = await q.newPage(); await r.goto(U + '?giorno=5#allenamento'); await r.waitForTimeout(400);
+  await r.click('.es.aperto .come-si-fa'); await r.waitForTimeout(300);
+  const x = await r.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth); v(x <= 0, `320 +${x}`);
+  v(await r.evaluate(() => { const f = document.querySelector('.foglio'); return f.getBoundingClientRect().top >= 0; }), 'a 320×568 il foglio non esce in alto (scorre dentro)');
+  await r.screenshot({ path: out + '/g-320.png' });
+  v(err.length === 0, 'errori: ' + err.join(' | '));
+  console.log(ok + ' ok, ' + ko + ' ko'); await b.close(); process.exit(ko ? 1 : 0);
+})();
