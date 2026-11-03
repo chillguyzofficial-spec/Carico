@@ -50,9 +50,9 @@
 
 /* Tabella delle serie */
 .sk-tabella { display: flex; flex-direction: column; }
-.intest-serie, .riga-serie { display: grid; grid-template-columns: 52px 1fr 1fr 52px; gap: 10px; align-items: center; }
+.intest-serie, .riga-serie { display: grid; grid-template-columns: 40px 64px 1fr 1fr 44px; gap: 8px; align-items: center; }
 .intest-serie { padding: 0 0 8px; border-bottom: 1px solid rgba(255, 255, 255, .12); font: 600 12px/16px var(--testo); letter-spacing: .1em; text-transform: uppercase; color: var(--fumo); }
-.intest-serie span:nth-child(2), .intest-serie span:nth-child(3) { text-align: center; }
+.intest-serie span:nth-child(n+2):nth-child(-n+4) { text-align: center; }
 .riga-serie { min-height: 60px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
 .n-serie { display: flex; align-items: center; gap: 2px; font: 700 18px/1 var(--display); color: var(--ardesia); }
 .riga-serie.extra .n-serie { color: var(--voltaico-chiaro); }
@@ -117,8 +117,25 @@
   .titolo-scheda { font-size: 60px; }
   .titoli-es h2 button { font-size: 34px; }
   .sk-testa.con-video { grid-template-columns: auto 1fr 92px; }
-  .intest-serie, .riga-serie { grid-template-columns: 44px 1fr 1fr 48px; gap: 8px; }
+  .intest-serie, .riga-serie { grid-template-columns: 30px 54px 1fr 1fr 44px; gap: 6px; }
+  .prima-cella { font-size: 15px; }
   .btn-linea { font-size: 15px; }
   .n-es { width: 36px; font-size: 26px; }
   .sk-riga .n-es { width: 44px; }
 }
+
+/* Migliorie dalle app migliori (Hevy, Strong, TrueCoach, Everfit), 2026-11-03 */
+.prima-cella { height: 44px; border-radius: 10px; font: 700 17px/1 var(--display); color: var(--fumo); text-align: center; white-space: nowrap; }
+.prima-cella i { font-style: normal; margin: 0 1px; opacity: .7; }
+button.prima-cella:active { background: var(--notte-2); color: var(--gesso); }
+.prima-cella.vuota { display: grid; place-items: center; }
+.riga-serie.record .n-serie { color: var(--voltaico); flex-direction: column; align-items: flex-start; gap: 3px; }
+.riga-serie.record .n-serie::after { content: 'PR'; font: 800 11px/1 var(--testo); letter-spacing: .08em; padding: 3px 5px; border-radius: 5px; background: var(--voltaico); color: var(--su-accento); }
+.riga-serie.record .cella[data-cella='kg'] { border-color: rgba(200, 240, 60, .55); color: var(--voltaico); }
+.fatica { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.fatica .quanto { font: 600 12px/16px var(--testo); letter-spacing: .1em; text-transform: uppercase; color: var(--fumo); margin-right: 4px; }
+.fatica button { min-height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--linea-2); font: 600 14px/1 var(--testo); color: var(--ardesia); }
+.fatica button[aria-checked='true'] { background: var(--voltaico); border-color: var(--voltaico); color: var(--su-accento); }
+.nota-tua-es { margin: 0; font: 500 14px/20px var(--testo); color: var(--ardesia); }
+.nota-tua-es b { color: var(--gesso); font-weight: 600; }
+.foglio textarea.campo-testo { min-height: 110px; }

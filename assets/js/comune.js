@@ -18,8 +18,7 @@
   const kg = (n) => String(Math.round(n * 100) / 100).replace('.', ','); // due decimali: il disco da 1,25 non diventa «1,3»
   const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-  const leggi = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
-  const scrivi = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* senza memoria si continua lo stesso */ } };
+  const { leggi, scrivi } = window.ARCHIVIO; // memoria condivisa con il gestionale (vedi archivio.js)
 
   const chiaveSessione = 'pt-sessione-' + iso(data(oggi));
   const chiaveCheckin = 'pt-checkin-s' + D.atleta.settimana;
@@ -67,6 +66,8 @@
     viste[v].render(param ? decodeURIComponent(param) : '');
     window.scrollTo(0, 0);
   }
+  // Il coach ha cambiato il programma dal gestionale (in un'altra scheda): si ridisegna la schermata aperta
+  window.ARCHIVIO.ascolta(window.ARCHIVIO.CHIAVE_PROGRAMMA, () => { window.ARCHIVIO.applicaProgramma(D); mostra(); });
   window.addEventListener('hashchange', mostra);
   document.addEventListener('DOMContentLoaded', mostra);
 

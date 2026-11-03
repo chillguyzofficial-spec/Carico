@@ -2,7 +2,7 @@
 html { background: var(--deriva); }
 body { min-height: 100vh; background: linear-gradient(var(--notte-0) 0%, var(--fondo) 50%, var(--deriva) 100%); }
 .link { font: 600 14px/1 var(--testo); color: var(--voltaico-chiaro); text-decoration: none; }
-.link:hover { color: #A9C3FF; }
+.link:hover { color: var(--voltaico); }
 
 .gestionale { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100vh; max-width: 1600px; margin: 0 auto; }
 
@@ -186,4 +186,43 @@ button.voce-coda:hover { background: rgba(28, 28, 28, .55); }
   .riga-titolo { flex-direction: column; align-items: flex-start; }
   .tr { grid-template-columns: minmax(0, 1fr) 110px; }
   .tr > :nth-child(4) { display: none; }
+}
+
+/* Marco dall'app: allenamenti registrati e programma modificabile (collegamento app ↔ gestionale, 2026-11-03) */
+.marco-blocco { display: flex; flex-direction: column; gap: 14px; }
+.marco-griglia { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 24px; align-items: start; }
+.marco-allenamenti, .marco-programma { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+.marco-blocco h3 { margin: 0; font: 700 24px/1 var(--display); text-transform: uppercase; }
+.vuoto-marco { margin: 0; font: 500 14px/20px var(--testo); color: var(--fumo); }
+.sessione-marco { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--linea); }
+.testa-sessione { display: flex; align-items: center; gap: 10px; font: 500 14px/20px var(--testo); color: var(--ardesia); }
+.testa-sessione b { color: var(--gesso); font-weight: 600; }
+.testa-sessione > span:first-child { flex: 1; }
+.testa-sessione .chip { height: 24px; padding: 0 9px; font-size: 12px; }
+.testa-sessione .tenue { color: var(--fumo); font-size: 13px; }
+.lista-marco { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.lista-marco li { padding: 9px 0; border-bottom: 1px solid var(--linea-tenue); display: flex; flex-direction: column; gap: 4px; }
+.lista-marco li:last-child { border-bottom: 0; }
+.es-marco { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.es-marco b { font: 600 15px/20px var(--testo); margin-right: 4px; }
+.es-marco .chip { height: 22px; padding: 0 8px; font-size: 11px; }
+.serie-marco { font: 500 13px/18px var(--testo); color: var(--ardesia); }
+.nota-marco { margin: 2px 0 0; padding: 6px 10px; border-left: 2px solid var(--avviso); font: italic 500 14px/20px var(--testo); color: var(--gesso); background: rgba(245, 181, 68, .06); border-radius: 0 8px 8px 0; }
+.giorni-prog { grid-template-columns: repeat(5, 1fr); }
+.giorni-prog .segmento { flex-direction: column; gap: 3px; height: 52px; font-size: 12px; }
+.giorni-prog .segmento span { font-size: 13px; }
+.tab-prog { display: flex; flex-direction: column; }
+.rp { display: grid; grid-template-columns: minmax(0, 1.5fr) 58px 58px 70px minmax(0, 1.6fr); gap: 8px; align-items: center; min-height: 52px; border-bottom: 1px solid var(--linea-tenue); }
+.rp.th { min-height: 34px; font: 600 11px/1 var(--testo); letter-spacing: .12em; color: var(--fumo); text-transform: uppercase; }
+.nome-prog-es { font: 600 14px/18px var(--testo); display: flex; flex-direction: column; gap: 2px; }
+.nome-prog-es i { font: normal 600 11px/1 var(--testo); letter-spacing: .08em; text-transform: uppercase; color: var(--voltaico); }
+.campo-prog { width: 100%; min-width: 0; height: 38px; border-radius: 10px; border: 1px solid var(--linea); background: var(--notte-2); color: var(--gesso); font: 600 15px/1 var(--testo); text-align: center; outline: 0; padding: 0 6px; }
+.campo-prog.nota { text-align: left; font-weight: 500; font-size: 13px; padding: 0 10px; }
+.campo-prog:focus { border-color: var(--voltaico); box-shadow: 0 0 0 3px rgba(200, 240, 60, .15); }
+.rp.cambiato .campo-prog { border-color: rgba(200, 240, 60, .35); }
+@media (max-width: 1180px) { .marco-griglia { grid-template-columns: 1fr; } }
+@media (max-width: 600px) {
+  .rp { grid-template-columns: minmax(0, 1fr) 48px 48px 60px; }
+  .rp > :nth-child(5) { grid-column: 1 / -1; margin-bottom: 8px; }
+  .rp.th > :nth-child(5) { display: none; }
 }

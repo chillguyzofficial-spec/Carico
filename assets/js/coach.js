@@ -16,8 +16,7 @@
   $('#data-oggi').textContent = `Lunedì ${dataLunedi}`;
 
   // ---------- Stato ----------
-  const leggi = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
-  const scrivi = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* senza memoria la prova resta in pagina */ } };
+  const { leggi, scrivi } = window.ARCHIVIO; // memoria condivisa con l'app (vedi archivio.js)
   let inviato = leggi(D.chiaveFeedback);
   let filtro = 'tutto';
 
@@ -34,8 +33,16 @@
   function coda() {
     // Il check-in mandato dall'app di Marco entra in cima alla coda
     const ci = leggi('pt-checkin-s' + D.atleta.settimana);
-    const extra = ci ? [{ id: 'marco-checkin', nome: 'Marco Rossi', foto: D.atleta.foto, chip: ['neutro', 'Check-in'], quando: 'nuovo',
+    let extra = ci ? [{ id: 'marco-checkin', nome: 'Marco Rossi', foto: D.atleta.foto, chip: ['neutro', 'Check-in'], quando: 'nuovo',
       testo: `Check-in settimana ${D.atleta.settimana} · allenamenti ${ci.allenamenti}/5, energia ${ci.energia}/5, carichi ${ci.carichi.toLowerCase()}${ci.note ? ' · «' + ci.note + '»' : ''}` }] : [];
+    // Allenamenti di Marco dall'app: in coda se completati o con una nota
+    sessioniMarco().forEach(({ d, k, S }) => {
+      const note = S.es.filter((e) => e.nota).length, limite = S.es.filter((e) => e.fatica === 'limite').length;
+      if (!S.finito && !note) return;
+      const fatte = S.es.reduce((t, e) => t + e.serie.filter((r) => r.fatta).length, 0), tot = S.es.reduce((t, e) => t + e.serie.length, 0);
+      extra.unshift({ id: 'marco-' + iso(d), nome: 'Marco Rossi', foto: D.atleta.foto, chip: note || limite ? ['avviso', note ? 'Nota' : 'Al limite'] : ['ok', 'Allenamento'], quando: 'oggi',
+        testo: `Allenamento · ${D.allenamenti[k].nome} ${S.finito ? 'completato' : 'in corso'} · ${fatte}/${tot} serie${note ? ` · ${note === 1 ? '1 nota' : note + ' note'}` : ''}` });
+    });
     const voci = extra.concat(D.coda).filter((v) => !(v.id === V.id && inviato))
       .filter((v) => filtro === 'tutto' || tipoVoce(v) === filtro);
     $('#coda').innerHTML = voci.map((v) => {
@@ -226,6 +233,108 @@
     }).join('');
   }
 
+  // ---------- Marco dall'app: allenamenti registrati ----------
+  // Legge le sessioni che l'app salva nell'archivio comune (pt-sessione-AAAA-MM-GG)
+  const GIORNI = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+  const FATICA = { facile: 'Facile', giusto: 'Giusto', limite: 'Al limite' };
+  const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const kgv = (n) => String(Math.round(n * 100) / 100).replace('.', ',');
+  function sessioniMarco() {
+    const giorni = Array.from({ length: 7 }, (_, i) => { const d = new Date(lunedi); d.setDate(lunedi.getDate() + i); return d; });
+    return giorni.map((d, i) => ({ i, d, k: D.settimana[i], S: leggi('pt-sessione-' + iso(d)) }))
+      .filter((x) => x.k && x.S && x.S.es && x.S.es.some((e) => e.serie.some((r) => r.fatta)));
+  }
+  function allenamentiMarco() {
+    const lista = sessioniMarco().reverse(); // il più recente in alto
+    const box = $('#marco-allenamenti');
+    if (!lista.length) {
+      box.innerHTML = `<h3>Allenamenti di questa settimana</h3><p class="vuoto-marco">Ancora niente: quando ${esc(D.atleta.nome)} segna le serie nell'app, compaiono qui.</p>`;
+      return;
+    }
+    box.innerHTML = '<h3>Allenamenti di questa settimana</h3>' + lista.map(({ i, d, k, S }) => {
+      const base = D.esercizi[k], all = D.allenamenti[k];
+      const fatte = S.es.reduce((t, e) => t + e.serie.filter((r) => r.fatta).length, 0), tot = S.es.reduce((t, e) => t + e.serie.length, 0);
+      const righe = S.es.map((e, j) => {
+        const b = e.agg ? null : base[j], nome = e.nome || (b ? b.nome : e.agg ? e.agg.nome : '');
+        const f = e.serie.filter((r) => r.fatta);
+        const segni = [];
+        if (!b) segni.push(`<span class="chip chip-neutro">Aggiunto da ${esc(D.atleta.nome)}</span>`);
+        if (e.nome && b) segni.push(`<span class="chip chip-neutro">Al posto di ${esc(b.nome)}</span>`);
+        const extra = e.serie.filter((r) => r.extra && r.fatta).length;
+        if (extra) segni.push(`<span class="chip chip-info">+${extra} serie</span>`);
+        if (b && !e.nome && f.some((r) => r.reps >= b.reps && r.kg > b.best)) segni.push('<span class="chip chip-ok">Record</span>');
+        if (e.fatica) segni.push(`<span class="chip chip-${e.fatica === 'limite' ? 'avviso' : 'neutro'}">${FATICA[e.fatica]}</span>`);
+        return `<li><div class="es-marco"><b>${esc(nome)}</b>${segni.join('')}</div>
+          <span class="serie-marco num">${f.length ? f.map((r) => `${kgv(r.kg)}×${r.reps}`).join(' · ') : 'non fatto'}</span>
+          ${e.nota ? `<p class="nota-marco">«${esc(e.nota)}»</p>` : ''}</li>`;
+      }).join('');
+      return `<article class="sessione-marco">
+        <div class="testa-sessione"><span><b>${GIORNI[i]} ${d.getDate()}</b> · ${esc(all.nome)}</span>
+          <span class="chip chip-${S.finito ? 'ok' : 'info'}">${S.finito ? 'Completato' : 'In corso'}</span><span class="num tenue">${fatte}/${tot} serie</span></div>
+        <ul class="lista-marco">${righe}</ul>
+      </article>`;
+    }).join('');
+  }
+
+  // ---------- Marco: programma che il coach può cambiare ----------
+  // Le modifiche vanno nell'archivio comune: l'app le usa nella prossima scheda non ancora iniziata
+  let progScelto = D.settimana.find(Boolean);
+  const CAMPI = ['serie', 'reps', 'kg', 'nota'];
+  function programmaMarco() {
+    const box = $('#marco-programma');
+    const tutte = leggi(window.ARCHIVIO.CHIAVE_PROGRAMMA) || {};
+    const lista = D.esercizi[progScelto];
+    const cambiato = (e) => e.originale && CAMPI.some((c) => (e[c] || '') !== (e.originale[c] || ''));
+    const giorni = D.settimana.map((k, i) => k && `<button class="segmento" role="radio" data-prog="${k}" aria-checked="${k === progScelto}">${GIORNI[i].slice(0, 3)} <span>${esc(D.allenamenti[k].nome)}</span></button>`).filter(Boolean).join('');
+    box.innerHTML = `
+      <h3>Programma di ${esc(D.atleta.nome)}</h3>
+      <div class="segmenti giorni-prog" role="radiogroup" aria-label="Allenamento">${giorni}</div>
+      <div class="tab-prog" role="table" aria-label="Esercizi di ${esc(D.allenamenti[progScelto].nome)}">
+        <div class="rp th" role="row"><span>Esercizio</span><span>Serie</span><span>Reps</span><span>Kg</span><span>Nota per ${esc(D.atleta.nome)}</span></div>
+        ${lista.map((e, i) => `<div class="rp${cambiato(e) ? ' cambiato' : ''}" role="row">
+          <span class="nome-prog-es">${esc(e.nome)}${cambiato(e) ? '<i>modificato</i>' : ''}</span>
+          <input class="campo-prog num" data-c="serie" data-i="${i}" value="${e.serie}" inputmode="numeric" aria-label="${esc(e.nome)}: serie">
+          <input class="campo-prog num" data-c="reps" data-i="${i}" value="${e.reps}" inputmode="numeric" aria-label="${esc(e.nome)}: ripetizioni">
+          <input class="campo-prog num" data-c="kg" data-i="${i}" value="${kgv(e.kg)}" inputmode="decimal" aria-label="${esc(e.nome)}: chili">
+          <input class="campo-prog nota" data-c="nota" data-i="${i}" value="${esc(e.nota || '')}" aria-label="${esc(e.nome)}: nota" placeholder="—">
+        </div>`).join('')}
+      </div>
+      <div class="azioni">
+        <span class="info">${esc(D.atleta.nome)} lo trova nella scheda, se non l'ha già iniziata.</span>
+        ${tutte[progScelto] ? '<button class="btn-sec" id="prog-ripristina">Torna al programma iniziale</button>' : ''}
+        <button class="btn-invia" id="prog-invia">Invia a ${esc(D.atleta.nome)}</button>
+      </div>`;
+  }
+  function scriviProgramma(tutte) {
+    scrivi(window.ARCHIVIO.CHIAVE_PROGRAMMA, Object.keys(tutte).length ? tutte : null);
+    window.ARCHIVIO.applicaProgramma(D);
+    programmaMarco();
+  }
+  function salvaProgramma() {
+    const tutte = leggi(window.ARCHIVIO.CHIAVE_PROGRAMMA) || {};
+    const nuove = D.esercizi[progScelto].map((e, i) => {
+      const o = e.originale || e, v = (c) => $('#marco-programma').querySelector(`[data-c="${c}"][data-i="${i}"]`).value.trim();
+      const num = (x, min, max, def) => { const n = Number(String(x).replace(',', '.')); return x !== '' && Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : def; };
+      const m = { serie: Math.round(num(v('serie'), 1, 10, o.serie)), reps: Math.round(num(v('reps'), 1, 50, o.reps)), kg: Math.round(num(v('kg'), 0, 500, o.kg) * 100) / 100, nota: v('nota') };
+      return CAMPI.some((c) => (m[c] || '') !== (o[c] || '')) ? m : null;
+    });
+    if (nuove.some(Boolean)) tutte[progScelto] = nuove; else delete tutte[progScelto];
+    scriviProgramma(tutte);
+    avviso('Programma aggiornato', `${D.allenamenti[progScelto].nome} · ${D.atleta.nome} lo trova nella prossima scheda`, null);
+  }
+  $('#marco-programma').addEventListener('click', (ev) => {
+    const b = ev.target.closest('button');
+    if (!b) return;
+    if (b.dataset.prog) { progScelto = b.dataset.prog; programmaMarco(); }
+    if (b.id === 'prog-invia') salvaProgramma();
+    if (b.id === 'prog-ripristina') {
+      const tutte = leggi(window.ARCHIVIO.CHIAVE_PROGRAMMA) || {};
+      delete tutte[progScelto];
+      scriviProgramma(tutte);
+      avviso('Programma iniziale ripristinato', D.allenamenti[progScelto].nome, null);
+    }
+  });
+
   // ---------- Filtri ----------
   document.querySelectorAll('.filtro').forEach((b) => b.addEventListener('click', () => {
     filtro = b.dataset.f;
@@ -233,8 +342,10 @@
     coda();
   }));
 
-  function tutto() { conteggi(); coda(); revisione(); }
+  function tutto() { conteggi(); coda(); revisione(); allenamentiMarco(); }
   window.addEventListener('storage', (e) => { if (e.key && e.key.startsWith('pt-checkin')) coda(); });
+  window.ARCHIVIO.ascolta('pt-sessione-', () => { coda(); allenamentiMarco(); }); // Marco segna una serie nell'app
   tutto();
   tabella();
+  programmaMarco();
 })();
