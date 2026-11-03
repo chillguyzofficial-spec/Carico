@@ -19,6 +19,12 @@ const FOTO = [
   { da: 'Ritratto di fatica in palestra.png', a: 'atleta-marco', w: 240, crop: [190, 40, 600, 600] },
   { da: 'Squat profondo in palestravetica.png', a: 'video-squat-s8', w: 600 },
   { da: 'Ritratto di fatica in palestra.png', a: 'record-marco', w: 600 },
+  { da: 'Momento di concentrazione in palestra.png', a: 'onboarding', w: 1000 },
+  { da: 'Sfondo Fitness Cinematico Blu Notte.png', a: 'trag-notte', w: 800 },
+  { da: 'Dettaglio Piastra 20 KG in Palestra.png', a: 'trag-piastra', w: 600, crop: [140, 0, 801, 1672] },
+  // Sito di presentazione (foto non usate nell'app)
+  { da: 'Ritratto atletico in palestra al buio.png', a: 'sito-hero', w: 1122 },
+  { da: 'Panca piana in palestra monocromatica.png', a: 'sito-coach', w: 1400 },
   // Libreria esercizi: miniature dei video dimostrativi del coach (16:9)
   { da: 'Trazioni alla sbarra in palestra industriale.png', a: 'demo-trazioni', w: 480 },
   { da: 'Sollevamento pesi in palestra industriale.png', a: 'demo-stacco', w: 480 },

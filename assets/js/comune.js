@@ -40,9 +40,21 @@
 
   // ---------- Navigazione ----------
   const viste = {};
-  const SENZA_MENU = ['allenamento', 'checkin'];
+  const SENZA_MENU = ['allenamento', 'checkin', 'traguardo', 'benvenuto'];
+  const collegato = () => !!leggi('pt-collegato');
+  let primaVolta = true;
   function mostra() {
-    const [nome, param] = (location.hash.slice(1) || 'oggi').split('/');
+    // Passaggio animato tra schermate (View Transitions), tranne la prima volta e con «Riduci movimento»
+    const fermo = primaVolta || !document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches;
+    primaVolta = false;
+    if (fermo) { cambia(); return; }
+    const t = document.startViewTransition(cambia);
+    t.ready.catch(() => {}); t.finished.catch(() => {}); // passaggio saltato se si tocca in fretta: non è un errore
+  }
+  function cambia() {
+    let [nome, param] = (location.hash.slice(1) || 'oggi').split('/');
+    if (!collegato()) nome = 'benvenuto'; // primo avvio: prima il codice del coach
+    else if (nome === 'benvenuto') nome = 'oggi';
     const v = viste[nome] ? nome : 'oggi';
     document.querySelectorAll('.vista').forEach((s) => { s.hidden = s.dataset.vista !== v; });
     document.querySelector('.menu').hidden = SENZA_MENU.includes(v);
@@ -60,7 +72,7 @@
 
   window.APP = {
     D, GIORNI, BREVI, LETTERE, MESI, adesso, oggi, lunedi, data, iso,
-    esc, kg, mmss, leggi, scrivi, avviso, viste, chiaveSessione, chiaveCheckin,
+    esc, kg, mmss, leggi, scrivi, avviso, viste, chiaveSessione, chiaveCheckin, mostra,
     vai: (h) => { if (location.hash === h) mostra(); else location.hash = h; },
     allenamentoDi: (i) => D.settimana[i] ? D.allenamenti[D.settimana[i]] : null,
     // «Adesso» nel giorno mostrato (con ?giorno= resta coerente con il resto della settimana)

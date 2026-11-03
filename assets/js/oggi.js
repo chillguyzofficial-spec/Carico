@@ -9,7 +9,7 @@
     const testata = `
       <div class="testata">
         <div class="saluto"><b>Ciao ${esc(D.atleta.nome)}</b><span>Settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span></div>
-        <button class="profilo" aria-label="Il tuo profilo"><img class="avatar" src="${D.atleta.foto}" alt=""></button>
+        <a class="profilo" href="#profilo" aria-label="Il tuo profilo"><img class="avatar" src="${D.atleta.foto}" alt=""></a>
       </div>`;
 
     if (all) {

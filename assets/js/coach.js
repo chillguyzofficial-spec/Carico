@@ -64,7 +64,7 @@
           <h3>Feedback inviato</h3>
           <p>${esc(D.atleta.nome)} lo vede in Home al prossimo accesso, sotto «Dal tuo coach».</p>
           <div class="azioni">
-            <a class="btn-invia" href="index.html" target="_blank" rel="noopener" style="display:flex;align-items:center;text-decoration:none">Apri l'app di ${esc(D.atleta.nome)}</a>
+            <a class="btn-invia" href="app.html" target="_blank" rel="noopener" style="display:flex;align-items:center;text-decoration:none">Apri l'app di ${esc(D.atleta.nome)}</a>
             <button class="btn-sec" id="riapri">Riapri la revisione</button>
           </div>
         </div>`;

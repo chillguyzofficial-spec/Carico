@@ -1,0 +1,107 @@
+/* Sito di presentazione di Carico. Stesso sistema dell'app: sezioni scure e chiare alternate,
+   foto grandi, testi grandi, nessun effetto che segue il mouse, nessuna parte fissa allo scorrimento. */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { background: var(--notte-0); }
+.contenitore { width: min(1200px, 100% - 40px); margin: 0 auto; }
+.contenitore.stretto { width: min(860px, 100% - 40px); }
+section { padding: 96px 0; }
+h1, h2 { margin: 0; font-family: var(--display); font-weight: 800; text-transform: uppercase; line-height: .94; letter-spacing: -.005em; } /* sotto .94 la virgola di «GIUSTO,» tocca la riga dopo */
+h1 { font-size: clamp(64px, 11vw, 132px); }
+h2 { font-size: clamp(48px, 7vw, 92px); margin-top: 14px; }
+.sopratitolo { display: block; font: 600 13px/16px var(--testo); letter-spacing: .16em; color: var(--voltaico-chiaro); text-transform: uppercase; }
+.testo-grande { font: 400 clamp(18px, 2vw, 21px)/1.5 var(--testo); color: var(--ardesia); margin: 22px 0 0; max-width: 640px; text-wrap: pretty; }
+.testo-grande b { color: var(--gesso); }
+a.btn-primario, a.btn-secondario { text-decoration: none; padding: 0 26px; }
+a.btn-primario { color: #fff; }
+a.btn-secondario { color: var(--gesso); }
+
+/* Sezioni chiare */
+.chiaro { background: var(--gesso); color: var(--notte-0); }
+.chiaro .sopratitolo { color: var(--voltaico); }
+.chiaro .testo-grande { color: #3B4457; }
+
+/* Testata (non fissa) */
+.testata-sito {
+  position: absolute; z-index: 5; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; gap: 24px; padding: 20px max(20px, (100% - 1200px) / 2);
+}
+.marchio-sito { min-height: 44px; display: flex; align-items: center; font: 800 30px/1 var(--display); letter-spacing: .04em; color: var(--gesso); text-decoration: none; margin-right: auto; }
+.testata-sito nav { display: flex; gap: 4px; }
+.testata-sito nav a { min-height: 44px; display: flex; align-items: center; padding: 0 12px; font: 500 15px/1 var(--testo); color: var(--ardesia); text-decoration: none; border-radius: 12px; }
+.testata-sito nav a:hover { color: var(--gesso); }
+.btn-testata { min-height: 44px; display: flex; align-items: center; padding: 0 18px; border-radius: 12px; background: var(--notte-3); border: 1px solid var(--linea-2); font: 600 15px/1 var(--testo); color: var(--gesso); text-decoration: none; }
+@media (max-width: 760px) { .testata-sito nav { display: none; } }
+
+/* 1 · Apertura */
+.apertura { position: relative; overflow: hidden; padding: 150px 0 96px; min-height: 100vh; display: flex; align-items: center; }
+.apertura-foto { position: absolute; inset: 0; }
+.apertura-foto img { width: 100%; height: 100%; object-fit: cover; object-position: 30% 25%; filter: grayscale(1) contrast(1.05); }
+.apertura-foto::before { content: ''; position: absolute; inset: 0; background: #0B2A6B; mix-blend-mode: color; opacity: .45; }
+.apertura-foto::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6, 8, 13, .92) 0%, rgba(6, 8, 13, .7) 45%, rgba(6, 8, 13, .35) 100%), linear-gradient(rgba(6, 8, 13, .6), rgba(6, 8, 13, 0) 30%, rgba(6, 8, 13, 0) 70%, var(--notte-0)); }
+.apertura-griglia { position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 56px; align-items: center; }
+.sottotitolo { font: 400 clamp(18px, 2vw, 22px)/1.5 var(--testo); color: var(--ardesia); margin: 26px 0 0; max-width: 560px; text-wrap: pretty; }
+.azioni-apertura { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+.azioni-apertura.centro { justify-content: center; }
+.nota-demo { margin: 16px 0 0; font: 500 14px/20px var(--testo); color: var(--fumo); }
+.nota-demo b { color: var(--gesso); letter-spacing: .08em; }
+
+/* Telefoni con le schermate vere */
+.telefono { margin: 0; padding: 10px; border-radius: 52px; background: #1d2129; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 40px 90px rgba(0, 0, 0, .55); max-width: 360px; justify-self: center; }
+.telefono img { width: 100%; height: auto; border-radius: 42px; }
+.chiaro .telefono { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 30px 70px rgba(6, 8, 13, .25); }
+
+/* 2 · tre punti */
+.tre-punti { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.tre-punti li { display: flex; flex-direction: column; gap: 8px; padding-top: 18px; border-top: 2px solid currentColor; }
+.tre-punti b { font: 700 28px/1 var(--display); text-transform: uppercase; }
+.tre-punti span { font: 400 16px/1.5 var(--testo); color: var(--ardesia); }
+.chiaro .tre-punti span { color: #3B4457; }
+
+/* 3 · fila di telefoni */
+.intestazione-sezione { max-width: 760px; }
+.fila-telefoni { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 56px; }
+.fila-telefoni figure { margin: 0; display: flex; flex-direction: column; gap: 22px; }
+.fila-telefoni figcaption { font: 400 16px/1.5 var(--testo); color: var(--ardesia); max-width: 320px; margin: 0 auto; text-align: center; }
+.fila-telefoni figcaption b { display: block; font: 700 26px/1 var(--display); text-transform: uppercase; color: var(--gesso); margin-bottom: 6px; }
+
+/* 4 · gestionale */
+.schermo-pc { margin: 56px 0 0; padding: 10px; border-radius: 22px; background: #1d2129; box-shadow: 0 40px 90px rgba(6, 8, 13, .3); }
+.schermo-pc img { width: 100%; height: auto; border-radius: 14px; display: block; }
+
+/* 5 / 6 · due colonne */
+.due-colonne { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
+.esempio-contesto { margin: 30px 0 0; padding: 18px 20px; border-radius: 18px; background: #142453; border: 1px solid #1F3A80; font: 400 17px/1.45 var(--testo); max-width: 460px; }
+.esempio-contesto span { display: block; width: fit-content; margin-bottom: 10px; padding: 4px 10px; border-radius: 8px; background: rgba(6, 8, 13, .35); border: 1px solid rgba(122, 162, 255, .25); font: 600 13px/18px var(--testo); color: var(--voltaico-chiaro); }
+.foto-sezione { margin: 0; border-radius: 22px; overflow: hidden; }
+.foto-sezione img { width: 100%; height: auto; display: block; filter: grayscale(1); }
+.passi { list-style: none; counter-reset: p; margin: 34px 0 0; padding: 0; display: flex; flex-direction: column; }
+.passi li { counter-increment: p; display: grid; grid-template-columns: 56px 1fr; column-gap: 8px; padding: 18px 0; border-top: 1px solid rgba(6, 8, 13, .12); }
+.passi li::before { content: counter(p, decimal-leading-zero); grid-row: 1 / 3; font: 800 40px/1 var(--display); color: var(--voltaico); }
+.passi b { font: 700 26px/1.05 var(--display); text-transform: uppercase; }
+.passi span { font: 400 16px/1.5 var(--testo); color: #3B4457; margin-top: 4px; }
+
+/* 7 · chiusura */
+.chiusura { text-align: center; padding: 120px 0; }
+.chiusura .testo-grande { margin-left: auto; margin-right: auto; }
+
+/* Piede: bianco, senza logo (l'ultima sezione è scura) */
+.piede { background: var(--gesso); color: #3B4457; padding: 28px 20px; text-align: center; font: 500 14px/1.6 var(--testo); }
+.piede p { margin: 0; }
+
+/* Tablet e telefono */
+@media (max-width: 960px) {
+  section { padding: 72px 0; }
+  .apertura { padding: 120px 0 72px; min-height: 0; }
+  .apertura-griglia, .due-colonne { grid-template-columns: 1fr; gap: 48px; }
+  .apertura-foto::after { background: linear-gradient(rgba(6, 8, 13, .65), rgba(6, 8, 13, .55) 40%, var(--notte-0) 100%); }
+  .telefono { max-width: 320px; }
+  .fila-telefoni { grid-template-columns: 1fr; gap: 56px; }
+  .tre-punti { grid-template-columns: 1fr; gap: 22px; }
+  .due-colonne.inverso .foto-sezione { order: 2; }
+}
+@media (max-width: 480px) {
+  .contenitore, .contenitore.stretto { width: calc(100% - 32px); }
+  .azioni-apertura a { width: 100%; }
+  .testata-sito { padding: 16px; }
+}
