@@ -192,3 +192,64 @@ a.voce-coda:hover { background: rgba(28, 28, 28, .55); }
   .accesso-foto::after { background: linear-gradient(180deg, rgba(0, 0, 0, .3) 0%, rgba(0, 0, 0, .85) 45%, #000 70%); }
   .accesso-modulo { justify-self: center; margin: 0 auto; align-self: end; padding-bottom: 48px; }
 }
+
+/* Gestionale compatto (2026-11-04: «tendine che si espandono, filtri per ogni cosa, non lungo 1000 metri») */
+.filtro { white-space: nowrap; }
+.filtro .num { margin-left: 4px; color: var(--fumo); font-weight: 500; }
+.filtro.attivo .num { color: inherit; }
+.filtri { flex-wrap: wrap; }
+.cerca.piccola { height: 38px; padding: 0 12px; min-width: 0; }
+.cerca.piccola input { font-size: 13px; }
+.coda-blocco .riga-titolo { flex-wrap: wrap; align-items: center; row-gap: 10px; }
+.coda-blocco .cerca.piccola { flex: 1 1 180px; max-width: 260px; }
+.barra-filtri { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.barra-filtri .cerca { flex: 1 1 280px; max-width: 420px; }
+.barra-filtri .btn-invia { margin-left: auto; }
+.ordina { display: flex; align-items: center; gap: 8px; font: 600 12px/1 var(--testo); letter-spacing: .08em; text-transform: uppercase; color: var(--fumo); }
+.ordina select { height: 38px; border-radius: 10px; border: 1px solid var(--linea); background: var(--notte-2); color: var(--gesso); font: 500 13px/1 var(--testo); padding: 0 10px; text-transform: none; letter-spacing: 0; color-scheme: dark; }
+.altri-g { width: 100%; min-height: 44px; font: 600 13px/1 var(--testo); color: var(--voltaico-chiaro); border-radius: 12px; }
+.altri-g:hover { background: var(--notte-2); }
+button.voce-coda { width: 100%; text-align: left; }
+/* Revisione chiusa: una riga */
+.revisione.chiusa { padding: 0; }
+.rev-chiusa { width: 100%; display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; padding: 14px; text-align: left; border-radius: inherit; }
+.rev-chiusa:hover { background: rgba(255, 255, 255, .03); }
+.rev-chiusa img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; filter: grayscale(1); }
+.rev-chiusa b { display: block; font: 800 22px/1.1 var(--display); text-transform: uppercase; margin-top: 4px; }
+.rev-chiusa small { font: 500 13px/18px var(--testo); color: var(--fumo); }
+.link-rev { display: flex; gap: 16px; align-items: center; }
+.lavoro { align-items: start; }
+/* Assistente: colonna consigli con «Mostra tutte» */
+.consigli-col { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+/* Tendine (piano, allenamenti, modelli) */
+.tendina-g { border-bottom: 1px solid var(--linea); }
+.tendina-g > summary, details.sessione-marco > summary, details.modello-card > summary { list-style: none; cursor: pointer; }
+.tendina-g > summary::-webkit-details-marker, details.sessione-marco > summary::-webkit-details-marker, details.modello-card > summary::-webkit-details-marker { display: none; }
+.tendina-g > summary { display: flex; align-items: center; gap: 12px; padding: 12px 0; flex-wrap: wrap; }
+.tendina-g > summary b { font: 600 15px/20px var(--testo); }
+.tendina-g > summary .tenue { flex: 1; font: 500 13px/18px var(--testo); color: var(--fumo); }
+.tendina-g[open] > summary .link { visibility: hidden; }
+.tendina-g .piano-coach { border-bottom: 0; padding-top: 4px; }
+details.sessione-marco > summary::after, details.modello-card > summary::after { content: ''; width: 8px; height: 8px; border-right: 1.8px solid var(--ardesia); border-bottom: 1.8px solid var(--ardesia); transform: rotate(45deg); margin: -4px 4px 0 auto; transition: transform .2s; flex: none; }
+details[open].sessione-marco > summary::after, details[open].modello-card > summary::after { transform: rotate(225deg); margin-top: 4px; }
+details.sessione-marco > summary { padding: 4px 0; }
+details.sessione-marco > summary > span:first-child { flex: 1; }
+/* Programmi a tendina in colonna */
+.elenco-modelli { display: flex; flex-direction: column; gap: 10px; }
+details.modello-card > summary { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: center; }
+details.modello-card > summary .etichetta { grid-column: 1; }
+details.modello-card > summary h2 { grid-column: 1; margin: 0; }
+details.modello-card > summary .info { grid-column: 1; font: 500 13px/18px var(--testo); color: var(--fumo); }
+details.modello-card > summary::after { grid-column: 2; grid-row: 1 / 4; }
+details.modello-card:not([open]) { gap: 0; }
+mark { background: rgba(var(--accento-rgb), .25); color: var(--gesso); border-radius: 4px; padding: 0 3px; }
+/* Messaggi: colonna atleti con ricerca */
+.colonna-chi { display: flex; flex-direction: column; border-right: 1px solid var(--linea); min-width: 0; }
+.colonna-chi .chi-g { border-right: 0; }
+.cerca-chi { display: flex; gap: 8px; padding: 10px 10px 4px; }
+.cerca-chi .cerca { flex: 1; }
+.conta-lib { font: 500 13px/1 var(--testo); color: var(--fumo); margin-left: auto; }
+@media (max-width: 900px) {
+  .colonna-chi { border-right: 0; border-bottom: 1px solid var(--linea); }
+  .barra-filtri .btn-invia { margin-left: 0; }
+}

@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/css/nero-lime.css?v=2">
 <script>try { document.documentElement.dataset.tema = JSON.parse(localStorage.getItem("pt-tema")) || "lime"; } catch (e) { /* tema predefinito */ }</script>
 <link rel="stylesheet" href="assets/css/coach.css?v=2">
-<link rel="stylesheet" href="assets/css/gestionale.css?v=2">
+<link rel="stylesheet" href="assets/css/gestionale.css?v=3">
 </head>
 <body>
 <!-- Accesso: per la demo un account di prova; con il database online diventa un accesso vero -->
@@ -60,6 +60,7 @@
         <section class="coda-blocco" aria-labelledby="t-coda">
           <div class="riga-titolo">
             <h2 id="t-coda" class="etichetta">Da rivedere · dal più recente</h2>
+            <label class="cerca piccola"><span class="vh">Cerca nella coda</span><input type="search" id="cerca-coda" placeholder="Cerca atleta o cosa…"></label>
             <div class="filtri" role="group" aria-label="Filtra">
               <button class="filtro attivo" data-f="tutto" aria-pressed="true">Tutto</button>
               <button class="filtro" data-f="video" aria-pressed="false">Video</button>
@@ -81,8 +82,13 @@
     <section class="pagina" data-pagina="atleti" hidden>
       <header class="intestazione">
         <div class="titoli"><span class="sopra">Atleti</span><h1>I tuoi atleti</h1><span class="riassunto" id="riassunto-atleti"></span></div>
-        <button class="btn-invia" data-nuovo>+ Nuovo atleta</button>
       </header>
+      <div class="barra-filtri">
+        <label class="cerca"><span class="vh">Cerca atleta</span><input type="search" id="cerca-atleti" placeholder="Cerca per nome, programma o codice"></label>
+        <div class="filtri" id="filtri-atleti" role="group" aria-label="Filtra atleti"></div>
+        <label class="ordina">Ordina<select id="ordina-atleti"><option value="nome">Nome</option><option value="stato">Da seguire prima</option><option value="settimana">Settimana</option><option value="fatti">Allenamenti fatti</option></select></label>
+        <button class="btn-invia" data-nuovo>+ Nuovo atleta</button>
+      </div>
       <div class="tabella card" role="table" aria-label="Atleti">
         <div class="tr th" role="row"><span role="columnheader">Atleta</span><span role="columnheader">Programma</span><span role="columnheader">Settimana</span><span role="columnheader">Questa settimana</span><span role="columnheader">Codice app</span><span role="columnheader">Stato</span></div>
         <div id="righe-atleti" role="rowgroup"></div>
@@ -118,6 +124,6 @@
 <script src="assets/js/programmi.js"></script>
 <script src="assets/js/archivio.js"></script>
 <script src="assets/js/guida.js"></script>
-<script src="assets/js/coach.js?v=2"></script>
+<script src="assets/js/coach.js?v=3"></script>
 </body>
 </html>

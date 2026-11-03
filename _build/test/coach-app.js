@@ -12,6 +12,8 @@ const verifica = (c, m) => { if (c) ok++; else { ko++; console.log('KO', m); } }
   const c = await ctx.newPage(); const err = []; c.on('pageerror', e => err.push(e.message));
   await c.goto('http://localhost:8995/coach.html'); await c.waitForTimeout(800);
   verifica((await c.textContent('#riassunto')).startsWith('1 video da rivedere'), 'riassunto iniziale');
+  verifica(!(await c.$('.scelta')), 'revisione chiusa all’inizio');
+  await c.click('#coda [data-apri-revisione]'); await c.waitForTimeout(200);
   await c.click('.scelta[data-p="Profondità"]');
   verifica(await c.getAttribute('.scelta.ottima', 'aria-pressed') === 'false', 'ottima si spegne');
   await c.click('.scelta[data-p="Profondità"]');

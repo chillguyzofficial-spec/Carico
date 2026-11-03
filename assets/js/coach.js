@@ -64,11 +64,11 @@
       for (let i = 0; i < 7; i++) {
         const S = sessione(DA, i);
         if (!iniziata(S)) continue;
-        const k = S.k || DA.settimana[i], note = S.es.filter((e) => e.nota).length, limite = S.es.filter((e) => e.fatica === 'limite').length;
+        const k = S.k || DA.settimana[i] || DA.settimanaBase[i], note = S.es.filter((e) => e.nota).length, limite = S.es.filter((e) => e.fatica === 'limite').length; // sessioni vecchie senza k: dal programma
         if (!S.finito && !note) continue;
         const fatte = S.es.reduce((t, e) => t + e.serie.filter((r) => r.fatta).length, 0), tot = S.es.reduce((t, e) => t + e.serie.length, 0);
         voci.push({ id: `${DA.id}-${i}`, tipo: 'allenamenti', atleta: DA.id, DA, chip: note || limite ? ['avviso', note ? 'Nota' : 'Al limite'] : ['ok', 'Allenamento'], t: S.fine || S.inizio || Date.now(),
-          testo: `Allenamento · ${DA.allenamenti[k] ? DA.allenamenti[k].nome : ''} ${S.finito ? 'completato' : 'in corso'} · ${fatte}/${tot} serie${note ? ` · ${note === 1 ? '1 nota' : note + ' note'}` : ''}` });
+          testo: `Allenamento · ${DA.allenamenti[k] ? DA.allenamenti[k].nome : 'libero'} ${S.finito ? 'completato' : 'in corso'} · ${fatte}/${tot} serie${note ? ` · ${note === 1 ? '1 nota' : note + ' note'}` : ''}` });
       }
       const sett = AR.settimanaDi(DA);
       sett.saltati.forEach((i) => voci.push({ id: `${DA.id}-saltato-${i}`, tipo: 'allenamenti', atleta: DA.id, DA, chip: ['avviso', 'Saltato'], t: Date.now() - 1,
@@ -83,17 +83,22 @@
     if (min < 1) return 'ora'; if (min < 60) return `${min} min`; if (min < 60 * 24) return `${Math.round(min / 60)} h`;
     return GIORNI[(new Date(t).getDay() + 6) % 7].slice(0, 3).toLowerCase();
   };
+  // Coda compatta: filtro per tipo, ricerca per atleta o testo, le prime 5 e «Mostra altri»
+  let cercaCoda = '', codaTutta = false;
   function coda() {
-    const voci = vociCoda().filter((v) => filtro === 'tutto' || v.tipo === filtro);
-    $('#coda').innerHTML = voci.map((v) => {
-      const aperta = v.id === (V && V.id);
+    const q = cercaCoda.trim().toLowerCase();
+    const voci = vociCoda().filter((v) => (filtro === 'tutto' || v.tipo === filtro) && (!q || (nomeIntero(v.DA) + ' ' + v.testo).toLowerCase().includes(q)));
+    const viste = codaTutta ? voci : voci.slice(0, 5);
+    $('#coda').innerHTML = viste.map((v) => {
+      const video = v.tipo === 'video';
       const DA = v.DA;
-      return `<li><${aperta ? 'div' : 'a'} class="voce-coda${aperta ? ' aperta' : ''}"${aperta ? ' aria-current="true"' : ` href="#atleta/${v.atleta}"`}>
+      return `<li><${video ? 'button' : 'a'} class="voce-coda${video && revisioneAperta ? ' aperta' : ''}"${video ? ' data-apri-revisione' : ` href="#atleta/${v.atleta}"`}>
         ${faccia(DA)}
-        <span class="testi"><span class="nome">${esc(nomeIntero(DA))}<span class="chip chip-${aperta ? 'info' : v.chip[0]}">${aperta ? 'Aperto' : esc(v.chip[1])}</span></span><span class="cosa">${esc(v.testo)}</span></span>
-        <span class="quando">${aperta ? '2 h' : quandoTesto(v.t)}</span>
-      </${aperta ? 'div' : 'a'}></li>`;
-    }).join('') || `<li class="vuoto"><p>${filtro === 'tutto' ? 'Niente da rivedere: quando un atleta finisce un allenamento, manda un video o un check-in, compare qui.' : 'Niente in questa categoria.'}</p></li>`;
+        <span class="testi"><span class="nome">${esc(nomeIntero(DA))}<span class="chip chip-${video && revisioneAperta ? 'info' : v.chip[0]}">${video && revisioneAperta ? 'Aperto' : esc(v.chip[1])}</span></span><span class="cosa">${esc(v.testo)}</span></span>
+        <span class="quando">${video ? '2 h' : quandoTesto(v.t)}</span>
+      </${video ? 'button' : 'a'}></li>`;
+    }).join('') + (voci.length > 5 ? `<li><button class="altri-g" data-coda-tutta>${codaTutta ? 'Mostra meno' : `Mostra altri ${voci.length - 5}`}</button></li>` : '')
+      || `<li class="vuoto"><p>${q ? `Niente con «${esc(cercaCoda)}».` : filtro === 'tutto' ? 'Niente da rivedere: quando un atleta finisce un allenamento, manda un video o un check-in, compare qui.' : 'Niente in questa categoria.'}</p></li>`;
   }
   function conteggi() {
     const voci = vociCoda(), at = tutti(), seguire = at.filter((DA) => situazione(DA).stato[0] === 'avviso').length;
@@ -108,8 +113,18 @@
   // ---------- Revisione video (Marco, la scena della demo) ----------
   const PROBLEMI = ['Profondità', 'Ginocchia in dentro', 'Schiena', 'Velocità in salita'];
   const CARICHI = [['Riduci', V.kg - 2.5, 'Riduci a'], ['Mantieni', V.kg, 'Mantieni il carico'], ['Aumenta', V.kg + 2.5, 'Aumenta a']];
+  // Revisione a tendina: chiusa mostra solo una riga, si apre dal video in coda o dall'assistente
+  let revisioneAperta = false;
   function revisione() {
     const box = $('#revisione');
+    box.classList.toggle('chiusa', !revisioneAperta);
+    if (!revisioneAperta) {
+      box.innerHTML = `<button class="rev-chiusa" data-apri-revisione aria-expanded="false">
+        <img src="${V.foto}" alt="">
+        <span><span class="etichetta">Revisione video · ${esc(nomeIntero(D))}</span><b>${esc(V.esercizio)} ${V.kg} kg × ${V.reps}</b><small>${inviato ? 'Feedback inviato' : 'Da rivedere · ' + V.durata}</small></span>
+        <span class="chip chip-${inviato ? 'ok' : 'info'}">${inviato ? 'Fatto' : 'Apri'}</span></button>`;
+      return;
+    }
     if (inviato) {
       box.innerHTML = `
         <div class="vuoto">
@@ -118,7 +133,7 @@
           <p>${esc(D.atleta.nome)} lo vede in Home al prossimo accesso, sotto «Dal tuo coach».</p>
           <div class="azioni">
             <a class="btn-invia" href="app.html" target="_blank" rel="noopener" style="display:flex;align-items:center;text-decoration:none">Apri l'app di ${esc(D.atleta.nome)}</a>
-            <button class="btn-sec" id="riapri">Riapri la revisione</button>
+            <button class="btn-sec" id="riapri">Riapri la revisione</button><button class="link" data-chiudi-revisione>Chiudi</button>
           </div>
         </div>`;
       $('#riapri').addEventListener('click', () => { inviato = null; scrivi(D.chiaveFeedback, null); tutto(); });
@@ -134,7 +149,7 @@
       <div class="rev-testa">
         <div><span class="etichetta">Revisione video · ${esc(nomeIntero(D))}</span>
         <span class="sotto">${esc(V.allenamento)} · lunedì ${lunedi.getDate()} ${MESI[lunedi.getMonth()].slice(0, 3)} · ${V.ora} · settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span></div>
-        <a class="link" href="#atleta/marco">Apri scheda atleta</a>
+        <span class="link-rev"><a class="link" href="#atleta/marco">Scheda atleta</a><button class="link" data-chiudi-revisione>Chiudi</button></span>
       </div>
       <div class="rev-corpo">
         <div class="lettore">
@@ -286,6 +301,7 @@
     });
     return c.sort((a, b) => b.peso - a.peso);
   }
+  let consigliTutti = false; // l'assistente mostra le prime 3, le altre a richiesta
   function assistente() {
     const c = consigli(), at = tutti();
     const fatti = at.reduce((t, DX) => t + situazione(DX).fatti, 0), previsti = at.reduce((t, DX) => t + DX.piano.aSettimana, 0);
@@ -296,8 +312,8 @@
         <h2 id="t-assistente">${c.length ? `${c.length} ${c.length === 1 ? 'cosa da fare' : 'cose da fare'} oggi` : 'Tutto in ordine'}</h2>
         <p>${at.length} ${at.length === 1 ? 'atleta' : 'atleti'} · ${fatti} allenamenti fatti su ${previsti} previsti questa settimana.${c.length ? ' Le più urgenti per prime.' : ' Nessuno da recuperare, niente in attesa.'}</p>
       </div>
-      ${c.length ? `<ul class="consigli">${c.slice(0, 6).map((x) => `<li class="consiglio-g ${x.tipo}"><span class="icona-c" aria-hidden="true">${ICONE[x.tipo]}</span><p>${x.testo}</p>${x.azione}</li>`).join('')}</ul>` : ''}
-      ${c.length > 6 ? `<p class="altri-consigli">E altre ${c.length - 6} nella coda qui sotto.</p>` : ''}`;
+      ${c.length ? `<div class="consigli-col"><ul class="consigli">${(consigliTutti ? c : c.slice(0, 3)).map((x) => `<li class="consiglio-g ${x.tipo}"><span class="icona-c" aria-hidden="true">${ICONE[x.tipo]}</span><p>${x.testo}</p>${x.azione}</li>`).join('')}</ul>
+      ${c.length > 3 ? `<button class="altri-g" data-consigli-tutti aria-expanded="${consigliTutti}">${consigliTutti ? 'Mostra solo le prime 3' : `Mostra tutte (${c.length})`}</button>` : ''}</div>` : ''}`;
   }
   function alza(val) {
     const [id, k, j, nuovo] = val.split('|'), DX = AR.datiDi(id), tutte = leggi(DX.k(AR.CHIAVE_PROGRAMMA)) || {};
@@ -326,9 +342,25 @@
   }
 
   // ---------- Atleti ----------
+  // Ricerca (nome, programma, codice), filtri e ordinamento: utile quando gli atleti diventano tanti
+  const FILTRI_ATLETI = [['tutti', 'Tutti'], ['seguire', 'Da seguire'], ['nuovi', 'Appena iniziati'], ['fissi', 'Giorni fissi'], ['flessibile', 'Quando vuole']];
+  let cercaAtleti = '', filtroAtleti = 'tutti', ordineAtleti = 'nome';
   function paginaAtleti() {
-    const at = tutti();
-    $('#riassunto-atleti').textContent = `${at.length} ${at.length === 1 ? 'atleta' : 'atleti'} · ognuno con il suo programma e il suo ritmo`;
+    const tuttiAt = tutti();
+    const codice = (DA) => AR.atleti().find((a) => a.id === DA.id).codice;
+    const passa = (DA) => {
+      const s = situazione(DA);
+      if (filtroAtleti === 'seguire' && s.stato[0] !== 'avviso') return false;
+      if (filtroAtleti === 'nuovi' && DA.atleta.settimana > 2) return false;
+      if ((filtroAtleti === 'fissi' || filtroAtleti === 'flessibile') && DA.piano.modo !== filtroAtleti) return false;
+      const q = cercaAtleti.trim().toLowerCase();
+      return !q || `${nomeIntero(DA)} ${DA.piano.nome} ${DA.piano.livello} ${codice(DA)}`.toLowerCase().includes(q);
+    };
+    const ord = { nome: (a, b) => nomeIntero(a).localeCompare(nomeIntero(b), 'it'), stato: (a, b) => (situazione(b).stato[0] === 'avviso') - (situazione(a).stato[0] === 'avviso'), settimana: (a, b) => b.atleta.settimana - a.atleta.settimana, fatti: (a, b) => situazione(b).fatti - situazione(a).fatti }[ordineAtleti];
+    const at = tuttiAt.filter(passa).sort(ord);
+    $('#filtri-atleti').innerHTML = FILTRI_ATLETI.map(([id, t]) => { const n = tuttiAt.filter((DA) => { const f = filtroAtleti; filtroAtleti = id; const ok = passa(DA); filtroAtleti = f; return ok; }).length; return `<button class="filtro${id === filtroAtleti ? ' attivo' : ''}" data-filtro-atleti="${id}" aria-pressed="${id === filtroAtleti}">${t} <span class="num">${n}</span></button>`; }).join('');
+    $('#riassunto-atleti').textContent = `${tuttiAt.length} ${tuttiAt.length === 1 ? 'atleta' : 'atleti'} · ognuno con il suo programma e il suo ritmo`;
+    if (!at.length) { $('#righe-atleti').innerHTML = `<p class="vuoto-marco" style="padding:18px 0">Nessun atleta${cercaAtleti ? ` con «${esc(cercaAtleti)}»` : ' in questo filtro'}.</p>`; return; }
     $('#righe-atleti').innerHTML = at.map((DA) => {
       const s = situazione(DA);
       return `<a class="tr riga-link" role="row" href="#atleta/${DA.id}">
@@ -378,14 +410,14 @@
     const box = $('#atleta-allenamenti');
     if (!box) return;
     const lista = [];
-    for (let i = 6; i >= 0; i--) { const S = sessione(DA, i); if (iniziata(S)) lista.push({ i, d: giornoData(i), k: S.k || DA.settimana[i], S }); }
+    for (let i = 6; i >= 0; i--) { const S = sessione(DA, i); if (iniziata(S)) lista.push({ i, d: giornoData(i), k: S.k || DA.settimana[i] || DA.settimanaBase[i], S }); }
     const ci = leggi(DA.k('pt-checkin-s' + DA.atleta.settimana));
     const check = ci ? `<div class="checkin-atleta"><span class="etichetta">Check-in settimana ${DA.atleta.settimana}</span><p>Allenamenti ${ci.allenamenti}/${DA.piano.aSettimana} · energia ${ci.energia}/5 · carichi ${esc(String(ci.carichi).toLowerCase())}${ci.note ? ` · «${esc(ci.note)}»` : ''}</p></div>` : '';
     if (!lista.length) {
       box.innerHTML = `<h3>Allenamenti di questa settimana</h3>${check}<p class="vuoto-marco">Ancora niente: quando ${esc(DA.atleta.nome)} segna le serie nell'app, compaiono qui.</p>`;
       return;
     }
-    box.innerHTML = '<h3>Allenamenti di questa settimana</h3>' + check + lista.map(({ i, d, k, S }) => {
+    box.innerHTML = '<h3>Allenamenti di questa settimana</h3>' + check + lista.map(({ i, d, k, S }, n) => {
       const base = DA.esercizi[k] || [], all = DA.allenamenti[k] || { nome: '' };
       const fatte = S.es.reduce((t, e) => t + e.serie.filter((r) => r.fatta).length, 0), tot = S.es.reduce((t, e) => t + e.serie.length, 0);
       const righe = S.es.map((e, j) => {
@@ -402,11 +434,14 @@
           <span class="serie-marco num">${f.length ? f.map((r) => `${kgv(r.kg)}×${r.reps}`).join(' · ') : 'non fatto'}</span>
           ${e.nota ? `<p class="nota-marco">«${esc(e.nota)}»</p>` : ''}</li>`;
       }).join('');
-      return `<article class="sessione-marco">
-        <div class="testa-sessione"><span><b>${GIORNI[i]} ${d.getDate()}</b> · ${esc(all.nome)}</span>
-          <span class="chip chip-${S.finito ? 'ok' : 'info'}">${S.finito ? 'Completato' : 'In corso'}</span><span class="num tenue">${fatte}/${tot} serie</span></div>
+      // Tendina: aperto solo il più recente; nella riga chiusa le cose da notare (note, record, fatica)
+      const note = S.es.filter((e) => e.nota).length, limite = S.es.filter((e) => e.fatica === 'limite').length;
+      return `<details class="sessione-marco"${n === 0 ? ' open' : ''}>
+        <summary class="testa-sessione"><span><b>${GIORNI[i]} ${d.getDate()}</b> · ${esc(all.nome || 'Allenamento libero')}</span>
+          ${note ? `<span class="chip chip-avviso">${note === 1 ? '1 nota' : note + ' note'}</span>` : ''}${limite ? '<span class="chip chip-avviso">Al limite</span>' : ''}
+          <span class="chip chip-${S.finito ? 'ok' : 'info'}">${S.finito ? 'Completato' : 'In corso'}</span><span class="num tenue">${fatte}/${tot} serie</span></summary>
         <ul class="lista-marco">${righe}</ul>
-      </article>`;
+      </details>`;
     }).join('');
   }
 
@@ -416,9 +451,13 @@
     : DA.piano.sequenza.map((k, n) => [k, 'N° ' + (n + 1)]));
   let progScelto = null;
   const CAMPI = ['serie', 'reps', 'kg', 'nota'];
+  // Il piano si cambia di rado: tendina chiusa con il riassunto in una riga
+  let pianoAperto = false;
   function pannelloPiano() {
     const p = DA.piano;
     return `
+      <details class="tendina-g" id="tendina-piano"${pianoAperto ? ' open' : ''}>
+      <summary><span class="etichetta">Piano</span><b>${esc(p.livello)} · ${esc(p.nome)}</b><span class="tenue">${ritmo(DA)}</span><span class="link">Cambia</span></summary>
       <div class="piano-coach">
         <div class="riga-piano"><span class="etichetta">Modello</span>
           <div class="modelli">${window.MODELLI.map((m) => `<button class="modello" data-modello="${m.id}" aria-pressed="${m.id === p.id}"><b>${esc(m.livello)}</b><span>${esc(m.nome)} · ${m.aSettimana} a sett.</span></button>`).join('')}</div></div>
@@ -429,7 +468,7 @@
           </div></div>
         <div class="riga-piano"><span class="etichetta">Allenamenti a settimana</span>
           <div class="segmenti numeri" role="radiogroup" aria-label="Allenamenti a settimana">${[2, 3, 4, 5, 6].map((n) => `<button class="segmento" role="radio" data-n="${n}" aria-checked="${n === p.aSettimana}">${n}</button>`).join('')}</div></div>
-      </div>`;
+      </div></details>`;
   }
   function cambiaPiano(nuovo) {
     scrivi(DA.k(AR.CHIAVE_PIANO), nuovo);
@@ -486,20 +525,33 @@
   }
 
   // ---------- Programmi (modelli) ----------
+  // Modelli a tendina: nella riga chiusa livello, ritmo e chi lo usa; ricerca per nome o esercizio («chi ha lo stacco?»)
+  let cercaProg = '', filtroProg = 'tutti';
   function paginaProgrammi() {
-    const at = tutti();
     $('[data-pagina="programmi"]').innerHTML = `
       <header class="intestazione"><div class="titoli"><span class="sopra">Programmi</span><h1>I tuoi modelli</h1><span class="riassunto">Il punto di partenza: per ogni atleta poi cambi modo, allenamenti a settimana, serie e carichi.</span></div></header>
-      <div class="griglia-modelli">${window.MODELLI.map((m) => {
-        const usano = at.filter((x) => x.piano.id === m.id);
-        return `<article class="card modello-card">
-          <span class="etichetta">${esc(m.livello)} · ${m.aSettimana} a settimana · ${m.modo === 'fissi' ? 'giorni fissi' : 'quando vuole'}</span>
-          <h2>${esc(m.nome)}</h2>
-          ${[...new Set(m.sequenza)].map((k) => `<div class="all-modello"><b>${esc(D.allenamenti[k].nome)}</b><span>${D.esercizi[k].map((e) => `${esc(e.nome)} ${e.serie}×${e.reps}`).join(' · ')}</span></div>`).join('')}
-          <div class="piede-modello"><span class="info">${usano.length ? 'Lo usa: ' + usano.map((x) => esc(x.atleta.nome)).join(', ') : 'Nessun atleta per ora'}</span>
-            <button class="btn-sec" data-nuovo data-preset="${m.id}">Nuovo atleta con questo</button></div>
-        </article>`;
-      }).join('')}</div>`;
+      <div class="barra-filtri">
+        <label class="cerca"><span class="vh">Cerca nei programmi</span><input type="search" id="cerca-programmi" placeholder="Cerca programma o esercizio (es. stacco)" value="${esc(cercaProg)}"></label>
+        <div class="filtri" id="filtri-programmi" role="group" aria-label="Livello"></div>
+      </div>
+      <div class="elenco-modelli" id="elenco-programmi"></div>`;
+    elencoProgrammi();
+  }
+  function elencoProgrammi() {
+    const at = tutti(), q = cercaProg.trim().toLowerCase();
+    const LIV = [['tutti', 'Tutti']].concat(window.MODELLI.map((m) => [m.livello, m.livello]));
+    $('#filtri-programmi').innerHTML = LIV.map(([id, t]) => `<button class="filtro${id === filtroProg ? ' attivo' : ''}" data-filtro-prog="${esc(id)}" aria-pressed="${id === filtroProg}">${esc(t)}</button>`).join('');
+    const lista = window.MODELLI.filter((m) => (filtroProg === 'tutti' || m.livello === filtroProg)
+      && (!q || `${m.nome} ${m.livello} ${m.sequenza.map((k) => D.allenamenti[k].nome + ' ' + D.esercizi[k].map((e) => e.nome).join(' ')).join(' ')}`.toLowerCase().includes(q)));
+    $('#elenco-programmi').innerHTML = lista.map((m) => {
+      const usano = at.filter((x) => x.piano.id === m.id);
+      return `<details class="card modello-card"${q ? ' open' : ''}>
+        <summary><span class="etichetta">${esc(m.livello)} · ${m.aSettimana} a settimana · ${m.modo === 'fissi' ? 'giorni fissi' : 'quando vuole'}</span>
+          <h2>${esc(m.nome)}</h2><span class="info">${usano.length ? 'Lo usa: ' + usano.map((x) => esc(x.atleta.nome)).join(', ') : 'Nessun atleta per ora'} · ${[...new Set(m.sequenza)].length} allenamenti</span></summary>
+        ${[...new Set(m.sequenza)].map((k) => `<div class="all-modello"><b>${esc(D.allenamenti[k].nome)}</b><span>${D.esercizi[k].map((e) => { const s = `${esc(e.nome)} ${e.serie}×${e.reps}`; return q && e.nome.toLowerCase().includes(q) ? `<mark>${s}</mark>` : s; }).join(' · ')}</span></div>`).join('')}
+        <div class="piede-modello"><button class="btn-sec" data-nuovo data-preset="${m.id}">Nuovo atleta con questo</button></div>
+      </details>`;
+    }).join('') || `<p class="vuoto-marco">Nessun programma con «${esc(cercaProg)}».</p>`;
   }
 
   // ---------- Messaggi ----------
@@ -518,7 +570,7 @@
     for (let i = m.length - 1; i >= 0 && m[i].da === 'atleta'; i--) n++;
     return n;
   }
-  let conChi = 'marco';
+  let conChi = 'marco', cercaChat = '', filtroChat = 'tutti';
   function paginaMessaggi(id) {
     if (id && AR.atleti().some((a) => a.id === id)) conChi = id;
     const at = tutti(), DX = at.find((x) => x.id === conChi) || at[0];
@@ -533,7 +585,12 @@
     $('[data-pagina="messaggi"]').innerHTML = `
       <header class="intestazione"><div class="titoli"><span class="sopra">Messaggi</span><h1>Messaggi</h1><span class="riassunto">Ogni messaggio dall'app arriva con esercizio e serie di cui parla.</span></div></header>
       <div class="chat-g card">
-        <ul class="chi-g">${at.map((x) => { const u = messaggiDi(x).slice(-1)[0], n = daLeggere(x); return `<li><a href="#messaggi/${x.id}" class="${x.id === DX.id ? 'attivo' : ''}">${faccia(x)}<span><b>${esc(nomeIntero(x))}</b><small>${u ? esc((u.da === 'coach' ? 'Tu: ' : '') + (u.testo || 'Video')).slice(0, 48) : 'Nessun messaggio'}</small></span>${n ? `<span class="conta">${n}</span>` : ''}</a></li>`; }).join('')}</ul>
+        <div class="colonna-chi">
+          <div class="cerca-chi"><label class="cerca piccola"><span class="vh">Cerca atleta</span><input type="search" id="cerca-chat" placeholder="Cerca atleta…" value="${esc(cercaChat)}"></label>
+            <button class="filtro${filtroChat === 'leggere' ? ' attivo' : ''}" data-filtro-chat="leggere" aria-pressed="${filtroChat === 'leggere'}">Da leggere</button></div>
+          <ul class="chi-g">${at.filter((x) => (!cercaChat.trim() || nomeIntero(x).toLowerCase().includes(cercaChat.trim().toLowerCase())) && (filtroChat !== 'leggere' || daLeggere(x) || x.id === DX.id))
+            .map((x) => { const u = messaggiDi(x).slice(-1)[0], n = daLeggere(x); return `<li><a href="#messaggi/${x.id}" class="${x.id === DX.id ? 'attivo' : ''}">${faccia(x)}<span><b>${esc(nomeIntero(x))}</b><small>${u ? esc((u.da === 'coach' ? 'Tu: ' : '') + (u.testo || 'Video')).slice(0, 48) : 'Nessun messaggio'}</small></span>${n ? `<span class="conta">${n}</span>` : ''}</a></li>`; }).join('') || '<li class="vuoto-marco" style="padding:10px">Nessuno.</li>'}</ul>
+        </div>
         <div class="conversazione">
           <div class="conv-testa">${faccia(DX)}<b>${esc(nomeIntero(DX))}</b><a class="link" href="#atleta/${DX.id}">Scheda atleta</a></div>
           <ol class="bolle-g" id="bolle-g">${bolle || '<li class="vuoto-marco">Ancora nessun messaggio. Scrivi tu il primo.</li>'}</ol>
@@ -544,7 +601,10 @@
   }
 
   // ---------- Libreria esercizi ----------
-  let cercaLib = '';
+  let cercaLib = '', filtroLib = 'tutti';
+  // Filtri per muscolo: [id, etichetta, parole da cercare nei muscoli della guida]
+  const GRUPPI_LIB = [['tutti', 'Tutti', []], ['petto', 'Petto', ['petto']], ['schiena', 'Schiena', ['dorso', 'schiena']], ['gambe', 'Gambe', ['quadricipiti', 'femorali', 'interno coscia', 'polpacci']],
+    ['glutei', 'Glutei', ['glutei']], ['spalle', 'Spalle', ['spalle']], ['braccia', 'Braccia', ['bicipiti', 'tricipiti', 'avambracci']], ['addome', 'Addome', ['addominali']], ['video', 'Con video', []]];
   function paginaLibreria() {
     const dove = {};
     Object.entries(D.esercizi).forEach(([k, l]) => l.forEach((e) => { (dove[e.nome] = dove[e.nome] || []).push(D.allenamenti[k].nome); }));
@@ -553,10 +613,15 @@
     const nomi = Object.keys(window.GUIDA || {}).sort((a, b) => a.localeCompare(b, 'it'));
     $('[data-pagina="libreria"]').innerHTML = `
       <header class="intestazione"><div class="titoli"><span class="sopra">Libreria esercizi</span><h1>Esercizi</h1><span class="riassunto">${nomi.length} esercizi con la spiegazione che l'atleta vede toccando «Come si fa».</span></div>
-        <label class="cerca"><span class="vh">Cerca esercizio</span><input type="search" id="cerca-lib" placeholder="Cerca esercizio o muscolo" value="${esc(cercaLib)}"></label></header>
+        </header>
+      <div class="barra-filtri">
+        <label class="cerca"><span class="vh">Cerca esercizio</span><input type="search" id="cerca-lib" placeholder="Cerca esercizio o muscolo" value="${esc(cercaLib)}"></label>
+        <div class="filtri" role="group" aria-label="Muscoli">${GRUPPI_LIB.map(([id, t]) => `<button class="filtro${id === filtroLib ? ' attivo' : ''}" data-filtro-lib="${id}" aria-pressed="${id === filtroLib}">${t}</button>`).join('')}</div>
+        <span class="conta-lib num" id="conta-lib"></span>
+      </div>
       <div class="griglia-lib">${nomi.map((n) => {
         const g = window.GUIDA[n];
-        return `<details class="card esercizio-lib" data-testo="${esc((n + ' ' + g.muscoli).toLowerCase())}">
+        return `<details class="card esercizio-lib" data-testo="${esc((n + ' ' + g.muscoli).toLowerCase())}" data-video="${demo[n] ? 1 : 0}">
           <summary>${demo[n] ? `<img src="assets/foto/${demo[n]}.webp" alt="">` : '<span class="senza-video">Video da registrare</span>'}<span class="nome-lib"><b>${esc(n)}</b><small>${esc(g.muscoli)}</small>${dove[n] ? `<small class="dove">Nei programmi: ${esc([...new Set(dove[n])].join(', '))}</small>` : ''}</span></summary>
           <ol>${g.passi.map((p) => `<li>${esc(p)}</li>`).join('')}</ol>
           <ul class="evita-lib">${g.errori.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
@@ -565,8 +630,14 @@
     filtraLibreria();
   }
   function filtraLibreria() {
-    const q = cercaLib.trim().toLowerCase();
-    document.querySelectorAll('.esercizio-lib').forEach((d) => { d.hidden = !!q && !d.dataset.testo.includes(q); });
+    const q = cercaLib.trim().toLowerCase(), g = GRUPPI_LIB.find((x) => x[0] === filtroLib);
+    let n = 0;
+    document.querySelectorAll('.esercizio-lib').forEach((d) => {
+      const t = d.dataset.testo;
+      const ok = (!q || t.includes(q)) && (filtroLib === 'tutti' || (filtroLib === 'video' ? d.dataset.video === '1' : g[2].some((m) => t.includes(m))));
+      d.hidden = !ok; if (ok) n++;
+    });
+    const c = $('#conta-lib'); if (c) c.textContent = `${n} esercizi`;
   }
 
   // ---------- Nuovo atleta ----------
@@ -660,7 +731,14 @@
     if (!b) return;
     const d = b.dataset;
     if (d.nuovo !== undefined) { ev.preventDefault(); apriNuovo(d.preset); return; }
-    if (d.vai === 'revisione') { $('#revisione').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    if (d.vai === 'revisione' || d.apriRevisione !== undefined) { revisioneAperta = true; revisione(); coda(); $('#revisione').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    if (d.chiudiRevisione !== undefined) { revisioneAperta = false; revisione(); coda(); return; }
+    if (d.codaTutta !== undefined) { codaTutta = !codaTutta; coda(); return; }
+    if (d.consigliTutti !== undefined) { consigliTutti = !consigliTutti; assistente(); return; }
+    if (d.filtroAtleti) { filtroAtleti = d.filtroAtleti; paginaAtleti(); return; }
+    if (d.filtroProg) { filtroProg = d.filtroProg; elencoProgrammi(); return; }
+    if (d.filtroChat) { filtroChat = d.filtroChat === filtroChat ? 'tutti' : d.filtroChat; paginaMessaggi(); return; }
+    if (d.filtroLib) { filtroLib = d.filtroLib; filtraLibreria(); document.querySelectorAll('[data-filtro-lib]').forEach((x) => { x.classList.toggle('attivo', x === b); x.setAttribute('aria-pressed', x === b); }); return; }
     if (d.alza) { alza(d.alza); return; }
     if (d.chiudiNuovo !== undefined) { chiudiNuovo(); if (b.tagName === 'BUTTON') ev.preventDefault(); return; }
     if (d.nModello) {
@@ -718,7 +796,16 @@
     if (ev.key === 'Escape' && !$('#nuovo-atleta').hidden) chiudiNuovo();
     if (ev.key === 'Enter' && !ev.shiftKey && ev.target.id === 'testo-g') { ev.preventDefault(); ev.target.form.requestSubmit(); }
   });
-  document.addEventListener('input', (ev) => { if (ev.target.id === 'cerca-lib') { cercaLib = ev.target.value; filtraLibreria(); } });
+  document.addEventListener('input', (ev) => {
+    const t = ev.target;
+    if (t.id === 'cerca-lib') { cercaLib = t.value; filtraLibreria(); }
+    if (t.id === 'cerca-coda') { cercaCoda = t.value; coda(); }
+    if (t.id === 'cerca-atleti') { cercaAtleti = t.value; paginaAtleti(); }
+    if (t.id === 'cerca-programmi') { cercaProg = t.value; elencoProgrammi(); }
+    if (t.id === 'cerca-chat') { cercaChat = t.value; paginaMessaggi(); const c = $('#cerca-chat'); c.focus(); c.setSelectionRange(c.value.length, c.value.length); }
+  });
+  document.addEventListener('toggle', (ev) => { if (ev.target.id === 'tendina-piano') pianoAperto = ev.target.open; }, true); // la tendina resta come l'ha lasciata il coach
+  document.addEventListener('change', (ev) => { if (ev.target.id === 'ordina-atleti') { ordineAtleti = ev.target.value; paginaAtleti(); } });
   $('#velo-nuovo').addEventListener('click', chiudiNuovo);
   document.querySelectorAll('.filtro').forEach((b) => b.addEventListener('click', () => {
     filtro = b.dataset.f;

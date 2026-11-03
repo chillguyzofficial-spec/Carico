@@ -23,7 +23,7 @@ const out = process.argv[2];
   await pc.goto(BASE + 'coach.html#atleti'); await pc.waitForTimeout(500);
   v((await testo(pc, '#righe-atleti')).includes('5 giorni fissi') && (await testo(pc, '#righe-atleti')).includes('2 a settimana, quando vuole'), 'tabella: ogni atleta ha il suo ritmo');
   await pc.goto(BASE + 'coach.html#atleta/marco'); await pc.waitForTimeout(400);
-  await pc.click('[data-modello="intero-3"]'); await pc.waitForTimeout(300);
+  await pc.evaluate(() => { const t = document.querySelector('#tendina-piano'); if (t) t.open = true; }); await pc.click('[data-modello="intero-3"]'); await pc.waitForTimeout(300);
   v(await pc.$('[data-modo="flessibile"][aria-checked="true"]') !== null && await pc.$('[data-n="3"][aria-checked="true"]') !== null, 'modello Base: 3 a settimana, quando vuole');
   v(await pc.$$eval('.giorni-prog .segmento', (a) => a.length) === 3 && (await testo(pc, '.giorni-prog')).includes('Corpo intero C'), 'editor: la sequenza A, B, C');
   await pc.goto(BASE + 'coach.html#atleti'); await pc.waitForTimeout(300);
@@ -61,8 +61,8 @@ const out = process.argv[2];
   v(box.includes('Mercoledì') && box.includes('Corpo intero B') && box.includes('Venerdì') && box.includes('Corpo intero C'), 'gestionale: allenamenti nei giorni scelti da Marco');
 
   // ---------- Giorni fissi, 2 a settimana ----------
-  await pc.click('[data-modo="fissi"]'); await pc.waitForTimeout(200);
-  await pc.click('[data-n="2"]'); await pc.waitForTimeout(200);
+  await pc.evaluate(() => { const t = document.querySelector('#tendina-piano'); if (t) t.open = true; }); await pc.click('[data-modo="fissi"]'); await pc.waitForTimeout(200);
+  await pc.evaluate(() => { const t = document.querySelector('#tendina-piano'); if (t) t.open = true; }); await pc.click('[data-n="2"]'); await pc.waitForTimeout(200);
   await pc.goto(BASE + 'coach.html#atleti'); await pc.waitForTimeout(300);
   v((await testo(pc, '#righe-atleti')).includes('2 giorni fissi'), 'coach: 2 giorni fissi');
   await pc.goto(BASE + 'coach.html#atleta/marco'); await pc.waitForTimeout(300);
@@ -72,7 +72,7 @@ const out = process.argv[2];
   v(await app.isVisible('[data-sposta]'), 'giorni fissi: torna «Cambia giorno»');
 
   // ---------- Torna al programma di sempre ----------
-  await pc.click('[data-modello="ppl-5"]'); await pc.waitForTimeout(200);
+  await pc.evaluate(() => { const t = document.querySelector('#tendina-piano'); if (t) t.open = true; }); await pc.click('[data-modello="ppl-5"]'); await pc.waitForTimeout(200);
   await app.goto(BASE + 'app.html?giorno=4#oggi'); await app.waitForTimeout(400);
   v((await testo(app, '.hero .titolone')) === 'Push A', 'di nuovo Push · Pull · Gambe');
   const x = await pc.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth); v(x <= 0, 'gestionale sborda +' + x);
