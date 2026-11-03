@@ -30,11 +30,15 @@ async function webp(page, png, file, larghezza) {
     await p.goto(URL(url)); await p.waitForTimeout(900);
     if (prima) { await prima(); await p.waitForTimeout(500); }
     await p.evaluate(() => document.getElementById('avviso').classList.remove('su'));
+    await p.waitForTimeout(500); // l'avviso sparisce con un'animazione: se no resta mezzo visibile nella foto
     await webp(conv, await p.screenshot(), file, 600);
   };
   await scatta('app.html?giorno=4', 'app-oggi.webp');
-  await scatta('app.html?giorno=4#allenamento', 'app-allenamento.webp', async () => { await p.evaluate(() => localStorage.removeItem('pt-sessione-' + new Date().toISOString())); });
-  await scatta('app.html?giorno=4#allenamento', 'app-recupero.webp', async () => { await p.click('#fatta'); await p.waitForTimeout(1300); });
+  await scatta('app.html?giorno=2#allenamento', 'app-allenamento.webp', async () => { // scheda: trazioni fatte, rematore aperto a metà
+    for (let j = 0; j < 4; j++) await p.click('[data-spunta="0-' + j + '"]');
+    await p.click('[data-spunta="1-0"]'); await p.waitForTimeout(400); await p.evaluate(() => { const s = document.querySelector('.es.aperto'); window.scrollTo(0, s.getBoundingClientRect().top + scrollY - 12); });
+  });
+  await scatta('app.html?giorno=4#allenamento', 'app-guida.webp', async () => { await p.click('[data-apri="1"]'); await p.waitForTimeout(300); await p.click('.es.aperto .come-si-fa'); });
   await scatta('app.html?giorno=4#coach/' + encodeURIComponent('Lento avanti · Push A · Serie 2 · 42,5 kg × 8'), 'app-chat.webp', async () => { await p.fill('#testo-chat', 'A fine serie sento la spalla destra, è normale?'); });
   await scatta('app.html?giorno=4#progressi', 'app-progressi.webp');
   await p.evaluate(() => Object.keys(localStorage).forEach((k) => localStorage.removeItem(k)));
