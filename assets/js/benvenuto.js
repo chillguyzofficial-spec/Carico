@@ -124,7 +124,7 @@
       const aSettimana = D.piano.aSettimana;
       document.querySelector('[data-vista="profilo"]').innerHTML = `
         <header class="profilo-foto">
-          <img src="assets/foto/${D.id === 'marco' ? 'profilo-marco' : 'profilo-atleta'}.webp" alt="">
+          <img src="assets/foto/${D.id === 'marco' ? 'profilo-marco' : D.atleta.profilo || 'profilo-atleta'}.webp" alt="">
           <a class="icona-44 indietro-profilo" href="${A.provenienza()}" aria-label="Indietro"><svg width="20" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M21 8H2M8 1L1 8l7 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           <div class="profilo-nome">
             <h1 class="titolo-pagina">${esc(D.atleta.nome)}<br>${esc(D.atleta.cognome)}</h1>

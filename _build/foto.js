@@ -40,6 +40,12 @@ const FOTO = [
   { da: 'Squat con bilanciere in palestra.png', a: 'profilo-marco', w: 900, crop: [0, 230, 941, 1000] },
   // Profilo degli atleti aggiunti dal coach (non hanno ancora una foto loro)
   { da: 'Palestra industriale tra luce e ombre.png', a: 'profilo-atleta', w: 900 },
+  // Account di prova (2026-11-03): Giulia appena iscritta, Davide avanzato; Luca col tablet per l'accesso al gestionale
+  { da: 'Ritratto atletico in palestra monocromatica.png', a: 'profilo-giulia', w: 900, crop: [0, 80, 941, 1000] },
+  { da: 'Ritratto atletico in palestra monocromatica.png', a: 'atleta-giulia', w: 240, crop: [430, 190, 380, 380] },
+  { da: 'Forza e concentrazione sotto le luci.png', a: 'profilo-davide', w: 900, crop: [0, 120, 941, 1000] },
+  { da: 'Forza e concentrazione sotto le luci.png', a: 'atleta-davide', w: 240, crop: [470, 190, 320, 320] },
+  { da: 'Allenamento concentrato in palestra.png', a: 'accesso-coach', w: 1400 },
 ];
 
 (async () => {

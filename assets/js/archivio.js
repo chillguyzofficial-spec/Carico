@@ -23,8 +23,8 @@
   const lunediOggi = isoData(lunediDi(new Date()));
   const PROVA = [
     { id: 'marco', codice: 'LUCA26', obiettivo: 'Forza e massa', prova: true },
-    { id: 'giulia', codice: 'LUCA11', nome: 'Giulia', cognome: 'Bianchi', obiettivo: 'Tonificazione', modello: 'intero-2', modo: 'flessibile', aSettimana: 2, inizio: lunediOggi, settimane: 12, prova: true },
-    { id: 'davide', codice: 'LUCA99', nome: 'Davide', cognome: 'Moretti', obiettivo: 'Powerlifting · gara a fine blocco', modello: 'ppl-5', modo: 'fissi', aSettimana: 5, settimane: 16, avanzato: { settimana: 11, scala: 1.45 }, prova: true },
+    { id: 'giulia', codice: 'LUCA11', nome: 'Giulia', cognome: 'Bianchi', foto: 'assets/foto/atleta-giulia.webp', profilo: 'profilo-giulia', obiettivo: 'Tonificazione', modello: 'intero-2', modo: 'flessibile', aSettimana: 2, inizio: lunediOggi, settimane: 12, prova: true },
+    { id: 'davide', codice: 'LUCA99', nome: 'Davide', cognome: 'Moretti', foto: 'assets/foto/atleta-davide.webp', profilo: 'profilo-davide', obiettivo: 'Powerlifting · gara a fine blocco', modello: 'ppl-5', modo: 'fissi', aSettimana: 5, settimane: 16, avanzato: { settimana: 11, scala: 1.45 }, prova: true },
   ];
   const atleti = () => PROVA.concat(leggi(CHIAVE_ATLETI) || []);
   const atletaDaCodice = (c) => atleti().find((a) => a.codice === String(c || '').trim().toUpperCase()) || null;
@@ -88,7 +88,7 @@
     else if (av) {
       // Atleta avanzato: stessa struttura dello storico di Marco, carichi da powerlifter e 10 settimane già fatte
       const a = atleti().find((x) => x.id === id), r = (n) => Math.round(n * av.scala / 2.5) * 2.5;
-      D.atleta = { nome: a.nome, cognome: a.cognome, foto: null, settimana: av.settimana, settimane: a.settimane, programma: '', obiettivo: a.obiettivo };
+      D.atleta = { nome: a.nome, cognome: a.cognome, foto: a.foto || null, profilo: a.profilo, settimana: av.settimana, settimane: a.settimane, programma: '', obiettivo: a.obiettivo };
       D.modelloBase = a.modello; D.modoBase = a.modo; D.nBase = a.aSettimana;
       Object.values(D.esercizi).flat().forEach((e) => {
         if (/^Trazioni/.test(e.nome)) { e.kg += 15; e.best += 15; e.prec = e.prec.map(([k, n]) => [k + 15, n]); return; } // zavorra
@@ -102,7 +102,7 @@
       const a = atleti().find((x) => x.id === id);
       const inizio = new Date(a.inizio + 'T12:00:00');
       const sett = Math.max(1, Math.floor((lunediDi(new Date()) - lunediDi(inizio)) / (7 * 86400000)) + 1);
-      D.atleta = { nome: a.nome, cognome: a.cognome, foto: null, settimana: Math.min(sett, a.settimane), settimane: a.settimane, programma: '', obiettivo: a.obiettivo };
+      D.atleta = { nome: a.nome, cognome: a.cognome, foto: a.foto || null, profilo: a.profilo, settimana: Math.min(sett, a.settimane), settimane: a.settimane, programma: '', obiettivo: a.obiettivo };
       D.modelloBase = a.modello; D.modoBase = a.modo; D.nBase = a.aSettimana;
       // Atleta nuovo: niente storico né carichi di Marco. I chili li mette il coach (o l'atleta alla prima seduta).
       Object.values(D.esercizi).flat().forEach((e) => { e.kg = 0; e.prec = []; e.best = Infinity; e.inizio = 0; e.nota = ''; e.video = false; });
