@@ -45,7 +45,8 @@ const FOTO = [
   { da: 'Ritratto atletico in palestra monocromatica.png', a: 'atleta-giulia', w: 240, crop: [430, 190, 380, 380] },
   { da: 'Forza e concentrazione sotto le luci.png', a: 'profilo-davide', w: 900, crop: [0, 120, 941, 1000] },
   { da: 'Forza e concentrazione sotto le luci.png', a: 'atleta-davide', w: 240, crop: [470, 190, 320, 320] },
-  { da: 'Allenamento concentrato in palestra.png', a: 'accesso-coach', w: 1400 },
+  // Accesso al gestionale: sfondo dal modello di Francesco (panca, asciugamano, cuffie nella luce delle finestre)
+  { da: 'Palestra monocromatica tra luci e ombre.png', a: 'accesso-sfondo', w: 1800 },
 ];
 
 (async () => {

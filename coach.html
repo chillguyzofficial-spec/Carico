@@ -13,20 +13,20 @@
 <link rel="stylesheet" href="assets/css/nero-lime.css?v=2">
 <script>try { document.documentElement.dataset.tema = JSON.parse(localStorage.getItem("pt-tema")) || "lime"; } catch (e) { /* tema predefinito */ }</script>
 <link rel="stylesheet" href="assets/css/coach.css?v=2">
-<link rel="stylesheet" href="assets/css/gestionale.css">
+<link rel="stylesheet" href="assets/css/gestionale.css?v=2">
 </head>
 <body>
 <!-- Accesso: per la demo un account di prova; con il database online diventa un accesso vero -->
 <div class="accesso" id="accesso" hidden>
-  <div class="accesso-foto"><img src="assets/foto/accesso-coach.webp" alt=""></div>
+  <div class="accesso-foto"><img src="assets/foto/accesso-sfondo.webp" alt=""></div>
   <form class="accesso-modulo" id="form-accesso" novalidate>
-    <span class="marchio-g">CARICO</span>
-    <span class="sopra">Gestionale per personal trainer</span>
+    <span class="marchio-g"><i aria-hidden="true">//</i> CARICO</span>
+    <span class="sopra">Gestionale per personal trainer</span><i class="trattino-g" aria-hidden="true"></i>
     <h1>Bentornato</h1>
     <label>Email<input type="email" id="a-email" autocomplete="username" placeholder="nome@esempio.it"></label>
     <label>Password<input type="password" id="a-password" autocomplete="current-password" placeholder="••••••••"></label>
     <p class="errore-nuovo" id="errore-accesso" hidden>Email o password non corrette.</p>
-    <button class="btn-invia" type="submit">Entra</button>
+    <button class="btn-invia entra-g" type="submit">Entra <svg width="18" height="12" viewBox="0 0 22 14" aria-hidden="true"><path d="M1 7h19M14 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="prova-accesso"><span>Demo: <b>luca@carico.app</b> · password <b>carico2026</b></span><button type="button" class="link" id="usa-prova">Usa l'account di prova</button></div>
   </form>
 </div>

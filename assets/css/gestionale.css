@@ -173,3 +173,22 @@ a.voce-coda:hover { background: rgba(28, 28, 28, .55); }
 .altri-consigli { grid-column: 2; margin: 0; font: 500 13px/18px var(--testo); color: var(--fumo); }
 @media (max-width: 1000px) { .assistente { grid-template-columns: 1fr; } .altri-consigli { grid-column: 1; } }
 @media (max-width: 600px) { .consiglio-g { grid-template-columns: 34px minmax(0, 1fr); } .consiglio-g > :last-child { grid-column: 2; justify-self: start; } }
+
+/* Accesso sul modello di Francesco (2026-11-04): foto a tutto schermo, modulo a destra sul nero */
+.accesso { position: relative; grid-template-columns: 1fr; overflow: hidden; }
+.accesso-foto { position: absolute; inset: 0; }
+.accesso-foto img { object-position: 30% 50%; filter: grayscale(1) brightness(.9); }
+.accesso-foto::after { background: linear-gradient(90deg, rgba(0, 0, 0, 0) 25%, rgba(0, 0, 0, .75) 55%, #000 78%); }
+.accesso-modulo { position: relative; z-index: 1; justify-self: end; margin-right: max(6vw, 20px); width: min(380px, calc(100% - 40px)); gap: 12px; }
+.marchio-g { font: 700 22px/1 var(--testo); letter-spacing: .35em; }
+.marchio-g i { font-style: normal; color: var(--voltaico); letter-spacing: -.05em; margin-right: .2em; }
+.accesso-modulo .sopra { color: var(--ardesia); letter-spacing: .3em; font-size: 11px; }
+.trattino-g { display: block; width: 28px; height: 2px; background: var(--voltaico); margin-top: 10px; }
+.accesso-modulo h1 { font-style: italic; letter-spacing: .01em; margin-top: 10px; }
+.entra-g { display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; letter-spacing: .25em; font-weight: 700; }
+@media (max-width: 800px) {
+  .accesso-foto { display: block; bottom: 35%; }
+  .accesso-foto img { object-position: 12% 75%; }
+  .accesso-foto::after { background: linear-gradient(180deg, rgba(0, 0, 0, .3) 0%, rgba(0, 0, 0, .85) 45%, #000 70%); }
+  .accesso-modulo { justify-self: center; margin: 0 auto; align-self: end; padding-bottom: 48px; }
+}
