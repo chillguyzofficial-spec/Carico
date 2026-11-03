@@ -1,0 +1,30 @@
+/* Nero e lime (scelta di Francesco 2026-11-03, «mi piace di più»): colori dalla variante «Nero Lime»
+   di Claude Design (design-source/claude-design-export). Caricato solo da app e gestionale:
+   il sito resta blu finché Francesco non decide (la sua apertura gli piace così). */
+:root {
+  --notte-0: #000000;   /* fondo app */
+  --notte-1: #0E0E0E;   /* superficie */
+  --notte-2: #161616;   /* rilievo, campi */
+  --notte-3: #222222;   /* pulsante secondario */
+  --deriva: #000000;
+  --fondo: #000000;
+  --linea: #2A2A2A;
+  --linea-2: #383836;
+  --linea-tenue: #1C1C1C;
+
+  --gesso: #F4F4F0;
+  --ardesia: #A8A8A3;
+  --fumo: #82827C;
+
+  --voltaico: #C8F03C;        /* azioni, fatto */
+  --voltaico-chiaro: #DDF77A; /* dati, attivo */
+  --su-accento: #0A0A0A;      /* sul lime il testo è nero */
+  --successo: #C8F03C;        /* un solo verde: il lime */
+}
+
+/* Regole della base scritte col blu */
+.btn-primario { box-shadow: 0 10px 30px rgba(200, 240, 60, .18), inset 0 1px 0 rgba(255, 255, 255, .25); }
+.btn-primario:active { background: #A9CF22; }
+.chip-info { background: rgba(221, 247, 122, .12); }
+.chip-ok { background: rgba(200, 240, 60, .12); color: var(--voltaico); }
+.avviso .spunta { background: rgba(200, 240, 60, .14); }

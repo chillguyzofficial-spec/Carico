@@ -56,9 +56,9 @@
     const passo = max - min > 60 ? 20 : 10;
     const tacche = [];
     for (let t = Math.ceil(min / passo) * passo; t <= max; t += passo) tacche.push(t);
-    const griglia = tacche.map((v) => `<g><line x1="0" x2="${W}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="#1B2438"/><text x="${W}" y="${(Y(v) - 4).toFixed(1)}" text-anchor="end">${kg(Math.round(v))}</text></g>`).join('');
+    const griglia = tacche.map((v) => `<g><line x1="0" x2="${W}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="#1C1C1C"/><text x="${W}" y="${(Y(v) - 4).toFixed(1)}" text-anchor="end">${kg(Math.round(v))}</text></g>`).join('');
     const ux = X(n - 1), uy = Y(reale[n - 1]);
-    const etichette = `<text x="${px}" y="${H - 6}">${n >= tutto.length ? 'inizio' : n + ' sett. fa'}</text><text x="${ux.toFixed(1)}" y="${H - 6}" text-anchor="middle" fill="#7AA2FF">oggi</text><text x="${W - px}" y="${H - 6}" text-anchor="end">sett. ${D.atleta.settimane}</text>`;
+    const etichette = `<text x="${px}" y="${H - 6}">${n >= tutto.length ? 'inizio' : n + ' sett. fa'}</text><text x="${ux.toFixed(1)}" y="${H - 6}" text-anchor="middle" fill="#DDF77A">oggi</text><text x="${W - px}" y="${H - 6}" text-anchor="end">sett. ${D.atleta.settimane}</text>`;
     // punti per la lettura col dito: x in %, etichetta della settimana, valore
     const lettura = reale.map((v, i) => {
       const sett = i - settimana1 + 1; // 1…6 nel blocco attuale, ≤0 nel blocco prima
@@ -68,18 +68,18 @@
       <div class="storico-box" data-punti='${JSON.stringify(lettura)}'>
         <svg class="storico" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(NOME_ES[k])}: da ${kg(reale[0])} a ${kg(reale[n - 1])} chili; obiettivo del coach ${kg(ob)}">
           <defs>
-            <linearGradient id="area-st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563FF" stop-opacity=".45"/><stop offset="1" stop-color="#2563FF" stop-opacity="0"/></linearGradient>
-            <linearGradient id="linea-st" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2563FF" stop-opacity=".4"/><stop offset="1" stop-color="#9DBBFF"/></linearGradient>
+            <linearGradient id="area-st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C8F03C" stop-opacity=".45"/><stop offset="1" stop-color="#C8F03C" stop-opacity="0"/></linearGradient>
+            <linearGradient id="linea-st" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F4F4F0" stop-opacity=".55"/><stop offset="1" stop-color="#F4F4F0"/></linearGradient>
           </defs>
           ${griglia}
-          <line x1="0" x2="${W}" y1="${Y(ob).toFixed(1)}" y2="${Y(ob).toFixed(1)}" stroke="#7AA2FF" stroke-opacity=".35" stroke-dasharray="2 4"/>
-          <text x="0" y="${(Y(ob) - 5).toFixed(1)}" fill="#7AA2FF">Obiettivo ${kg(ob)} kg</text>
-          <line x1="${ux.toFixed(1)}" x2="${ux.toFixed(1)}" y1="${top}" y2="${H - bot}" stroke="#7AA2FF" stroke-opacity=".25"/>
-          ${piano.length > 1 ? `<polyline points="${piano.join(' ')}" fill="none" stroke="#A3ACBD" stroke-width="1.5" stroke-dasharray="5 5" stroke-linecap="round"/>` : ''}
+          <line x1="0" x2="${W}" y1="${Y(ob).toFixed(1)}" y2="${Y(ob).toFixed(1)}" stroke="#DDF77A" stroke-opacity=".35" stroke-dasharray="2 4"/>
+          <text x="0" y="${(Y(ob) - 5).toFixed(1)}" fill="#DDF77A">Obiettivo ${kg(ob)} kg</text>
+          <line x1="${ux.toFixed(1)}" x2="${ux.toFixed(1)}" y1="${top}" y2="${H - bot}" stroke="#DDF77A" stroke-opacity=".25"/>
+          ${piano.length > 1 ? `<polyline points="${piano.join(' ')}" fill="none" stroke="#C8F03C" stroke-width="1.8" stroke-dasharray="5 5" stroke-linecap="round"/>` : ''}
           <path d="M${linea.replace(/ /g, 'L')}V${H - bot}H${px}Z" fill="url(#area-st)"/>
           <polyline class="linea-viva" points="${linea}" fill="none" stroke="url(#linea-st)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-          <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="9" fill="#2563FF" opacity=".25" class="pulsa"/>
-          <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="5" fill="#070B14" stroke="#9DBBFF" stroke-width="2.5"/>
+          <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="9" fill="#C8F03C" opacity=".25" class="pulsa"/>
+          <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="5" fill="#000000" stroke="#F4F4F0" stroke-width="2.5"/>
           ${etichette}
         </svg>
         <span class="cursore" hidden><i class="riga"></i><i class="punto"></i><span class="fumetto"><b></b><small></small></span></span>
@@ -151,7 +151,7 @@
     const intervalli = INTERVALLI.map(([n, w]) => `<button class="intervallo" data-int="${n}" aria-pressed="${n === intervallo}"${w !== 999 && w > disponibili ? ' disabled title="Non ci sono ancora abbastanza settimane"' : ''}>${n}</button>`).join('');
     const tr = traguardi().map((t) => `
       <li><a class="riga-traguardo${t.fatto ? '' : ' futuro'}" href="#traguardo/${t.id}">
-        <span class="segno">${t.fatto ? '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#7AA2FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#2E3A55" stroke-width="1.5" stroke-dasharray="2 2.5"/></svg>`}</span>
+        <span class="segno">${t.fatto ? '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#DDF77A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#383836" stroke-width="1.5" stroke-dasharray="2 2.5"/></svg>`}</span>
         <span class="cosa"><b>${esc(t.titolo)}</b><span>${esc(t.riga)}</span></span>
         <span class="quando-t">${esc(t.quando)}</span>
       </a></li>`).join('');
@@ -183,7 +183,7 @@
       </section>
       <section class="blocco" aria-labelledby="t-blocco">
         <h2 id="t-blocco" class="etichetta" style="margin:0">Questo blocco</h2>
-        <div class="tre-dati num">
+        <div class="tre-dati divisi num">
           <span><b>${r.fatti}/${r.previsti}</b><small>allenamenti fatti</small></span>
           <span><b>${r.aderenza}%</b><small>costanza</small></span>
           <span><b>${ESERCIZI.length}</b><small>record personali</small></span>
@@ -204,7 +204,7 @@
       ? `<span>${r.fatti} / 60 allenamenti</span><span>${r.aderenza}% costanza</span><span>+${kg(D.progressi.panca.punti.slice(-1)[0] - D.progressi.panca.punti[0])} kg in panca</span>`
       : `<span>${esc(t.riga)}</span><span>${esc(t.quando)} · con ${esc(D.coach.nome)}</span>`;
     document.querySelector('[data-vista="traguardo"]').innerHTML = `
-      <header class="barra-top"><a class="icona-44" href="#progressi" aria-label="Chiudi"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A3ACBD" stroke-width="1.8" stroke-linecap="round"/></svg></a><div class="centro"><b>Traguardo</b><span>${t.fatto ? esc(t.quando) : 'Anteprima · si sblocca a fine programma'}</span></div><span class="icona-44"></span></header>
+      <header class="barra-top"><a class="icona-44" href="#progressi" aria-label="Chiudi"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A8A8A3" stroke-width="1.8" stroke-linecap="round"/></svg></a><div class="centro"><b>Traguardo</b><span>${t.fatto ? esc(t.quando) : 'Anteprima · si sblocca a fine programma'}</span></div><span class="icona-44"></span></header>
       <div class="corpo-es">
         <figure class="card-traguardo${t.fatto ? '' : ' bloccato'}" id="card-traguardo">
           <img src="assets/foto/${t.foto}.webp" alt="">
@@ -237,14 +237,14 @@
     x.globalCompositeOperation = 'color'; x.fillStyle = 'rgba(11,42,107,.45)'; x.fillRect(0, 0, 1080, 1920);
     x.globalCompositeOperation = 'source-over';
     const g = x.createLinearGradient(0, 0, 0, 1920);
-    g.addColorStop(0, 'rgba(6,8,13,.55)'); g.addColorStop(.35, 'rgba(7,11,20,0)'); g.addColorStop(.62, 'rgba(7,11,20,.85)'); g.addColorStop(1, '#070B14');
+    g.addColorStop(0, 'rgba(6,8,13,.55)'); g.addColorStop(.35, 'rgba(7,11,20,0)'); g.addColorStop(.62, 'rgba(7,11,20,.85)'); g.addColorStop(1, '#000000');
     x.fillStyle = g; x.fillRect(0, 0, 1080, 1920);
-    x.fillStyle = '#F2F4F8'; x.font = '800 56px "Big Shoulders Display"'; x.fillText('CARICO', 80, 140);
+    x.fillStyle = '#F4F4F0'; x.font = '800 56px "Big Shoulders Display"'; x.fillText('CARICO', 80, 140);
     const fig = document.querySelector('#card-traguardo figcaption');
-    x.fillStyle = '#7AA2FF'; x.font = '600 34px Geist'; x.fillText(fig.querySelector('.sopratitolo').textContent.toUpperCase().split('').join(' '), 80, 1290);
-    x.fillStyle = '#F2F4F8'; x.font = '800 190px "Big Shoulders Display"'; x.fillText(fig.querySelector('.grande').textContent.toUpperCase(), 72, 1470);
+    x.fillStyle = '#DDF77A'; x.font = '600 34px Geist'; x.fillText(fig.querySelector('.sopratitolo').textContent.toUpperCase().split('').join(' '), 80, 1290);
+    x.fillStyle = '#F4F4F0'; x.font = '800 190px "Big Shoulders Display"'; x.fillText(fig.querySelector('.grande').textContent.toUpperCase(), 72, 1470);
     x.font = '600 52px Geist'; x.fillText(fig.querySelector('.nome').textContent, 80, 1560);
-    x.fillStyle = '#A3ACBD'; x.font = '500 38px Geist';
+    x.fillStyle = '#A8A8A3'; x.font = '500 38px Geist';
     [...fig.querySelectorAll('.righe span')].forEach((sp, i) => x.fillText(sp.textContent, 80, 1650 + i * 56));
     const blob = await new Promise((ok) => c.toBlob(ok, 'image/png'));
     const file = new File([blob], `carico-${t.id}.png`, { type: 'image/png' });
@@ -265,6 +265,7 @@
     });
   });
 
+  A.riepilogo = riepilogo; // lo usa anche il Profilo
   A.viste.progressi = { render };
   A.viste.traguardo = { render: renderTraguardo };
 })();

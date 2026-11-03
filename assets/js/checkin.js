@@ -12,7 +12,7 @@
     const pronto = r.allenamenti && r.energia && r.carichi;
     document.querySelector('[data-vista="checkin"]').innerHTML = `
       <header class="barra-top">
-        <a class="icona-44" href="#oggi" aria-label="Chiudi"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A3ACBD" stroke-width="1.8" stroke-linecap="round"/></svg></a>
+        <a class="icona-44" href="#oggi" aria-label="Chiudi"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A8A8A3" stroke-width="1.8" stroke-linecap="round"/></svg></a>
         <div class="centro"><b>Check-in · settimana ${D.atleta.settimana}</b><span>1 minuto</span></div>
         <span class="icona-44"></span>
       </header>

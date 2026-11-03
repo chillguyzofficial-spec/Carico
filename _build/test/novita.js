@@ -30,7 +30,7 @@ const U = 'http://localhost:8993/app.html';
   v(await p.isVisible('.menu'), 'menu visibile');
   // profilo
   await p.click('a.profilo'); await p.waitForTimeout(400);
-  v((await p.textContent('[data-vista="profilo"]')).includes('Collegati dal'), 'profilo');
+  v((await p.textContent('[data-vista="profilo"]')).includes('Insieme dal'), 'profilo');
   await p.screenshot({ path: out + '/n-profilo.png' }); await largo('profilo');
   // progressi
   await p.click('.menu a[href="#progressi"]'); await p.waitForTimeout(400);

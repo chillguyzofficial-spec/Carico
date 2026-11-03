@@ -220,7 +220,7 @@
         <span class="tenue" role="cell">${esc(a.settimana)}</span>
         <span class="quadretti" role="cell" aria-label="${[...a.giorni].map((g) => nomi[g]).join(', ')}">${[...a.giorni].map((g) => `<i class="q ${g}"></i>`).join('')}</span>
         <span class="chiave" role="cell">${esc(a.chiave)}</span>
-        <span role="cell"><svg width="84" height="24" viewBox="-2 -2 124 48" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="#7AA2FF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
+        <span role="cell"><svg width="84" height="24" viewBox="-2 -2 124 48" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="#DDF77A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
         <span role="cell"><span class="chip chip-${a.stato[0]}">${esc(a.stato[1])}</span></span>
       </div>`;
     }).join('');

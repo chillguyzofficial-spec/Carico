@@ -59,7 +59,7 @@
   width: 100%; min-width: 0; height: 44px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .1); background: #161616;
   font: 700 24px/1 var(--display); color: var(--gesso); text-align: center; outline: 0; padding: 0;
 }
-.cella:focus { border-color: var(--voltaico); box-shadow: 0 0 0 3px rgba(37, 99, 255, .25); }
+.cella:focus { border-color: var(--voltaico); box-shadow: 0 0 0 3px rgba(200, 240, 60, .25); }
 .cella::placeholder { color: var(--fumo); }
 .riga-serie.fatta .cella { background: transparent; border-color: transparent; color: var(--ardesia); }
 .sk-casella { justify-self: end; width: 44px; height: 44px; display: grid; place-items: center; position: relative; }

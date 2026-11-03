@@ -58,12 +58,12 @@
       </header>
       <ol class="messaggi" aria-label="Conversazione con ${esc(D.coach.nome)}">${righe}</ol>
       <form class="scrivi" id="scrivi">
-        ${contesto ? `<div class="contesto-scrivi"><span><small>Stai chiedendo di</small>${esc(contesto)}</span><button type="button" class="icona-44" id="togli-contesto" aria-label="Togli il riferimento all'esercizio"><svg width="12" height="12" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A3ACBD" stroke-width="2" stroke-linecap="round"/></svg></button></div>` : ''}
+        ${contesto ? `<div class="contesto-scrivi"><span><small>Stai chiedendo di</small>${esc(contesto)}</span><button type="button" class="icona-44" id="togli-contesto" aria-label="Togli il riferimento all'esercizio"><svg width="12" height="12" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A8A8A3" stroke-width="2" stroke-linecap="round"/></svg></button></div>` : ''}
         <div class="riga-scrivi">
-          <button type="button" class="icona-44 allega" id="allega" aria-label="Allega foto o video"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#A3ACBD" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <button type="button" class="icona-44 allega" id="allega" aria-label="Allega foto o video"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#A8A8A3" stroke-width="1.8" stroke-linecap="round"/></svg></button>
           <label class="vh" for="testo-chat">Messaggio</label>
           <textarea id="testo-chat" rows="1" placeholder="${contesto ? 'Scrivi solo la domanda' : `Scrivi a ${esc(D.coach.breve)}`}"></textarea>
-          <button class="invia" type="submit" aria-label="Invia"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="invia" type="submit" aria-label="Invia"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
       </form>`;
     // l'ultimo messaggio resta sopra la casella di scrittura (la pagina ha il margine apposta)

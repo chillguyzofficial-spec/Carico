@@ -91,21 +91,45 @@
 
   A.viste.profilo = {
     render() {
+      // Layout dal modello di Francesco (2026-11-03): foto grande col nome, coach, percorso in numeri, programma
       const c = A.leggi('pt-collegato') || {};
       const dal = c.quando ? new Date(c.quando) : null;
+      const MESI_LUNGHI = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+      const giornoMese = (d) => `${d.getDate()} ${MESI_LUNGHI[d.getMonth()]}`;
+      const due = (n) => String(n).padStart(2, '0');
+      const r = A.riepilogo();
+      const inizio = A.data(-(D.atleta.settimana - 1) * 7), fine = A.data((D.atleta.settimane - D.atleta.settimana + 1) * 7 - 1);
+      const aSettimana = D.settimana.filter(Boolean).length;
       document.querySelector('[data-vista="profilo"]').innerHTML = `
-        <header class="testa-pagina profilo-testa">
-          <img class="avatar" src="${D.atleta.foto}" alt="" width="88" height="88">
-          <h1 class="titolo-pagina">${esc(D.atleta.nome)} ${esc(D.atleta.cognome)}</h1>
-          <span class="sotto">Settimana ${D.atleta.settimana} di ${D.atleta.settimane} · ${esc(D.atleta.programma)}</span>
+        <header class="profilo-foto">
+          <img src="${D.atleta.foto}" alt="">
+          <div class="profilo-nome">
+            <h1 class="titolo-pagina">${esc(D.atleta.nome)}<br>${esc(D.atleta.cognome)}</h1>
+            <span class="ruolo num">Atleta · settimana <b>${due(D.atleta.settimana)}</b> / ${D.atleta.settimane}</span>
+          </div>
         </header>
         <section class="blocco">
           <h2 class="etichetta" style="margin:0">Il tuo coach</h2>
-          <a class="card-coach card" href="#coach">
-            <img class="avatar" src="${D.coach.foto}" alt="" width="56" height="56">
-            <div><b>${esc(D.coach.nome)}</b><span>${dal ? `Collegati dal ${dal.getDate()} ${A.MESI[dal.getMonth()]}` : esc(D.coach.ruolo)}</span></div>
-            <span class="link-azione">Scrivi</span>
-          </a>
+          <div class="coach-profilo">
+            <img class="avatar" src="${D.coach.foto}" alt="" width="64" height="64">
+            <div class="chi-coach"><b>${esc(D.coach.nome)}</b><span>${esc(D.coach.ruolo)}</span>${dal ? `<span>Insieme dal ${giornoMese(dal)}</span>` : ''}</div>
+            <a class="btn-contorno" href="#coach">Scrivi a ${esc(D.coach.breve)} <svg width="16" height="12" viewBox="0 0 22 14" aria-hidden="true"><path d="M1 7h19M14 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+        </section>
+        <section class="blocco">
+          <h2 class="etichetta" style="margin:0">Il tuo percorso</h2>
+          <div class="tre-dati divisi num">
+            <span><b>${due(D.atleta.settimana)}<i>/</i>${D.atleta.settimane}</b><small>settimane</small></span>
+            <span><b>${r.fatti}<i>/</i>${r.previsti}</b><small>allenamenti</small></span>
+            <span><b>${r.aderenza}%</b><small>costanza</small></span>
+          </div>
+        </section>
+        <section class="blocco programma-attuale">
+          <h2 class="etichetta" style="margin:0">Programma attuale</h2>
+          <div class="due-colonne">
+            <div><b class="nome-prog">${esc(D.atleta.programma)}</b><span>${aSettimana} allenamenti a settimana</span></div>
+            <dl class="date-prog"><div><dt>Iniziato il</dt><dd>${giornoMese(inizio)}</dd></div><div><dt>Fine prevista</dt><dd>${giornoMese(fine)}</dd></div></dl>
+          </div>
         </section>
         <section class="blocco">
           <h2 class="etichetta" style="margin:0">Questa è una demo</h2>

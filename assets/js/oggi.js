@@ -8,17 +8,17 @@
   function hero(sessione) {
     const testata = `
       <div class="testata">
-        <div class="saluto"><b>Ciao ${esc(D.atleta.nome)}</b><span>Settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span></div>
         <a class="profilo" href="#profilo" aria-label="Il tuo profilo"><img class="avatar" src="${D.atleta.foto}" alt=""></a>
+        <div class="saluto"><b>Ciao ${esc(D.atleta.nome)}</b><span>Settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span></div>
       </div>`;
 
     if (all) {
       const finito = sessione && sessione.finito;
       const azione = finito
         ? `<a class="btn-secondario" href="#allenamento">Completato · rivedi le serie</a>`
-        : `<a class="btn-primario" href="#allenamento">
-            <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><path d="M2 1.5v13l11-6.5z" fill="#fff"/></svg>
-            ${sessione ? 'Riprendi allenamento' : 'Inizia allenamento'}
+        : `<a class="btn-primario btn-scheda" href="#allenamento">
+            ${sessione ? 'Riprendi la scheda' : 'Apri scheda'}
+            <svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><path d="M1 7h19M14 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>`;
       return `
       <section class="hero ${all.breve.toLowerCase()}" aria-label="Allenamento di oggi">
@@ -53,7 +53,7 @@
               <span class="riga"><span class="nome">${esc(prossimo.nome)}</span><span class="info num">${prossimo.esercizi} esercizi · ~${prossimo.minuti} min</span></span>
             </span>
             <span class="vai">Anteprima</span>
-            <svg width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5" fill="none" stroke="#7AA2FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5" fill="none" stroke="#DDF77A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
         </div>
       </section>`;
@@ -64,7 +64,7 @@
     const periodo = inizio.getMonth() === fine.getMonth()
       ? `${inizio.getDate()}–${fine.getDate()} ${MESI[fine.getMonth()]}`
       : `${inizio.getDate()} ${MESI[inizio.getMonth()]} – ${fine.getDate()} ${MESI[fine.getMonth()]}`;
-    const spunta = '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#7AA2FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const spunta = '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#DDF77A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const giorni = D.settimana.map((k, i) => {
       const cls = ['giorno'];
       if (!k) cls.push('libero');
@@ -188,10 +188,10 @@
             <span class="delta">${esc(p.delta)}</span>
           </div>
           <svg width="124" height="56" viewBox="-4 -4 128 52" aria-hidden="true">
-            <defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563FF" stop-opacity=".35"/><stop offset="1" stop-color="#2563FF" stop-opacity="0"/></linearGradient></defs>
+            <defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C8F03C" stop-opacity=".35"/><stop offset="1" stop-color="#C8F03C" stop-opacity="0"/></linearGradient></defs>
             <path d="M${linea.replace(/ /g, 'L')}V44H0Z" fill="url(#area)"/>
-            <polyline points="${linea}" fill="none" stroke="#7AA2FF" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            <circle cx="${ux}" cy="${uy.toFixed(1)}" r="4" fill="#070B14" stroke="#7AA2FF" stroke-width="2"/>
+            <polyline points="${linea}" fill="none" stroke="#DDF77A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="${ux}" cy="${uy.toFixed(1)}" r="4" fill="#000000" stroke="#DDF77A" stroke-width="2"/>
           </svg>
         </div>
       </section>`;

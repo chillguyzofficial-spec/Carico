@@ -149,7 +149,7 @@
         <p class="dischi-riga" id="dischi-${i}">${testoDischi(i)}</p>
         ${nota}
         <div class="due-azioni">
-          <button class="btn-linea" data-video="${i}">${s.video ? `${SPUNTA('#3DD68C', 18)} Video inviato` : '<svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><rect x="1" y="1" width="14" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 6l6-3.5v11L15 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Invia video al coach'}</button>
+          <button class="btn-linea" data-video="${i}">${s.video ? `${SPUNTA('#C8F03C', 18)} Video inviato` : '<svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><rect x="1" y="1" width="14" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 6l6-3.5v11L15 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Invia video al coach'}</button>
           <button class="btn-linea" data-piu="${i}"><span aria-hidden="true">+</span> Aggiungi serie</button>
         </div>
         <div class="altre-azioni">
@@ -164,7 +164,7 @@
     return `
       ${testata()}
       <div class="corpo-scheda">
-        ${fatte === 0 ? `<button class="link-tutto" id="tutto">${SPUNTA('#7AA2FF', 16)} Fatto tutto come previsto</button>` : ''}
+        ${fatte === 0 ? `<button class="link-tutto" id="tutto">${SPUNTA('#DDF77A', 16)} Fatto tutto come previsto</button>` : ''}
         <div class="elenco-es">${S.es.map((_, i) => (i === qui ? esercizioAperto(i) : rigaChiusa(i))).join('')}</div>
         <button class="aggiungi-es" id="aggiungi"><b>+ Aggiungi un esercizio</b><span>Fuori programma: ${esc(D.coach.breve)} lo vede nel riepilogo</span></button>
         <button class="btn-primario" id="concludi"${fatte ? '' : ' disabled'}>Concludi allenamento</button>
@@ -211,7 +211,7 @@
       return `<div class="riga-riep num"><span class="nome">${esc(nomeDi(i))}</span><span class="tenue">${f.length ? `${quante} · ${pesoTesto(i, top)}` : 'non fatto'}</span>${chip}</div>`;
     }).join('');
     return `
-      <header class="barra-top"><a class="icona-44" href="#oggi" aria-label="Torna a Oggi"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A3ACBD" stroke-width="1.8" stroke-linecap="round"/></svg></a><div class="centro"><b>${esc(all.nome)} · completato</b><span class="num">${durata} min</span></div><button class="icona-44" id="riapri" aria-label="Riapri la scheda"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z" fill="none" stroke="#A3ACBD" stroke-width="1.8" stroke-linejoin="round"/></svg></button></header>
+      <header class="barra-top"><a class="icona-44" href="#oggi" aria-label="Torna a Oggi"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A8A8A3" stroke-width="1.8" stroke-linecap="round"/></svg></a><div class="centro"><b>${esc(all.nome)} · completato</b><span class="num">${durata} min</span></div><button class="icona-44" id="riapri" aria-label="Riapri la scheda"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z" fill="none" stroke="#A8A8A3" stroke-width="1.8" stroke-linejoin="round"/></svg></button></header>
       <div class="corpo-es fine">
         <div class="pila-10"><span class="completato">Allenamento completato</span><h1 class="nome-es">${esc(all.nome)}</h1></div>
         <div class="tre-dati num">
