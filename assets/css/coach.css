@@ -226,3 +226,19 @@ button.voce-coda:hover { background: rgba(28, 28, 28, .55); }
   .rp > :nth-child(5) { grid-column: 1 / -1; margin-bottom: 8px; }
   .rp.th > :nth-child(5) { display: none; }
 }
+
+/* Piano dell'atleta: modello, modo e allenamenti a settimana (programma per persona, 2026-11-03) */
+.piano-coach { display: flex; flex-direction: column; gap: 12px; padding: 14px 0 16px; border-bottom: 1px solid var(--linea); }
+.riga-piano { display: flex; flex-direction: column; gap: 6px; }
+.modelli { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.modello { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--linea); background: var(--notte-1); text-align: left; }
+.modello b { font: 700 14px/18px var(--testo); }
+.modello span { font: 500 12px/16px var(--testo); color: var(--fumo); }
+.modello[aria-pressed="true"] { border-color: var(--voltaico); background: rgba(200, 240, 60, .08); }
+.modello[aria-pressed="true"] b { color: var(--voltaico); }
+.segmenti.due { grid-template-columns: 1fr 1fr; }
+.segmenti.due .segmento { flex-direction: column; gap: 3px; height: 54px; }
+.segmenti.due .segmento span { font-size: 12px; }
+.segmenti.numeri { grid-template-columns: repeat(5, 1fr); max-width: 320px; }
+.tr .ritmo { display: block; margin-top: 3px; font: 500 12px/16px var(--testo); color: var(--fumo); }
+@media (max-width: 600px) { .modelli { grid-template-columns: 1fr 1fr; } }

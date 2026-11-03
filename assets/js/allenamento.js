@@ -23,7 +23,7 @@
   const firma = () => JSON.stringify(ESERCIZI.map((e) => [e.serie, e.reps, e.kg, e.nota]));
   function nuova() {
     return {
-      inizio: null, finito: false, fine: null, prog: firma(),
+      inizio: null, finito: false, fine: null, prog: firma(), k: chiave, // k: quale allenamento (nel modo «quando vuoi» non lo dice il giorno)
       es: ESERCIZI.map((e) => ({ nome: null, nota: '', video: null, rec: null, serie: Array.from({ length: e.serie }, () => ({ kg: e.kg, reps: e.reps, fatta: false })) })),
     };
   }
@@ -117,6 +117,16 @@
       </section>`;
   }
 
+  // Progressione: il target sale da solo quando la settimana prima hai chiuso tutte le serie (il coach la vede e può correggerla)
+  function progressione(i) {
+    const e = ex(i), s = S.es[i];
+    if (e.mio || s.nome || !e.prec.length) return '';
+    const prima = Math.max(...e.prec.map((p) => p[0])), tutte = e.prec.every((p) => p[1] >= e.reps);
+    if (e.kg > prima && tutte) return `<p class="progressione">▲ +${kg(e.kg - prima)} kg da sola: la settimana scorsa hai chiuso tutte le serie.</p>`;
+    if (e.kg === prima && !tutte) return '<p class="progressione stessa">= Stesso peso: la settimana scorsa ti è mancata qualche ripetizione.</p>';
+    return '';
+  }
+
   function esercizioAperto(i) {
     const e = ex(i), s = S.es[i];
     const ultima = e.prec.length ? Math.max(...e.prec.map((p) => p[0])) : null;
@@ -159,6 +169,7 @@
           ${righe}
         </div>
         <p class="dischi-riga" id="dischi-${i}">${testoDischi(i)}</p>
+        ${progressione(i)}
         <div class="fatica" role="radiogroup" aria-label="Com'è andata?"><span class="quanto">Com'è andata?</span>${Object.entries(FATICA).map(([k, t]) => `<button role="radio" data-fatica="${i}-${k}" aria-checked="${s.fatica === k}">${t}</button>`).join('')}</div>
         ${nota}
         ${s.nota ? `<p class="nota-tua-es"><b>La tua nota:</b> «${esc(s.nota)}»</p>` : ''}
@@ -460,7 +471,7 @@
     render() {
       foglio = null; aperto = null;
       S = A.leggi(A.chiaveSessione);
-      if (all && (!S || !S.es || S.es.length < ESERCIZI.length)) { S = nuova(); salva(); } // in più = esercizi aggiunti
+      if (all && (!S || !S.es || S.es.length < ESERCIZI.length || (S.k && S.k !== chiave))) { S = nuova(); salva(); } // in più = esercizi aggiunti; altro allenamento = il coach ha cambiato piano
       // Non ancora iniziata e senza cambi dell'atleta: riprende serie e pesi dal programma (il coach può averlo cambiato)
       else if (all && !S.finito && S.prog !== firma() && contaFatte() === 0 && S.es.length === ESERCIZI.length && !S.es.some((s) => s.nome || s.nota || s.fatica || s.serie.some((r) => r.extra))) { S = nuova(); salva(); }
       disegna();

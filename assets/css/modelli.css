@@ -150,3 +150,11 @@
 .puntini { display: flex; justify-content: center; gap: 6px; margin-top: -2px; }
 .puntini i { width: 6px; height: 6px; border-radius: 3px; background: var(--linea-2); transition: width .25s, background .25s; }
 .puntini i.on { width: 18px; background: var(--voltaico); }
+
+/* Programma per persona: modo «N a settimana, quando vuoi» e progressione (2026-11-03) */
+.nota-flessibile { font: 500 14px/20px var(--testo); color: var(--ardesia); max-width: 300px; }
+.flex-spiega { margin: 18px 20px 0; font: 500 15px/22px var(--testo); color: var(--ardesia); }
+.flex-spiega b { color: var(--voltaico); }
+.progressione { margin: -8px 0 0; font: 600 13px/18px var(--testo); color: var(--voltaico); }
+.progressione.stessa { color: var(--ardesia); font-weight: 500; }
+.conto-sett { color: var(--voltaico); font-weight: 700; }

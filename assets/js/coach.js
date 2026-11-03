@@ -222,6 +222,12 @@
   }
 
   // ---------- Tabella atleti ----------
+  // Ogni atleta ha il suo ritmo: chi inizia 2-3 volte a settimana, chi è più allenato di più (Marco lo decide il pannello sotto)
+  const RITMI = { 'Davide Moretti': [4, 'fissi'], 'Elena Ricci': [2, 'flessibile'], 'Sara Gallo': [3, 'flessibile'], 'Giulia Bianchi': [3, 'fissi'], 'Andrea Conti': [5, 'fissi'] };
+  const ritmo = (nome) => {
+    const [n, modo] = nome === 'Marco Rossi' ? [D.piano.aSettimana, D.piano.modo] : RITMI[nome] || [3, 'fissi'];
+    return modo === 'fissi' ? `${n} giorni fissi` : `${n} a settimana, quando vuole`;
+  };
   function tabella() {
     const nomi = { f: 'fatto', s: 'saltato', r: 'riposo', p: 'previsto' };
     $('#righe-atleti').innerHTML = D.atleti.map((a) => {
@@ -229,7 +235,7 @@
       const pts = a.punti.map((v, i) => `${(i * 24).toFixed(0)},${(40 - (v - min) / (max - min || 1) * 34).toFixed(1)}`).join(' ');
       return `<div class="tr" role="row">
         <span class="atleta" role="cell">${esc(a.nome)}</span>
-        <span class="tenue" role="cell">${esc(a.programma)}</span>
+        <span class="tenue" role="cell">${esc(a.nome === 'Marco Rossi' ? D.piano.nome : a.programma)}<small class="ritmo">${ritmo(a.nome)}</small></span>
         <span class="tenue" role="cell">${esc(a.settimana)}</span>
         <span class="quadretti" role="cell" aria-label="${[...a.giorni].map((g) => nomi[g]).join(', ')}">${[...a.giorni].map((g) => `<i class="q ${g}"></i>`).join('')}</span>
         <span class="chiave" role="cell">${esc(a.chiave)}</span>
@@ -247,7 +253,7 @@
   const kgv = (n) => String(Math.round(n * 100) / 100).replace('.', ',');
   function sessioniMarco() {
     const giorni = Array.from({ length: 7 }, (_, i) => { const d = new Date(lunedi); d.setDate(lunedi.getDate() + i); return d; });
-    return giorni.map((d, i) => ({ i, d, k: D.settimana[i], S: leggi('pt-sessione-' + iso(d)) }))
+    return giorni.map((d, i) => { const S = leggi('pt-sessione-' + iso(d)); return { i, d, k: (S && S.k) || D.settimana[i], S }; }) // «quando vuole»: l'allenamento lo dice la sessione
       .filter((x) => x.k && x.S && x.S.es && x.S.es.some((e) => e.serie.some((r) => r.fatta)));
   }
   function allenamentiMarco() {
@@ -284,17 +290,45 @@
 
   // ---------- Marco: programma che il coach può cambiare ----------
   // Le modifiche vanno nell'archivio comune: l'app le usa nella prossima scheda non ancora iniziata
-  let progScelto = D.settimana.find(Boolean);
+  // Allenamenti del piano: con i giorni fissi per giorno, con «quando vuole» in ordine di sequenza
+  const voci = () => (D.piano.modo === 'fissi'
+    ? D.settimana.map((k, i) => k && [k, GIORNI[i].slice(0, 3)]).filter(Boolean)
+    : D.piano.sequenza.map((k, n) => [k, 'N° ' + (n + 1)]));
+  let progScelto = voci()[0][0];
   const CAMPI = ['serie', 'reps', 'kg', 'nota'];
+  function pannelloPiano() {
+    const p = D.piano;
+    return `
+      <div class="piano-coach">
+        <div class="riga-piano"><span class="etichetta">Modello</span>
+          <div class="modelli">${window.MODELLI.map((m) => `<button class="modello" data-modello="${m.id}" aria-pressed="${m.id === p.id}"><b>${esc(m.livello)}</b><span>${esc(m.nome)} · ${m.aSettimana} a sett.</span></button>`).join('')}</div></div>
+        <div class="riga-piano"><span class="etichetta">Come si allena</span>
+          <div class="segmenti due" role="radiogroup" aria-label="Come si allena">
+            <button class="segmento" role="radio" data-modo="fissi" aria-checked="${p.modo === 'fissi'}">Giorni fissi <span>li può spostare</span></button>
+            <button class="segmento" role="radio" data-modo="flessibile" aria-checked="${p.modo === 'flessibile'}">Quando vuole <span>l'app propone il prossimo</span></button>
+          </div></div>
+        <div class="riga-piano"><span class="etichetta">Allenamenti a settimana</span>
+          <div class="segmenti numeri" role="radiogroup" aria-label="Allenamenti a settimana">${[2, 3, 4, 5, 6].map((n) => `<button class="segmento" role="radio" data-n="${n}" aria-checked="${n === p.aSettimana}">${n}</button>`).join('')}</div></div>
+      </div>`;
+  }
+  function cambiaPiano(nuovo) {
+    scrivi(window.ARCHIVIO.CHIAVE_PIANO, nuovo);
+    window.ARCHIVIO.applicaPiano(D); window.ARCHIVIO.applicaProgramma(D); window.ARCHIVIO.applicaSettimana(D);
+    progScelto = voci()[0][0];
+    programmaMarco(); allenamentiMarco(); coda(); tabella();
+    avviso('Piano aggiornato', `${D.piano.nome} · ${ritmo('Marco Rossi')} · ${D.atleta.nome} lo vede alla prossima apertura dell'app`, null);
+  }
   function programmaMarco() {
     const box = $('#marco-programma');
     const tutte = leggi(window.ARCHIVIO.CHIAVE_PROGRAMMA) || {};
+    if (!voci().some((v) => v[0] === progScelto)) progScelto = voci()[0][0];
     const lista = D.esercizi[progScelto];
     const cambiato = (e) => e.originale && CAMPI.some((c) => (e[c] || '') !== (e.originale[c] || ''));
-    const giorni = D.settimana.map((k, i) => k && `<button class="segmento" role="radio" data-prog="${k}" aria-checked="${k === progScelto}">${GIORNI[i].slice(0, 3)} <span>${esc(D.allenamenti[k].nome)}</span></button>`).filter(Boolean).join('');
+    const giorni = voci().map(([k, l]) => `<button class="segmento" role="radio" data-prog="${k}" aria-checked="${k === progScelto}">${l} <span>${esc(D.allenamenti[k].nome)}</span></button>`).join('');
     box.innerHTML = `
       <h3>Programma di ${esc(D.atleta.nome)}</h3>
-      <div class="segmenti giorni-prog" role="radiogroup" aria-label="Allenamento">${giorni}</div>
+      ${pannelloPiano()}
+      <div class="segmenti giorni-prog" role="radiogroup" aria-label="Allenamento" style="grid-template-columns: repeat(${voci().length}, 1fr)">${giorni}</div>
       <div class="tab-prog" role="table" aria-label="Esercizi di ${esc(D.allenamenti[progScelto].nome)}">
         <div class="rp th" role="row"><span>Esercizio</span><span>Serie</span><span>Reps</span><span>Kg</span><span>Nota per ${esc(D.atleta.nome)}</span></div>
         ${lista.map((e, i) => `<div class="rp${cambiato(e) ? ' cambiato' : ''}" role="row">
@@ -332,6 +366,11 @@
     const b = ev.target.closest('button');
     if (!b) return;
     if (b.dataset.prog) { progScelto = b.dataset.prog; programmaMarco(); }
+    // Piano: modello, modo e allenamenti a settimana (cambiando modello si riparte dai suoi valori)
+    const ora = leggi(window.ARCHIVIO.CHIAVE_PIANO) || {};
+    if (b.dataset.modello) { if (b.dataset.modello !== D.piano.id) cambiaPiano({ modello: b.dataset.modello }); return; }
+    if (b.dataset.modo) { if (b.dataset.modo !== D.piano.modo) cambiaPiano({ ...ora, modello: D.piano.id, modo: b.dataset.modo }); return; }
+    if (b.dataset.n) { if (Number(b.dataset.n) !== D.piano.aSettimana) cambiaPiano({ ...ora, modello: D.piano.id, aSettimana: Number(b.dataset.n) }); return; }
     if (b.id === 'prog-invia') salvaProgramma();
     if (b.id === 'prog-ripristina') {
       const tutte = leggi(window.ARCHIVIO.CHIAVE_PROGRAMMA) || {};

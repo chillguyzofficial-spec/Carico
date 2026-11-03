@@ -9,10 +9,27 @@
   const sessione = (i) => A.leggi('pt-sessione-' + A.iso(A.data(i)));
   const iniziata = (s) => !!(s && s.es && s.es.some((e) => e.serie.some((r) => r.fatta)));
 
+  // ---------- Modo «N a settimana, quando vuoi» (scelto dal coach nel gestionale) ----------
+  // Nessun giorno fisso: oggi l'app propone il prossimo allenamento della sequenza, finché non hai fatto gli N della settimana.
+  // Se oggi non ti alleni, domani te lo ripropone: niente «non fatto» da recuperare.
+  const flessibile = D.piano && D.piano.modo === 'flessibile';
+  let fattiPrima = 0; // allenamenti fatti questa settimana prima di oggi
+  if (flessibile) {
+    const seq = D.piano.sequenza, N = D.piano.aSettimana, base = (D.atleta.settimana - 1) * N;
+    for (let i = 0; i < A.oggi; i++) {
+      const s = sessione(i);
+      // Nella storia della demo il lunedì è fatto (lo squat che il coach ha appena rivisto)
+      if (iniziata(s) || (i === 0 && !s)) { D.settimana[i] = (s && s.k) || seq[(base + fattiPrima) % seq.length]; fattiPrima++; }
+    }
+    const s = sessione(A.oggi);
+    D.settimana[A.oggi] = s && s.k ? s.k : fattiPrima < N ? seq[(base + fattiPrima) % seq.length] : null;
+  }
+
   // fatto · oggi · previsto · riposo · nonfatto (passato, da decidere) · saltato (scelto dall'atleta)
   function stato(i) {
     const k = D.settimana[i], s = sessione(i);
     if (!k) return 'riposo';
+    if (flessibile) return i < A.oggi || (s && s.finito) ? 'fatto' : 'oggi';
     if (s && s.finito) return 'fatto';
     if (i === A.oggi) return 'oggi';
     if (i > A.oggi) return 'previsto';
@@ -23,7 +40,13 @@
     return 'nonfatto';
   }
   // Il più recente allenamento passato non fatto (quello da proporre in Oggi)
-  const daRecuperare = () => { for (let i = A.oggi - 1; i >= 0; i--) if (stato(i) === 'nonfatto') return i; return -1; };
+  const daRecuperare = () => { if (flessibile) return -1; for (let i = A.oggi - 1; i >= 0; i--) if (stato(i) === 'nonfatto') return i; return -1; };
+  // Quanti allenamenti fatti questa settimana (anche oggi, se finito) su quanti previsti
+  function conto() {
+    const n = flessibile ? D.piano.aSettimana : D.settimana.filter(Boolean).length;
+    const fatti = D.settimana.reduce((t, k, i) => t + (k && stato(i) === 'fatto' ? 1 : 0), 0);
+    return { fatti, n, numero: Math.min(n, (flessibile ? fattiPrima : D.settimana.slice(0, A.oggi).filter(Boolean).length) + 1) };
+  }
   // Primo giorno libero dopo oggi (per spostare l'allenamento di oggi quando si recupera)
   const liberoDopo = (da) => { for (let j = da + 1; j < 7; j++) if (!D.settimana[j]) return j; return -1; };
 
@@ -39,7 +62,7 @@
   function ricarica() { location.hash = '#oggi'; location.reload(); } // l'allenamento di oggi cambia: si riparte puliti
 
   A.piano = {
-    stato, daRecuperare, liberoDopo,
+    stato, daRecuperare, liberoDopo, flessibile, conto,
     sposta(da, a) { salva(sposta(da, a)); ricarica(); },
     // Dove si può recuperare: oggi, se è libero o se l'allenamento di oggi non è ancora iniziato
     // (allora quello di oggi va al primo giorno libero dopo); se oggi è già iniziato, il primo giorno libero dopo.

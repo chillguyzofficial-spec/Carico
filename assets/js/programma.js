@@ -4,8 +4,18 @@
 
   A.viste.programma = {
     render(param) {
-      const scelto = D.allenamenti[param] ? param : (D.settimana[A.oggi] || D.settimana.find((k, i) => k && i > A.oggi) || D.settimana.find(Boolean));
+      const flex = A.piano.flessibile;
+      const scelto = D.allenamenti[param] ? param : (D.settimana[A.oggi] || D.settimana.find((k, i) => k && i > A.oggi) || D.settimana.find(Boolean) || D.piano.sequenza[0]);
       const sessione = A.leggi(A.chiaveSessione);
+      // «Quando vuoi»: niente giorni, la sequenza degli allenamenti con quelli già fatti e il prossimo
+      const fattiSett = D.settimana.filter((k, i) => k && A.piano.stato(i) === 'fatto');
+      const sequenza = D.piano.sequenza.map((k, n) => {
+        const a = D.allenamenti[k], volte = fattiSett.filter((x) => x === k).length;
+        const stato = k === D.settimana[A.oggi] && A.piano.stato(A.oggi) === 'oggi' ? '<span class="chip chip-info">Prossimo</span>' : volte ? '<span class="chip chip-ok">Fatto</span>' : '';
+        return `<li><a class="giorno-prog${k === scelto ? ' scelto' : ''}" href="#programma/${k}" aria-label="${esc(a.nome)}"${k === scelto ? ' aria-current="true"' : ''}>
+          <span class="quando num"><b>N°</b><span>${n + 1}</span></span>
+          <span class="cosa"><b>${esc(a.nome)}</b><span>${esc(a.muscoli)}</span></span>${stato}</a></li>`;
+      }).join('');
       const giorni = D.settimana.map((k, i) => {
         const a = k ? D.allenamenti[k] : null;
         const st = A.piano.stato(i); // fatto, oggi, non fatto, saltato (piano.js)
@@ -30,9 +40,10 @@
         <header class="testa-pagina">
           <span class="sopratitolo">Settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span>
           <h1 class="titolo-pagina">Programma</h1>
-          <span class="sotto">${esc(D.atleta.programma)} · preparato da ${esc(D.coach.nome)}</span>
+          <span class="sotto">${esc(D.atleta.programma)} · ${D.piano.aSettimana} allenamenti a settimana${flex ? ', quando vuoi' : ''} · preparato da ${esc(D.coach.nome)}</span>
         </header>
-        <ul class="settimana-prog card" aria-label="Questa settimana">${giorni}</ul>
+        ${flex ? `<p class="flex-spiega">Questa settimana <b>${fattiSett.length} di ${D.piano.aSettimana}</b>. Ti alleni nei giorni che vuoi: l’app ti propone sempre il prossimo della sequenza.</p>` : ''}
+        <ul class="settimana-prog card" aria-label="${flex ? 'Sequenza degli allenamenti' : 'Questa settimana'}">${flex ? sequenza : giorni}</ul>
         <section class="blocco" aria-labelledby="t-giorno">
           <div class="intesta"><h2 id="t-giorno" class="titolo-sezione">${esc(a.nome)}</h2><span class="etichetta num" style="letter-spacing:0">${a.esercizi} esercizi · ~${a.minuti} min</span></div>
           <ol class="lista-es">${esercizi}</ol>

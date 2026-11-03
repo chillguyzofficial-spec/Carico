@@ -25,12 +25,12 @@
         <div class="hero-foto"><img src="assets/foto/${all.foto}.webp" alt="" fetchpriority="high"></div>
         ${testata}
         <div class="hero-testo">
-          <span class="sopratitolo">${finito ? 'Oggi · fatto' : 'Oggi'}</span>
+          <span class="sopratitolo">${finito ? 'Oggi · fatto' : 'Oggi'}${A.piano.flessibile ? ` · allenamento ${A.piano.conto().numero} di ${D.piano.aSettimana}` : ''}</span>
           <h1 class="titolone">${esc(all.nome)}</h1>
           <span class="muscoli">${esc(all.muscoli)}</span>
           <span class="durata-all">${all.esercizi} esercizi · ~${all.minuti} min</span>
           ${azione}
-          ${finito ? '' : '<button class="link-sposta" data-sposta>Oggi non riesci? Cambia giorno</button>'}
+          ${finito ? '' : A.piano.flessibile ? '<span class="nota-flessibile">Oggi non riesci? Nessun problema: domani te lo ripropongo.</span>' : '<button class="link-sposta" data-sposta>Oggi non riesci? Cambia giorno</button>'}
         </div>
       </section>`;
     }
@@ -41,14 +41,16 @@
     if (dopo === 7) dopo = 0;
     const prossimo = dopo ? D.allenamenti[D.settimana[(oggi + dopo) % 7]] : null;
     const quando = dopo === 1 ? 'Domani' : GIORNI[(oggi + dopo) % 7];
+    // Modo «quando vuoi»: se è riposo vuol dire che gli allenamenti della settimana sono fatti
+    const completa = A.piano.flessibile;
     return `
       <section class="hero riposo" aria-label="Giorno di riposo">
         <div class="hero-foto"><img src="assets/foto/hero-riposo.webp" alt="" fetchpriority="high"></div>
         ${testata}
         <div class="hero-testo">
-          <span class="sopratitolo">Oggi · ${GIORNI[oggi]} ${data(oggi).getDate()}</span>
-          <h1 class="titolone">Riposo</h1>
-          <p class="consiglio">${esc(D.riposo)}</p>
+          <span class="sopratitolo">${completa ? `Settimana completata · ${D.piano.aSettimana} di ${D.piano.aSettimana}` : `Oggi · ${GIORNI[oggi]} ${data(oggi).getDate()}`}</span>
+          <h1 class="titolone">${completa ? 'Fatto' : 'Riposo'}</h1>
+          <p class="consiglio">${completa ? `Hai fatto i tuoi ${D.piano.aSettimana} allenamenti. Lunedì ripartiamo. ` : ''}${esc(D.riposo)}</p>
           ${prossimo ? `<a class="domani" href="#programma/${D.settimana[(oggi + dopo) % 7]}">
             <span class="cosa">
               <span class="quando">${quando} · ${BREVI[(oggi + dopo) % 7]} ${data(oggi + dopo).getDate()}</span>
@@ -77,7 +79,7 @@
       if (i === oggi) cls.push('corrente');
       if (fatto) cls.push('fatto');
       if (st === 'nonfatto' || st === 'saltato') cls.push(st);
-      const tipo = k ? D.allenamenti[k].breve : 'Riposo';
+      const tipo = k ? D.allenamenti[k].breve : A.piano.flessibile ? '—' : 'Riposo'; // «quando vuoi»: i giorni vuoti sono solo liberi
       const stato = NOMI[st];
       const dentro = `<span class="lettera" aria-hidden="true">${LETTERE[i]}</span>
         <span class="cerchio" aria-hidden="true">${fatto ? spunta : st === 'nonfatto' || st === 'saltato' ? X : data(i).getDate()}</span>
@@ -89,7 +91,7 @@
     }).join('');
     return `
       <section class="blocco settimana" aria-labelledby="t-sett">
-        <div class="intesta etichetta"><h2 id="t-sett" class="etichetta" style="margin:0">Questa settimana</h2><span class="destra"><span class="num">${periodo}</span><button class="link-calendario" data-calendario aria-label="Apri il calendario del programma"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 10h16M9 3v4M15 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Calendario</button></span></div>
+        <div class="intesta etichetta"><h2 id="t-sett" class="etichetta" style="margin:0">Questa settimana</h2><span class="destra"><span class="num">${A.piano.flessibile ? `<b class="conto-sett">${A.piano.conto().fatti} di ${D.piano.aSettimana}</b>` : periodo}</span><button class="link-calendario" data-calendario aria-label="Apri il calendario del programma"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 10h16M9 3v4M15 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Calendario</button></span></div>
         <ul class="giorni">${giorni}</ul>
       </section>`;
   }
@@ -276,7 +278,7 @@
   }
   function progresso(cosa) {
     // Prima card: quella del giorno (diversa dall'esercizio di cui parla il coach), poi gli altri gruppi
-    let k = D.progressoDelGiorno[chiave || 'riposo'];
+    let k = D.progressoDelGiorno[chiave] || D.progressoDelGiorno.riposo; // allenamenti di altri modelli: quella di riposo
     const nomeCoach = cosa && (cosa.tipo === 'carico' ? cosa.c.esercizio : cosa.tipo === 'feedback' ? D.video.esercizio : '');
     if (nomeCoach && D.progressi[k].nome.startsWith(nomeCoach)) k = 'panca';
     const ordine = [GRUPPI.find((g) => g.id === k)].concat(GRUPPI.filter((g) => g.id !== k));

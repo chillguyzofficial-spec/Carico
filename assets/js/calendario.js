@@ -13,7 +13,9 @@
     const n = giorniTra(inizio(), d), sett = Math.floor(n / 7) + 1, dow = ((n % 7) + 7) % 7;
     if (n < 0 || sett > D.atleta.settimane) return { stato: 'fuori' };
     if (sett === D.atleta.settimana) { const k = D.settimana[dow]; return { stato: A.piano.stato(dow), k, sett }; }
-    const k = D.settimanaBase[dow];
+    // Settimane passate e future: giorni fissi del coach, oppure («quando vuoi») i giorni tipici con la sequenza
+    const p = D.piano, j = p.storico.indexOf(dow);
+    const k = p.modo === 'fissi' ? D.settimanaBase[dow] : j < 0 ? null : p.sequenza[((sett - 1) * p.aSettimana + j) % p.sequenza.length];
     if (!k) return { stato: 'riposo', sett };
     if (sett > D.atleta.settimana) return { stato: 'previsto', k, sett };
     return { stato: STORICO_SALTATI.some(([s, g]) => s === sett && g === dow) ? 'saltato' : 'fatto', k, sett };
