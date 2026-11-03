@@ -140,7 +140,7 @@
             <h2><button id="es-${i}" data-apri="${i}" aria-expanded="true">${esc(nomeDi(i))}</button></h2>
           </div>
           ${e.demo && !s.nome ? `<button class="tecnica" data-demo="${i}" aria-label="Guarda come si fa: video di ${esc(D.coach.breve)}, ${e.durata}"><img src="assets/foto/${e.demo}.webp" alt=""><span class="play" aria-hidden="true"><svg width="12" height="14" viewBox="0 0 10 12"><path d="M1 1v10l8-5z" fill="#fff"/></svg></span><span class="etich">Vedi tecnica</span></button>` : ''}
-          <div class="dati-es num"><span class="schema">${s.serie.length} × ${e.reps}</span><span class="ultima">${dati}</span></div>
+          <div class="dati-es num"><span class="schema">${s.serie.length} × ${e.reps}</span><span class="ultima">${dati}</span><button class="chiudi-es" data-apri="${i}" aria-label="Chiudi ${esc(nomeDi(i))}">${FRECCIA}</button></div>
         </div>
         <div class="sk-tabella" role="group" aria-label="Serie di ${esc(nomeDi(i))}">
           <div class="intest-serie" aria-hidden="true"><span>Serie</span><span>${zavorra(i) ? '+Kg' : 'Kg'}</span><span>Rep</span><span></span></div>
