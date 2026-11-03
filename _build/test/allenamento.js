@@ -18,13 +18,8 @@ const out = process.argv[2];
   // tocca una serie del secondo esercizio (ordine libero)
   await p.click('.riquadro[data-i="1"][data-j="0"]'); await p.waitForTimeout(300);
   v(await p.$('.riquadro[data-i="1"][data-j="0"].fatta') !== null, 'serie segnata con un tocco');
-  v(await p.isVisible('.capsula'), 'capsula del recupero');
-  v((await p.textContent('.capsula')).includes('Lento avanti'), 'capsula dice l\u2019esercizio');
-  await p.click('[data-rec="15"]'); await p.waitForTimeout(200);
-  v((await p.textContent('.titoli-es >> nth=1')).includes('recupero 1:45'), 'recupero +15 ricordato');
+  v(!(await p.$('.capsula')), 'nessun timer dopo la serie');
   await p.screenshot({ path: out + '/k-recupero.png' });
-  await p.click('#salta'); await p.waitForTimeout(200);
-  v(!(await p.isVisible('.capsula')), 'salta');
   // modifica una serie fatta: panca 75
   await p.click('.riquadro[data-i="0"][data-j="0"]'); await p.waitForTimeout(200);
   await p.click('.riquadro[data-i="0"][data-j="0"]'); await p.waitForTimeout(300);

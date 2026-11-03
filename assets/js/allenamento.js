@@ -1,6 +1,6 @@
 // Allenamento del giorno come SCHEDA UNICA (scelta di Francesco 2026-11-03: niente app che guida passo passo).
 // Tutti gli esercizi su una pagina, ogni serie è un riquadro già compilato: un tocco = fatta, in qualsiasi ordine.
-// Toccando una serie fatta si cambiano peso e ripetizioni. Il recupero è una capsula in basso che parte da sola.
+// Toccando una serie fatta si cambiano peso e ripetizioni. Niente timer (tolti su richiesta di Francesco).
 // In cima «Fatto tutto come previsto» per chi ha fretta. La sessione è salvata (si chiude e si riprende).
 (function () {
   const A = window.APP, D = A.D, { esc, kg, mmss } = A;
@@ -12,7 +12,6 @@
   const numIt = (n) => { const [i, d] = String(Math.round(Math.abs(n) * 10) / 10).split('.'); return (n < 0 ? '−' : '') + i.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (d ? ',' + d : ''); };
 
   let S = null;          // sessione salvata
-  let orologio = null;   // aggiorna tempo e recupero
   let foglio = null;     // { tipo: 'serie' | 'menu' | 'sostituisci', i, j }
   const aperti = new Set(); // esercizi finiti riaperti a mano
 
@@ -29,7 +28,6 @@
   const ex = (i) => ESERCIZI[i];
   const nomeDi = (i) => S.es[i].nome || ex(i).nome;
   const recDi = (i) => S.es[i].rec || ex(i).rec;
-  const trascorso = () => (S.inizio ? (Date.now() - S.inizio) / 1000 : 0);
   const contaFatte = () => S.es.reduce((t, s) => t + s.serie.filter((r) => r.fatta).length, 0);
   const contaTotali = () => S.es.reduce((t, s) => t + s.serie.length, 0);
   const volume = (serie) => serie.reduce((t, s) => t + s.kg * s.reps, 0);
@@ -41,19 +39,6 @@
     return valide.length ? valide.reduce((m, s) => (s.kg > m.kg ? s : m)) : null;
   }
   const SPUNTA = (c, w = 16) => `<svg width="${w}" height="${w}" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-
-  // ---------- Suono: in palestra il telefono è sulla panca, e su iPhone il sito non può vibrare ----------
-  let audio = null, ultimoSecondo = null;
-  const suonoAttivo = () => A.leggi('pt-suono') !== false;
-  function sblocca() { if (!audio && (window.AudioContext || window.webkitAudioContext)) audio = new (window.AudioContext || window.webkitAudioContext)(); }
-  function bip(lungo) {
-    if (!suonoAttivo() || !audio) return;
-    const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime;
-    o.frequency.value = lungo ? 1046 : 784;
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + (lungo ? 0.6 : 0.15));
-    o.connect(g).connect(audio.destination); o.start(t); o.stop(t + (lungo ? 0.65 : 0.2));
-  }
 
   // ---------- Dischi per lato e confronto con le settimane prima ----------
   const BILANCIERE = ['Panca piana', 'Squat', 'Stacco da terra', 'Stacco rumeno', 'Lento avanti', 'Rematore con bilanciere', 'Hip thrust', 'Curl con bilanciere'];
@@ -142,7 +127,7 @@
     return `
       <header class="barra-top">
         <a class="icona-44" href="#oggi" aria-label="Chiudi (la scheda resta salvata)"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#A3ACBD" stroke-width="1.8" stroke-linecap="round"/></svg></a>
-        <div class="centro"><b>${esc(all.nome)}</b><span class="num"><span id="trascorso">${mmss(trascorso())}</span> · ${fatte} di ${totali} serie</span></div>
+        <div class="centro"><b>${esc(all.nome)}</b><span class="num">${fatte} di ${totali} serie</span></div>
         <span class="icona-44"></span>
       </header>
       <div class="avanza" aria-hidden="true"><i style="width:${fatte / totali * 100}%"></i></div>
@@ -150,21 +135,7 @@
         ${fatte === 0 ? '<p class="aiuto-scheda">Tocca la serie quando l’hai fatta.</p><button class="btn-secondario" id="tutto">✓ Fatto tutto come previsto</button>' : ''}
         ${carte}
         <button class="btn-primario" id="concludi"${fatte ? '' : ' disabled'}>Concludi allenamento</button>
-      </div>
-      ${capsula()}`;
-  }
-
-  // Capsula del recupero (in basso, sopra la scheda)
-  function capsula() {
-    if (!S.recupero || S.recupero.fine <= Date.now()) return '';
-    const i = S.recupero.es;
-    return `<div class="capsula" role="timer" aria-label="Recupero">
-      <span class="testo"><small>Recupero · ${esc(nomeDi(i))}</small><b class="num" id="cifre">${mmss(Math.ceil((S.recupero.fine - Date.now()) / 1000))}</b></span>
-      <button class="tasto-cap" data-rec="-15" aria-label="15 secondi in meno">−15</button>
-      <button class="tasto-cap" data-rec="15" aria-label="15 secondi in più">+15</button>
-      <button class="tasto-cap chiudi" id="salta" aria-label="Salta il recupero"><svg width="12" height="12" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#F2F4F8" stroke-width="2" stroke-linecap="round"/></svg></button>
-      <i class="traccia-cap"><i id="traccia-rec"></i></i>
-    </div>`;
+      </div>`; // timer tolti su richiesta di Francesco (2026-11-03): niente capsula del recupero né tempo trascorso
   }
 
   // ---------- Fogli dal basso: modifica serie, menu esercizio, sostituzione ----------
@@ -213,7 +184,6 @@
           <span class="testi"><b>Chiedi al coach</b><span class="contesto">${esc(`${nomeDi(i)} · serie ${j + 1} · ${kg(r.kg)} kg × ${r.reps}`)}</span></span>
         </a>
         ${(e.alt || []).length ? `<button class="voce-foglio" id="sostituisci"><span class="icona-tonda vuota"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M5 8h13l-3-3M19 16H6l3 3" fill="none" stroke="#A3ACBD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="testi"><b>Sostituisci esercizio</b><span class="tenue">Attrezzo occupato o fastidio</span></span></button>` : ''}
-        <button class="voce-foglio" id="suono" aria-pressed="${suonoAttivo()}"><span class="icona-tonda vuota"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="none" stroke="#A3ACBD" stroke-width="1.8" stroke-linejoin="round"/></svg></span><span class="testi"><b>Suono a fine recupero: ${suonoAttivo() ? 'sì' : 'no'}</b><span class="tenue">Bip agli ultimi 3 secondi</span></span></button>
         <button class="chiudi-foglio" data-chiudi>Chiudi</button>`;
     }
     return `<div class="velo-foglio" data-chiudi></div><div class="foglio" role="dialog" aria-modal="true" aria-label="${esc(nomeDi(i))}"><span class="maniglia" aria-hidden="true"></span>${dentro}</div>`;
@@ -253,32 +223,16 @@
   }
   function ridisegnaTenendoPosizione() { const y = scrollY; disegna(); scrollTo(0, y); }
 
-  function tic() {
-    const t = document.getElementById('trascorso');
-    if (t) t.textContent = mmss(trascorso());
-    if (!S.recupero) return;
-    const resta = (S.recupero.fine - Date.now()) / 1000;
-    const c = document.getElementById('cifre');
-    if (c) {
-      c.textContent = mmss(Math.max(0, Math.ceil(resta)));
-      document.getElementById('traccia-rec').style.width = Math.max(0, Math.min(100, resta / S.recupero.totale * 100)) + '%';
-    }
-    const sec = Math.ceil(resta);
-    if (sec !== ultimoSecondo) { ultimoSecondo = sec; if (sec <= 3 && sec >= 1) bip(false); }
-    if (resta <= 0) { bip(true); navigator.vibrate && navigator.vibrate([200, 100, 200]); S.recupero = null; ultimoSecondo = null; salva(); if (!foglio) ridisegnaTenendoPosizione(); }
-  }
-
   function segnaFatta(i, j) {
     const r = S.es[i].serie[j], e = ex(i);
     r.fatta = true;
     const completo = S.es[i].serie.every((x) => x.fatta);
     if (!S.inizio) S.inizio = Date.now();
     const resta = S.es.some((s) => s.serie.some((x) => !x.fatta));
-    S.recupero = resta ? { fine: Date.now() + recDi(i) * 1000, totale: recDi(i), es: i } : null;
-    ultimoSecondo = null;
+    S.recupero = null;
     salva(); ridisegnaTenendoPosizione();
     const rec = completo && record(i); // un solo annuncio, quando l'esercizio è finito
-    A.avviso(rec ? `${nomeDi(i)} finito · record personale` : completo ? `${nomeDi(i)} finito` : `${nomeDi(i)} · serie ${j + 1}`, rec ? `${kg(rec.kg)} kg × ${rec.reps}: ${kg(rec.kg - e.best)} kg oltre il tuo migliore` : `${kg(r.kg)} kg × ${r.reps}${resta ? ` · recupero ${mmss(recDi(i))}` : ''}`, () => {
+    A.avviso(rec ? `${nomeDi(i)} finito · record personale` : completo ? `${nomeDi(i)} finito` : `${nomeDi(i)} · serie ${j + 1}`, rec ? `${kg(rec.kg)} kg × ${rec.reps}: ${kg(rec.kg - e.best)} kg oltre il tuo migliore` : `${kg(r.kg)} kg × ${r.reps}`, () => {
       r.fatta = false; S.recupero = null; salva(); ridisegnaTenendoPosizione();
     });
   }
@@ -306,7 +260,6 @@
   function clic(ev) {
     const t = ev.target.closest('button, a, [data-chiudi]');
     if (!t) return;
-    sblocca();
     if (t.matches('[data-chiudi]')) { foglio = null; ridisegnaTenendoPosizione(); return; }
     if (t.dataset.j !== undefined) { // riquadro di una serie
       const i = Number(t.dataset.i), j = Number(t.dataset.j);
@@ -316,11 +269,6 @@
     if (t.dataset.apri !== undefined) { aperti.add(Number(t.dataset.apri)); ridisegnaTenendoPosizione(); return; }
     if (t.dataset.menu !== undefined) { foglio = { tipo: 'menu', i: Number(t.dataset.menu) }; ridisegnaTenendoPosizione(); return; }
     if (t.dataset.delta) { regola(t.dataset.campo, Number(t.dataset.delta)); return; }
-    if (t.dataset.rec) {
-      const i = S.recupero.es, nuovo = Math.max(15, Math.min(600, recDi(i) + Number(t.dataset.rec)));
-      S.recupero.fine += (nuovo - recDi(i)) * 1000; S.recupero.totale = nuovo; S.es[i].rec = nuovo;
-      salva(); ridisegnaTenendoPosizione(); return;
-    }
     if (t.dataset.alt !== undefined) { S.es[foglio.i].nome = t.dataset.alt || null; foglio = null; salva(); ridisegnaTenendoPosizione(); return; }
     switch (t.id) {
       case 'salva-serie': {
@@ -333,8 +281,6 @@
       case 'sostituisci': foglio = { tipo: 'sostituisci', i: foglio.i }; ridisegnaTenendoPosizione(); break;
       case 'registra': document.getElementById('file-video').click(); break;
       case 'demo': A.avviso(`Dimostrazione di ${D.coach.breve}`, `Qui parte il video del coach (${ex(foglio.i).durata})`); break;
-      case 'suono': A.scrivi('pt-suono', !suonoAttivo()); if (suonoAttivo()) bip(false); ridisegnaTenendoPosizione(); break;
-      case 'salta': S.recupero = null; salva(); ridisegnaTenendoPosizione(); break;
       case 'tutto': {
         const prima = JSON.stringify(S);
         S.es.forEach((s) => s.serie.forEach((r) => { r.fatta = true; }));
@@ -361,8 +307,7 @@
       S = A.leggi(A.chiaveSessione);
       if (all && (!S || !S.es || S.es.length !== ESERCIZI.length)) { S = nuova(); salva(); }
       disegna();
-      clearInterval(orologio);
-      orologio = setInterval(() => { if (location.hash.startsWith('#allenamento') && S && !S.finito) tic(); }, 250);
+      if (S && S.recupero) { S.recupero = null; salva(); } // sessioni salvate quando c'era il timer
     },
   };
 })();
