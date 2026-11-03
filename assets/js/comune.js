@@ -20,8 +20,8 @@
 
   const { leggi, scrivi } = window.ARCHIVIO; // memoria condivisa con il gestionale (vedi archivio.js)
 
-  const chiaveSessione = 'pt-sessione-' + iso(data(oggi));
-  const chiaveCheckin = 'pt-checkin-s' + D.atleta.settimana;
+  const chiaveSessione = D.k('pt-sessione-' + iso(data(oggi)));
+  const chiaveCheckin = D.k('pt-checkin-s' + D.atleta.settimana);
 
   // Avviso in basso con «Annulla» (dalla tavola: «Serie 2 salvata · Annulla»)
   let timer = null;

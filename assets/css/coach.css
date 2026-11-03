@@ -39,7 +39,7 @@ body { min-height: 100vh; background: linear-gradient(var(--notte-0) 0%, var(--f
 }
 .cerca input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--gesso); font: 500 14px/1 var(--testo); }
 .cerca input::placeholder { color: var(--fumo); }
-.cerca:focus-within { border-color: var(--voltaico); box-shadow: 0 0 0 4px rgba(200, 240, 60, .12); }
+.cerca:focus-within { border-color: var(--voltaico); box-shadow: 0 0 0 4px rgba(var(--accento-rgb), .12); }
 .btn-sec {
   height: 44px; padding: 0 18px; border-radius: 12px; background: var(--notte-3); border: 1px solid var(--linea-2);
   font: 600 15px/1 var(--testo); color: var(--gesso); white-space: nowrap;
@@ -116,15 +116,15 @@ button.voce-coda:hover { background: rgba(28, 28, 28, .55); }
   min-height: 84px; resize: none; border-radius: 14px; background: var(--notte-1); border: 1px solid var(--linea);
   padding: 14px 16px; font: 400 15px/22px var(--testo); color: var(--gesso); outline: 0;
 }
-.messaggio:focus { border-color: var(--voltaico); box-shadow: 0 0 0 4px rgba(200, 240, 60, .12); }
+.messaggio:focus { border-color: var(--voltaico); box-shadow: 0 0 0 4px rgba(var(--accento-rgb), .12); }
 .azioni { display: flex; gap: 12px; align-items: center; }
 .azioni .info { flex: 1; font: 500 13px/18px var(--testo); color: var(--fumo); }
 .azioni .btn-sec { height: 48px; border-radius: 14px; }
 .btn-invia {
   height: 48px; padding: 0 22px; border-radius: 14px; background: var(--voltaico); color: var(--su-accento); font: 600 15px/1 var(--testo);
-  box-shadow: 0 8px 24px rgba(200, 240, 60, .3), inset 0 1px 0 rgba(255, 255, 255, .18); white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(var(--accento-rgb), .3), inset 0 1px 0 rgba(255, 255, 255, .18); white-space: nowrap;
 }
-.btn-invia:hover { background: #A9CF22; }
+.btn-invia:hover { background: var(--voltaico-scuro); }
 .btn-invia:disabled { background: var(--notte-3); color: var(--fumo); box-shadow: none; cursor: not-allowed; }
 
 /* Stato vuoto */
@@ -145,7 +145,7 @@ button.voce-coda:hover { background: rgba(28, 28, 28, .55); }
 .tr .chiave { font: 500 14px/1.2 var(--testo); }
 .quadretti { display: flex; gap: 4px; }
 .q { display: inline-block; width: 18px; height: 18px; border-radius: 5px; }
-.q.f { background: rgba(221, 247, 122, .5); }
+.q.f { background: rgba(var(--accento-chiaro-rgb), .5); }
 .q.s { background: rgba(255, 97, 102, .55); }
 .q.r { border: 1px dashed var(--linea-2); }
 .q.p { border: 1.5px solid var(--linea-2); }
@@ -218,8 +218,8 @@ button.voce-coda:hover { background: rgba(28, 28, 28, .55); }
 .nome-prog-es i { font: normal 600 11px/1 var(--testo); letter-spacing: .08em; text-transform: uppercase; color: var(--voltaico); }
 .campo-prog { width: 100%; min-width: 0; height: 38px; border-radius: 10px; border: 1px solid var(--linea); background: var(--notte-2); color: var(--gesso); font: 600 15px/1 var(--testo); text-align: center; outline: 0; padding: 0 6px; }
 .campo-prog.nota { text-align: left; font-weight: 500; font-size: 13px; padding: 0 10px; }
-.campo-prog:focus { border-color: var(--voltaico); box-shadow: 0 0 0 3px rgba(200, 240, 60, .15); }
-.rp.cambiato .campo-prog { border-color: rgba(200, 240, 60, .35); }
+.campo-prog:focus { border-color: var(--voltaico); box-shadow: 0 0 0 3px rgba(var(--accento-rgb), .15); }
+.rp.cambiato .campo-prog { border-color: rgba(var(--accento-rgb), .35); }
 @media (max-width: 1180px) { .marco-griglia { grid-template-columns: 1fr; } }
 @media (max-width: 600px) {
   .rp { grid-template-columns: minmax(0, 1fr) 48px 48px 60px; }
@@ -234,7 +234,7 @@ button.voce-coda:hover { background: rgba(28, 28, 28, .55); }
 .modello { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--linea); background: var(--notte-1); text-align: left; }
 .modello b { font: 700 14px/18px var(--testo); }
 .modello span { font: 500 12px/16px var(--testo); color: var(--fumo); }
-.modello[aria-pressed="true"] { border-color: var(--voltaico); background: rgba(200, 240, 60, .08); }
+.modello[aria-pressed="true"] { border-color: var(--voltaico); background: rgba(var(--accento-rgb), .08); }
 .modello[aria-pressed="true"] b { color: var(--voltaico); }
 .segmenti.due { grid-template-columns: 1fr 1fr; }
 .segmenti.due .segmento { flex-direction: column; gap: 3px; height: 54px; }

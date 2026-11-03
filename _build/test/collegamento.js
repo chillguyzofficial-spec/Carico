@@ -38,15 +38,18 @@ const out = process.argv[2];
 
   // ---------- Gestionale: vede l'allenamento ----------
   const pc = await b.newContext({ viewport: { width: 1440, height: 900 } });
+  await pc.addInitScript(() => sessionStorage.setItem('pt-coach-sessione', '1'));
   // stesso «telefono» e stesso PC nella demo: si copia la memoria dell'app nel browser del gestionale
   const memoria = await app.evaluate(() => JSON.stringify(localStorage));
   await pc.addInitScript((m) => { if (!sessionStorage.getItem('copiata')) { Object.entries(JSON.parse(m)).forEach(([k, x]) => localStorage.setItem(k, x)); sessionStorage.setItem('copiata', '1'); } }, memoria);
   const coach = await pc.newPage(); guarda(coach);
   await coach.goto(BASE + 'coach.html'); await coach.waitForTimeout(500);
-  const box = await testo(coach, '#marco-allenamenti');
+  const codaTesto = await testo(coach, '#coda');
+  await coach.goto(BASE + 'coach.html#atleta/marco'); await coach.waitForTimeout(400);
+  const box = await testo(coach, '#atleta-allenamenti');
   v(box.includes('Push A') && box.includes('Completato'), 'gestionale: allenamento completato');
   v(box.includes('75×8') && box.includes('+1 serie') && box.includes('Record') && box.includes('Al limite') && box.includes('Fastidio alla spalla'), 'gestionale: serie, extra, record, fatica, nota');
-  v((await testo(coach, '#coda')).includes('Allenamento · Push A completato'), 'gestionale: in coda');
+  v(codaTesto.includes('Allenamento · Push A completato'), 'gestionale: in coda');
   await coach.screenshot({ path: out + '/c-coach.png', fullPage: true });
 
   // ---------- Gestionale: cambia il programma di martedì (Pull A) ----------
@@ -55,7 +58,7 @@ const out = process.argv[2];
   await coach.fill('[data-c="serie"][data-i="0"]', '5');
   await coach.fill('[data-c="nota"][data-i="0"]', 'Oggi prova 7,5 di zavorra.');
   await coach.click('#prog-invia'); await coach.waitForTimeout(250);
-  v((await testo(coach, '#marco-programma')).includes('modificato') && await coach.isVisible('#prog-ripristina'), 'programma salvato e segnato come modificato');
+  v((await testo(coach, '#atleta-programma')).includes('modificato') && await coach.isVisible('#prog-ripristina'), 'programma salvato e segnato come modificato');
   const prog = await coach.evaluate(() => localStorage.getItem('pt-programma-marco'));
 
   // ---------- App: la scheda di martedì segue il coach ----------
@@ -77,7 +80,7 @@ const out = process.argv[2];
 
   // ---------- Ripristina ----------
   await coach.click('#prog-ripristina'); await coach.waitForTimeout(200);
-  v(!(await coach.evaluate(() => localStorage.getItem('pt-programma-marco'))) && !(await testo(coach, '#marco-programma')).includes('modificato'), 'programma iniziale ripristinato');
+  v(!(await coach.evaluate(() => localStorage.getItem('pt-programma-marco'))) && !(await testo(coach, '#atleta-programma')).includes('modificato'), 'programma iniziale ripristinato');
 
   // sborda?
   for (const [p, n] of [[app, 'app'], [coach, 'coach']]) { const x = await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth); v(x <= 0, `sborda ${n} +${x}`); }

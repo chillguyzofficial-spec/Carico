@@ -3,7 +3,8 @@
 (function () {
   const A = window.APP, D = A.D, { esc, kg } = A;
   const ESERCIZI = ['panca', 'squat', 'stacco', 'rematore'];
-  const OBIETTIVO = { panca: 80, squat: 90, stacco: 135, rematore: 77.5 };
+  // Obiettivi di fine blocco (Marco); per un atleta avanzato in scala con i suoi carichi
+  const OBIETTIVO = Object.fromEntries(Object.entries({ panca: 80, squat: 90, stacco: 135, rematore: 77.5 }).map(([k, v]) => [k, Math.round(v * (D.scala || 1) / 2.5) * 2.5]));
   const NOME_ES = { panca: 'Panca piana', squat: 'Squat', stacco: 'Stacco da terra', rematore: 'Rematore con bilanciere' };
   const INTERVALLI = [['1M', 4], ['3M', 13], ['6M', 26], ['1A', 52], ['Tutto', 999]];
   let scelto = 'panca', intervallo = 'Tutto';
@@ -58,7 +59,7 @@
     for (let t = Math.ceil(min / passo) * passo; t <= max; t += passo) tacche.push(t);
     const griglia = tacche.map((v) => `<g><line x1="0" x2="${W}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="#1C1C1C"/><text x="${W}" y="${(Y(v) - 4).toFixed(1)}" text-anchor="end">${kg(Math.round(v))}</text></g>`).join('');
     const ux = X(n - 1), uy = Y(reale[n - 1]);
-    const etichette = `<text x="${px}" y="${H - 6}">${n >= tutto.length ? 'inizio' : n + ' sett. fa'}</text><text x="${ux.toFixed(1)}" y="${H - 6}" text-anchor="middle" fill="#DDF77A">oggi</text><text x="${W - px}" y="${H - 6}" text-anchor="end">sett. ${D.atleta.settimane}</text>`;
+    const etichette = `<text x="${px}" y="${H - 6}">${n >= tutto.length ? 'inizio' : n + ' sett. fa'}</text><text x="${ux.toFixed(1)}" y="${H - 6}" text-anchor="middle" style="fill:var(--voltaico-chiaro)">oggi</text><text x="${W - px}" y="${H - 6}" text-anchor="end">sett. ${D.atleta.settimane}</text>`;
     // punti per la lettura col dito: x in %, etichetta della settimana, valore
     const lettura = reale.map((v, i) => {
       const sett = i - settimana1 + 1; // 1…6 nel blocco attuale, ≤0 nel blocco prima
@@ -68,17 +69,17 @@
       <div class="storico-box" data-punti='${JSON.stringify(lettura)}'>
         <svg class="storico" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(NOME_ES[k])}: da ${kg(reale[0])} a ${kg(reale[n - 1])} chili; obiettivo del coach ${kg(ob)}">
           <defs>
-            <linearGradient id="area-st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C8F03C" stop-opacity=".45"/><stop offset="1" stop-color="#C8F03C" stop-opacity="0"/></linearGradient>
+            <linearGradient id="area-st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--voltaico)" stop-opacity=".45"/><stop offset="1" style="stop-color:var(--voltaico)" stop-opacity="0"/></linearGradient>
             <linearGradient id="linea-st" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F4F4F0" stop-opacity=".55"/><stop offset="1" stop-color="#F4F4F0"/></linearGradient>
           </defs>
           ${griglia}
-          <line x1="0" x2="${W}" y1="${Y(ob).toFixed(1)}" y2="${Y(ob).toFixed(1)}" stroke="#DDF77A" stroke-opacity=".35" stroke-dasharray="2 4"/>
-          <text x="0" y="${(Y(ob) - 5).toFixed(1)}" fill="#DDF77A">Obiettivo ${kg(ob)} kg</text>
-          <line x1="${ux.toFixed(1)}" x2="${ux.toFixed(1)}" y1="${top}" y2="${H - bot}" stroke="#DDF77A" stroke-opacity=".25"/>
-          ${piano.length > 1 ? `<polyline points="${piano.join(' ')}" fill="none" stroke="#C8F03C" stroke-width="1.8" stroke-dasharray="5 5" stroke-linecap="round"/>` : ''}
+          <line x1="0" x2="${W}" y1="${Y(ob).toFixed(1)}" y2="${Y(ob).toFixed(1)}" style="stroke:var(--voltaico-chiaro)" stroke-opacity=".35" stroke-dasharray="2 4"/>
+          <text x="0" y="${(Y(ob) - 5).toFixed(1)}" style="fill:var(--voltaico-chiaro)">Obiettivo ${kg(ob)} kg</text>
+          <line x1="${ux.toFixed(1)}" x2="${ux.toFixed(1)}" y1="${top}" y2="${H - bot}" style="stroke:var(--voltaico-chiaro)" stroke-opacity=".25"/>
+          ${piano.length > 1 ? `<polyline points="${piano.join(' ')}" fill="none" style="stroke:var(--voltaico)" stroke-width="1.8" stroke-dasharray="5 5" stroke-linecap="round"/>` : ''}
           <path d="M${linea.replace(/ /g, 'L')}V${H - bot}H${px}Z" fill="url(#area-st)"/>
           <polyline class="linea-viva" points="${linea}" fill="none" stroke="url(#linea-st)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-          <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="9" fill="#C8F03C" opacity=".25" class="pulsa"/>
+          <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="9" style="fill:var(--voltaico)" opacity=".25" class="pulsa"/>
           <circle cx="${ux.toFixed(1)}" cy="${uy.toFixed(1)}" r="5" fill="#000000" stroke="#F4F4F0" stroke-width="2.5"/>
           ${etichette}
         </svg>
@@ -123,7 +124,7 @@
     const sess = A.leggi(A.chiaveSessione);
     let fattiSett = 0, previstiSett = 0;
     D.settimana.forEach((k, i) => { const st = A.piano.stato(i); if (st === 'fatto') { fattiSett++; previstiSett++; } else if (st === 'nonfatto' || st === 'saltato') previstiSett++; });
-    const fatti = 22 + fattiSett, previsti = 25 + previstiSett; // settimane 1–5: 22 su 25 (3 saltati)
+    const fatti = D.storicoFatti[0] + fattiSett, previsti = D.storicoFatti[1] + previstiSett; // Marco: settimane 1–5, 22 su 25 (3 saltati)
     return { fatti, previsti, aderenza: Math.round(fatti / previsti * 100) };
   }
 
@@ -139,6 +140,14 @@
   }
 
   function render() {
+    if (!D.storia) { // atleta appena aggiunto dal coach: ancora niente da mostrare
+      const r = riepilogo();
+      document.querySelector('[data-vista="progressi"]').innerHTML = `
+        <header class="testa-pagina con-foto"><img class="foto-testa" src="assets/foto/progressi-testa.webp" alt=""><span class="sopratitolo">Settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span><h1 class="titolo-pagina">Progressi</h1></header>
+        <section class="blocco"><p class="nota-tua" style="margin:0">I grafici compaiono dopo le prime settimane: ogni serie che segni diventa un punto. Per ora conta la costanza.</p>
+          <div class="tre-dati divisi num"><span><b>${r.fatti}</b><small>allenamenti fatti</small></span><span><b>${D.piano.aSettimana}</b><small>a settimana</small></span><span><b>${D.atleta.settimane}</b><small>settimane</small></span></div></section>`;
+      return;
+    }
     const tutto = storico(scelto), p = D.progressi[scelto];
     const attuale = tutto[tutto.length - 1], s1 = p.punti[0];
     const delta = Math.round((attuale - s1) / s1 * 100);
@@ -151,7 +160,7 @@
     const intervalli = INTERVALLI.map(([n, w]) => `<button class="intervallo" data-int="${n}" aria-pressed="${n === intervallo}"${w !== 999 && w > disponibili ? ' disabled title="Non ci sono ancora abbastanza settimane"' : ''}>${n}</button>`).join('');
     const tr = traguardi().map((t) => `
       <li><a class="riga-traguardo${t.fatto ? '' : ' futuro'}" href="#traguardo/${t.id}">
-        <span class="segno">${t.fatto ? '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#DDF77A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#383836" stroke-width="1.5" stroke-dasharray="2 2.5"/></svg>`}</span>
+        <span class="segno">${t.fatto ? '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" style="stroke:var(--voltaico-chiaro)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : `<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#383836" stroke-width="1.5" stroke-dasharray="2 2.5"/></svg>`}</span>
         <span class="cosa"><b>${esc(t.titolo)}</b><span>${esc(t.riga)}</span></span>
         <span class="quando-t">${esc(t.quando)}</span>
       </a></li>`).join('');
@@ -199,6 +208,7 @@
 
   // ---------- Card del traguardo (schermo + immagine) ----------
   function renderTraguardo(id) {
+    if (!D.storia) { location.hash = '#progressi'; return; } // traguardi solo con uno storico (per ora: Marco)
     const t = traguardi().find((x) => x.id === id) || traguardi()[0];
     const r = riepilogo();
     const sotto = t.id === 'dodici'
@@ -242,7 +252,7 @@
     x.fillStyle = g; x.fillRect(0, 0, 1080, 1920);
     x.fillStyle = '#F4F4F0'; x.font = '800 56px "Big Shoulders Display"'; x.fillText('CARICO', 80, 140);
     const fig = document.querySelector('#card-traguardo figcaption');
-    x.fillStyle = '#DDF77A'; x.font = '600 34px Geist'; x.fillText(fig.querySelector('.sopratitolo').textContent.toUpperCase().split('').join(' '), 80, 1290);
+    x.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--voltaico-chiaro').trim() || '#DDF77A'; x.font = '600 34px Geist'; x.fillText(fig.querySelector('.sopratitolo').textContent.toUpperCase().split('').join(' '), 80, 1290);
     x.fillStyle = '#F4F4F0'; x.font = '800 190px "Big Shoulders Display"'; x.fillText(fig.querySelector('.grande').textContent.toUpperCase(), 72, 1470);
     x.font = '600 52px Geist'; x.fillText(fig.querySelector('.nome').textContent, 80, 1560);
     x.fillStyle = '#A8A8A3'; x.font = '500 38px Geist';

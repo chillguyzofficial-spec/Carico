@@ -10,74 +10,106 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/sistema.css">
-<link rel="stylesheet" href="assets/css/nero-lime.css">
-<link rel="stylesheet" href="assets/css/coach.css">
+<link rel="stylesheet" href="assets/css/nero-lime.css?v=2">
+<script>try { document.documentElement.dataset.tema = JSON.parse(localStorage.getItem("pt-tema")) || "lime"; } catch (e) { /* tema predefinito */ }</script>
+<link rel="stylesheet" href="assets/css/coach.css?v=2">
+<link rel="stylesheet" href="assets/css/gestionale.css">
 </head>
 <body>
-<div class="gestionale">
+<!-- Accesso: per la demo un account di prova; con il database online diventa un accesso vero -->
+<div class="accesso" id="accesso" hidden>
+  <div class="accesso-foto"><img src="assets/foto/sito-coach.webp" alt=""></div>
+  <form class="accesso-modulo" id="form-accesso" novalidate>
+    <span class="marchio-g">CARICO</span>
+    <span class="sopra">Gestionale per personal trainer</span>
+    <h1>Bentornato</h1>
+    <label>Email<input type="email" id="a-email" autocomplete="username" placeholder="nome@esempio.it"></label>
+    <label>Password<input type="password" id="a-password" autocomplete="current-password" placeholder="••••••••"></label>
+    <p class="errore-nuovo" id="errore-accesso" hidden>Email o password non corrette.</p>
+    <button class="btn-invia" type="submit">Entra</button>
+    <div class="prova-accesso"><span>Demo: <b>luca@carico.app</b> · password <b>carico2026</b></span><button type="button" class="link" id="usa-prova">Usa l'account di prova</button></div>
+  </form>
+</div>
+<div class="gestionale" hidden>
   <aside class="laterale">
     <div class="io"><img class="avatar" id="io-foto" src="assets/foto/coach-luca.webp" alt="" width="40" height="40"><div><b id="io-nome">Luca Ferri</b><span>Personal trainer</span></div></div>
     <nav class="navigazione" aria-label="Sezioni">
-      <a class="attiva" href="#oggi" aria-current="page">Oggi<span class="conta" id="conta-oggi">13</span></a>
-      <a href="#atleti">Atleti<span class="conta">18</span></a>
-      <a href="#programmi">Programmi</a>
-      <a href="#revisioni">Revisioni video<span class="conta" id="conta-video">4</span></a>
-      <a href="#checkin">Check-in<span class="conta">7</span></a>
-      <a href="#messaggi">Messaggi</a>
-      <a href="#libreria">Libreria esercizi</a>
+      <a href="#oggi" data-pag="oggi">Oggi<span class="conta" id="conta-oggi"></span></a>
+      <a href="#atleti" data-pag="atleti">Atleti<span class="conta" id="conta-atleti"></span></a>
+      <a href="#programmi" data-pag="programmi">Programmi</a>
+      <a href="#messaggi" data-pag="messaggi">Messaggi<span class="conta" id="conta-messaggi"></span></a>
+      <a href="#libreria" data-pag="libreria">Libreria esercizi</a>
     </nav>
-    <a class="impostazioni" href="#impostazioni">Impostazioni</a>
+    <button class="btn-invia nuovo-laterale" data-nuovo>+ Nuovo atleta</button>
+    <button class="esci" id="esci">Esci</button>
   </aside>
 
   <main class="principale">
-    <header class="intestazione">
-      <div class="titoli">
-        <span class="sopra" id="data-oggi"></span>
-        <h1 id="saluto">Buonasera, Luca</h1>
-        <span class="riassunto num" id="riassunto"></span>
-      </div>
-      <label class="cerca"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#82827C" stroke-width="1.6"/><path d="M11 11l3 3" stroke="#82827C" stroke-width="1.6" stroke-linecap="round"/></svg><span class="vh">Cerca</span><input type="search" placeholder="Cerca atleta o esercizio"></label>
-      <button class="btn-sec">Nuovo programma</button>
-    </header>
-
-    <div class="lavoro">
-      <section class="coda-blocco" aria-labelledby="t-coda">
-        <div class="riga-titolo">
-          <h2 id="t-coda" class="etichetta">Da rivedere · per priorità</h2>
-          <div class="filtri" role="group" aria-label="Filtra">
-            <button class="filtro attivo" data-f="tutto" aria-pressed="true">Tutto</button>
-            <button class="filtro" data-f="video" aria-pressed="false">Video</button>
-            <button class="filtro" data-f="check" aria-pressed="false">Check-in</button>
-          </div>
+    <!-- Oggi: cosa c'è da rivedere -->
+    <section class="pagina" data-pagina="oggi">
+      <header class="intestazione">
+        <div class="titoli">
+          <span class="sopra" id="data-oggi"></span>
+          <h1 id="saluto">Buonasera, Luca</h1>
+          <span class="riassunto num" id="riassunto"></span>
         </div>
-        <ul class="coda card" id="coda"></ul>
-      </section>
-
-      <section class="revisione card-rilievo" id="revisione" aria-label="Revisione video"></section>
-    </div>
-
-    <!-- Collegato all'app di Marco: allenamenti registrati e programma che il coach può cambiare -->
-    <section class="marco-blocco" aria-labelledby="t-marco">
-      <div class="riga-titolo"><h2 id="t-marco" class="etichetta">Marco Rossi · dall'app</h2><a class="link" href="app.html" target="_blank" rel="noopener">Apri l'app di Marco</a></div>
-      <div class="marco-griglia">
-        <div class="card marco-allenamenti" id="marco-allenamenti" aria-live="polite"></div>
-        <div class="card marco-programma" id="marco-programma"></div>
+        <button class="btn-sec" data-nuovo>+ Nuovo atleta</button>
+      </header>
+      <section class="assistente" id="assistente" aria-labelledby="t-assistente"></section>
+      <div class="lavoro">
+        <section class="coda-blocco" aria-labelledby="t-coda">
+          <div class="riga-titolo">
+            <h2 id="t-coda" class="etichetta">Da rivedere · dal più recente</h2>
+            <div class="filtri" role="group" aria-label="Filtra">
+              <button class="filtro attivo" data-f="tutto" aria-pressed="true">Tutto</button>
+              <button class="filtro" data-f="video" aria-pressed="false">Video</button>
+              <button class="filtro" data-f="check" aria-pressed="false">Check-in</button>
+              <button class="filtro" data-f="allenamenti" aria-pressed="false">Allenamenti</button>
+            </div>
+          </div>
+          <ul class="coda card" id="coda"></ul>
+        </section>
+        <section class="revisione card-rilievo" id="revisione" aria-label="Revisione video"></section>
       </div>
+      <section class="blocco-g" aria-labelledby="t-settimana">
+        <div class="riga-titolo"><h2 id="t-settimana" class="etichetta">I tuoi atleti · questa settimana</h2><a class="link" href="#atleti">Tutti gli atleti</a></div>
+        <div class="schede-atleti" id="schede-atleti"></div>
+      </section>
     </section>
 
-    <section class="atleti-blocco" aria-labelledby="t-atleti">
-      <div class="riga-titolo"><h2 id="t-atleti" class="etichetta">Atleti · settimana in corso</h2><a class="link" href="#atleti">Tutti gli atleti</a></div>
+    <!-- Atleti -->
+    <section class="pagina" data-pagina="atleti" hidden>
+      <header class="intestazione">
+        <div class="titoli"><span class="sopra">Atleti</span><h1>I tuoi atleti</h1><span class="riassunto" id="riassunto-atleti"></span></div>
+        <button class="btn-invia" data-nuovo>+ Nuovo atleta</button>
+      </header>
       <div class="tabella card" role="table" aria-label="Atleti">
-        <div class="tr th" role="row"><span role="columnheader">Atleta</span><span role="columnheader">Programma</span><span role="columnheader">Settimana</span><span role="columnheader">Ultimi 7 giorni</span><span role="columnheader">Esercizio chiave</span><span role="columnheader">6 sett.</span><span role="columnheader">Stato</span></div>
+        <div class="tr th" role="row"><span role="columnheader">Atleta</span><span role="columnheader">Programma</span><span role="columnheader">Settimana</span><span role="columnheader">Questa settimana</span><span role="columnheader">Codice app</span><span role="columnheader">Stato</span></div>
         <div id="righe-atleti" role="rowgroup"></div>
       </div>
-      <div class="legenda"><span><i class="q f"></i>Fatto</span><span><i class="q s"></i>Saltato</span><span><i class="q r"></i>Riposo</span><span><i class="q p"></i>Previsto</span></div>
+      <div class="legenda"><span><i class="q f"></i>Fatto</span><span><i class="q s"></i>Non fatto o saltato</span><span><i class="q r"></i>Riposo / libero</span><span><i class="q p"></i>Previsto</span></div>
     </section>
+
+    <!-- Un atleta -->
+    <section class="pagina" data-pagina="atleta" hidden></section>
+
+    <!-- Programmi -->
+    <section class="pagina" data-pagina="programmi" hidden></section>
+
+    <!-- Messaggi -->
+    <section class="pagina" data-pagina="messaggi" hidden></section>
+
+    <!-- Libreria esercizi -->
+    <section class="pagina" data-pagina="libreria" hidden></section>
   </main>
 </div>
 
+<!-- Nuovo atleta -->
+<div class="velo-g" id="velo-nuovo" hidden></div>
+<div class="finestra-g" id="nuovo-atleta" role="dialog" aria-modal="true" aria-labelledby="t-nuovo" hidden></div>
+
 <div class="avviso" id="avviso" role="status" aria-live="polite">
-  <span class="spunta"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#C8F03C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <span class="spunta"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" style="stroke:var(--voltaico)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
   <div style="flex:1"><strong id="avviso-titolo"></strong><span id="avviso-testo"></span></div>
   <button class="link" id="annulla">Annulla</button>
 </div>
@@ -85,6 +117,7 @@
 <script src="assets/js/dati.js"></script>
 <script src="assets/js/programmi.js"></script>
 <script src="assets/js/archivio.js"></script>
-<script src="assets/js/coach.js"></script>
+<script src="assets/js/guida.js"></script>
+<script src="assets/js/coach.js?v=2"></script>
 </body>
 </html>

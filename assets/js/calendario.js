@@ -18,7 +18,7 @@
     const k = p.modo === 'fissi' ? D.settimanaBase[dow] : j < 0 ? null : p.sequenza[((sett - 1) * p.aSettimana + j) % p.sequenza.length];
     if (!k) return { stato: 'riposo', sett };
     if (sett > D.atleta.settimana) return { stato: 'previsto', k, sett };
-    return { stato: STORICO_SALTATI.some(([s, g]) => s === sett && g === dow) ? 'saltato' : 'fatto', k, sett };
+    return { stato: D.storia && STORICO_SALTATI.some(([s, g]) => s === sett && g === dow) ? 'saltato' : 'fatto', k, sett };
   }
 
   function html(offset, scelto) {

@@ -6,7 +6,7 @@
 (function () {
   const A = window.APP, D = A.D, AR = window.ARCHIVIO;
 
-  const sessione = (i) => A.leggi('pt-sessione-' + A.iso(A.data(i)));
+  const sessione = (i) => A.leggi(D.k('pt-sessione-' + A.iso(A.data(i))));
   const iniziata = (s) => !!(s && s.es && s.es.some((e) => e.serie.some((r) => r.fatta)));
 
   // ---------- Modo «N a settimana, quando vuoi» (scelto dal coach nel gestionale) ----------
@@ -19,7 +19,7 @@
     for (let i = 0; i < A.oggi; i++) {
       const s = sessione(i);
       // Nella storia della demo il lunedì è fatto (lo squat che il coach ha appena rivisto)
-      if (iniziata(s) || (i === 0 && !s)) { D.settimana[i] = (s && s.k) || seq[(base + fattiPrima) % seq.length]; fattiPrima++; }
+      if (iniziata(s) || (D.storia && i === 0 && !s)) { D.settimana[i] = (s && s.k) || seq[(base + fattiPrima) % seq.length]; fattiPrima++; }
     }
     const s = sessione(A.oggi);
     D.settimana[A.oggi] = s && s.k ? s.k : fattiPrima < N ? seq[(base + fattiPrima) % seq.length] : null;
@@ -36,7 +36,7 @@
     if (iniziata(s)) return 'fatto';
     if (AR.settimanaDi(D).saltati.includes(i)) return 'saltato';
     // Nella storia della demo il lunedì è fatto (lo squat che il coach ha appena rivisto)
-    if (i === 0 && D.settimanaBase[0] === k && !AR.settimanaDi(D).cambi.some((c) => c.da === 0 || c.a === 0)) return 'fatto';
+    if (D.storia && i === 0 && D.settimanaBase[0] === k && !AR.settimanaDi(D).cambi.some((c) => c.da === 0 || c.a === 0)) return 'fatto';
     return 'nonfatto';
   }
   // Il più recente allenamento passato non fatto (quello da proporre in Oggi)
@@ -50,7 +50,7 @@
   // Primo giorno libero dopo oggi (per spostare l'allenamento di oggi quando si recupera)
   const liberoDopo = (da) => { for (let j = da + 1; j < 7; j++) if (!D.settimana[j]) return j; return -1; };
 
-  function salva(s) { AR.scrivi(AR.chiaveSettimana(), s); AR.applicaSettimana(D); }
+  function salva(s) { AR.scrivi(AR.chiaveSettimana(D), s); AR.applicaSettimana(D); }
   // Sposta l'allenamento del giorno «da» al giorno «a» (scambio se «a» ne ha già uno)
   function sposta(da, a, s = AR.settimanaDi(D)) {
     const k = s.giorni[da];

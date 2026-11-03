@@ -50,7 +50,7 @@ body { background: var(--notte-0); }
 .consiglio { font: 400 16px/23px var(--testo); color: var(--ardesia); margin-top: 16px; max-width: 320px; text-wrap: pretty; }
 .domani {
   margin-top: 24px; padding: 14px 4px 14px 0; min-height: 64px; width: 100%; text-align: left;
-  border-top: 1px solid rgba(221, 247, 122, .18); display: flex; align-items: center; gap: 12px;
+  border-top: 1px solid rgba(var(--accento-chiaro-rgb), .18); display: flex; align-items: center; gap: 12px;
 }
 .domani .cosa { flex: 1; display: flex; flex-direction: column; gap: 3px; }
 .domani .quando { font: 600 11px/14px var(--testo); letter-spacing: .14em; color: var(--fumo); text-transform: uppercase; }
@@ -74,12 +74,12 @@ body { background: var(--notte-0); }
   border: 1.5px solid var(--linea-2);
 }
 .giorno .tipo { font: 500 11px/14px var(--testo); color: var(--fumo); }
-.giorno.fatto .cerchio { border: 0; background: rgba(200, 240, 60, .18); }
+.giorno.fatto .cerchio { border: 0; background: rgba(var(--accento-rgb), .18); }
 .giorno.libero .cerchio { border: 1px dashed var(--linea-2); color: var(--fumo); }
 .giorno.oggi .lettera { font-weight: 700; color: var(--gesso); }
 .giorno.oggi .tipo { font-weight: 600; color: var(--gesso); }
-.giorno.oggi .cerchio { border: 0; background: var(--voltaico); color: var(--su-accento); font: 700 15px/1 var(--testo); box-shadow: 0 0 0 4px rgba(200, 240, 60, .2); }
-.giorno.oggi.libero .cerchio { background: none; border: 1.5px dashed var(--voltaico-chiaro); color: var(--gesso); box-shadow: 0 0 0 4px rgba(200, 240, 60, .12); }
+.giorno.oggi .cerchio { border: 0; background: var(--voltaico); color: var(--su-accento); font: 700 15px/1 var(--testo); box-shadow: 0 0 0 4px rgba(var(--accento-rgb), .2); }
+.giorno.oggi.libero .cerchio { background: none; border: 1.5px dashed var(--voltaico-chiaro); color: var(--gesso); box-shadow: 0 0 0 4px rgba(var(--accento-rgb), .12); }
 
 /* ---------- DAL TUO COACH ---------- */
 .coach-card { padding: 16px 16px 18px; display: flex; flex-direction: column; gap: 14px; }

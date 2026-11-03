@@ -72,8 +72,8 @@ a.btn-secondario { color: var(--gesso); }
 
 /* 5 / 6 · due colonne */
 .due-colonne { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
-.esempio-contesto { margin: 30px 0 0; padding: 18px 20px; border-radius: 18px; background: rgba(200, 240, 60, .1); border: 1px solid rgba(200, 240, 60, .3); font: 400 17px/1.45 var(--testo); max-width: 460px; }
-.esempio-contesto span { display: block; width: fit-content; margin-bottom: 10px; padding: 4px 10px; border-radius: 8px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(221, 247, 122, .25); font: 600 13px/18px var(--testo); color: var(--voltaico-chiaro); }
+.esempio-contesto { margin: 30px 0 0; padding: 18px 20px; border-radius: 18px; background: rgba(var(--accento-rgb), .1); border: 1px solid rgba(var(--accento-rgb), .3); font: 400 17px/1.45 var(--testo); max-width: 460px; }
+.esempio-contesto span { display: block; width: fit-content; margin-bottom: 10px; padding: 4px 10px; border-radius: 8px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(var(--accento-chiaro-rgb), .25); font: 600 13px/18px var(--testo); color: var(--voltaico-chiaro); }
 .foto-sezione { margin: 0; border-radius: 22px; overflow: hidden; }
 .foto-sezione img { width: 100%; height: auto; display: block; filter: grayscale(1); }
 .passi { list-style: none; counter-reset: p; margin: 34px 0 0; padding: 0; display: flex; flex-direction: column; }

@@ -32,14 +32,14 @@
 }
 .pallino b { font: 700 20px/1 var(--display); color: var(--fumo); }
 .pallino small { font: 600 11px/14px var(--testo); color: var(--fumo); min-height: 14px; }
-.pallino.adesso { border-color: var(--voltaico-chiaro); box-shadow: 0 0 0 3px rgba(200, 240, 60, .18); }
+.pallino.adesso { border-color: var(--voltaico-chiaro); box-shadow: 0 0 0 3px rgba(var(--accento-rgb), .18); }
 .pallino.adesso b, .pallino.adesso small { color: var(--gesso); }
 .pallino.fatto { border-color: transparent; background: rgba(61, 214, 140, .12); }
 .pallino.fatto small { color: var(--successo); }
 .pallino.fatto svg { animation: scatto .32s cubic-bezier(.3, 1.6, .5, 1) both; }
 
 /* Consigli: nota del coach e video, in fondo e piccoli */
-.avviso-video { margin: 0; padding: 12px 14px; border-radius: 14px; background: rgba(221, 247, 122, .1); border: 1px solid rgba(221, 247, 122, .25); font: 500 14px/20px var(--testo); color: var(--voltaico-chiaro); }
+.avviso-video { margin: 0; padding: 12px 14px; border-radius: 14px; background: rgba(var(--accento-chiaro-rgb), .1); border: 1px solid rgba(var(--accento-chiaro-rgb), .25); font: 500 14px/20px var(--testo); color: var(--voltaico-chiaro); }
 .consigli { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px solid var(--linea-tenue); }
 .consigli .nota-coach { margin: 0; padding: 8px 0; align-items: flex-start; font-size: 15px; line-height: 21px; color: var(--ardesia); }
 .consigli .nota-coach img { margin-top: -1px; }

@@ -9,6 +9,7 @@ const out = process.argv[2];
   const testo = async (p, s) => (await p.textContent(s)).replace(/\s+/g, ' ').trim();
   // Un solo browser per app e gestionale (stessa memoria, come sullo stesso PC)
   const ctx = await b.newContext({ ...devices['iPhone 13'] });
+  await ctx.addInitScript(() => sessionStorage.setItem('pt-coach-sessione', '1')); // accesso al gestionale
   await ctx.addInitScript(() => { if (!localStorage.getItem('pt-collegato')) localStorage.setItem('pt-collegato', '{"quando":1}'); });
   const pc = await ctx.newPage(); guarda(pc); await pc.setViewportSize({ width: 1440, height: 900 });
   const app = await ctx.newPage(); guarda(app);
@@ -19,11 +20,13 @@ const out = process.argv[2];
   v((await testo(app, '.es.aperto')).includes('+2,5 kg da sola'), 'Lento avanti: progressione spiegata');
 
   // ---------- Il coach assegna «Corpo intero · 3 a settimana, quando vuole» ----------
-  await pc.goto(BASE + 'coach.html'); await pc.waitForTimeout(500);
+  await pc.goto(BASE + 'coach.html#atleti'); await pc.waitForTimeout(500);
   v((await testo(pc, '#righe-atleti')).includes('5 giorni fissi') && (await testo(pc, '#righe-atleti')).includes('2 a settimana, quando vuole'), 'tabella: ogni atleta ha il suo ritmo');
+  await pc.goto(BASE + 'coach.html#atleta/marco'); await pc.waitForTimeout(400);
   await pc.click('[data-modello="intero-3"]'); await pc.waitForTimeout(300);
   v(await pc.$('[data-modo="flessibile"][aria-checked="true"]') !== null && await pc.$('[data-n="3"][aria-checked="true"]') !== null, 'modello Base: 3 a settimana, quando vuole');
   v(await pc.$$eval('.giorni-prog .segmento', (a) => a.length) === 3 && (await testo(pc, '.giorni-prog')).includes('Corpo intero C'), 'editor: la sequenza A, B, C');
+  await pc.goto(BASE + 'coach.html#atleti'); await pc.waitForTimeout(300);
   v((await testo(pc, '#righe-atleti')).includes('Corpo intero') && (await testo(pc, '#righe-atleti')).includes('3 a settimana, quando vuole'), 'tabella: Marco aggiornato');
   await pc.screenshot({ path: out + '/pi-coach.png', fullPage: true });
 
@@ -53,14 +56,16 @@ const out = process.argv[2];
   v(await app.$$eval('.cal-fatto', (a) => a.length) >= 3, 'calendario con gli allenamenti fatti');
 
   // ---------- Il coach vede gli allenamenti «quando vuole» ----------
-  await pc.reload(); await pc.waitForTimeout(400);
-  const box = await testo(pc, '#marco-allenamenti');
+  await pc.goto(BASE + 'coach.html#atleta/marco'); await pc.waitForTimeout(400);
+  const box = await testo(pc, '#atleta-allenamenti');
   v(box.includes('Mercoledì') && box.includes('Corpo intero B') && box.includes('Venerdì') && box.includes('Corpo intero C'), 'gestionale: allenamenti nei giorni scelti da Marco');
 
   // ---------- Giorni fissi, 2 a settimana ----------
   await pc.click('[data-modo="fissi"]'); await pc.waitForTimeout(200);
   await pc.click('[data-n="2"]'); await pc.waitForTimeout(200);
+  await pc.goto(BASE + 'coach.html#atleti'); await pc.waitForTimeout(300);
   v((await testo(pc, '#righe-atleti')).includes('2 giorni fissi'), 'coach: 2 giorni fissi');
+  await pc.goto(BASE + 'coach.html#atleta/marco'); await pc.waitForTimeout(300);
   await app.goto(BASE + 'app.html?giorno=1#oggi'); await app.waitForTimeout(400);
   const tipi = await app.$$eval('.giorno .tipo', (a) => a.map((x) => x.textContent));
   v(tipi[0] === 'Intero' && tipi[3] === 'Intero' && tipi.filter((t) => t === 'Intero').length === 2, 'app: lunedì e giovedì, ' + tipi.join(','));

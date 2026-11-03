@@ -1,6 +1,6 @@
-/* Nero e lime (scelta di Francesco 2026-11-03, «mi piace di più»): colori dalla variante «Nero Lime»
-   di Claude Design (design-source/claude-design-export). Caricato solo da app e gestionale:
-   il sito resta blu finché Francesco non decide (la sua apertura gli piace così). */
+/* Colori dell'app. Nero e lime è quello scelto da Francesco (2026-11-03, dalla variante «Nero Lime» di Claude Design).
+   Temi da scegliere nel Profilo (richiesta di Francesco 2026-11-03: «3 accostamenti che spaccano, tutto visibile»):
+   fondo sempre nero, cambia solo l'accento. Ogni accento è chiaro: sopra ci va testo nero (contrasto alto), e sul nero si legge. */
 :root {
   --notte-0: #000000;   /* fondo app */
   --notte-1: #0E0E0E;   /* superficie */
@@ -16,15 +16,26 @@
   --ardesia: #A8A8A3;
   --fumo: #82827C;
 
+  /* Nero · Lime (predefinito) */
   --voltaico: #C8F03C;        /* azioni, fatto */
   --voltaico-chiaro: #DDF77A; /* dati, attivo */
-  --su-accento: #0A0A0A;      /* sul lime il testo è nero */
-  --successo: #C8F03C;        /* un solo verde: il lime */
+  --voltaico-scuro: #A9CF22;  /* pulsante premuto */
+  --accento-rgb: 200, 240, 60;
+  --accento-chiaro-rgb: 221, 247, 122;
+  --su-accento: #0A0A0A;      /* sull'accento il testo è nero */
+  --successo: var(--voltaico); /* un solo colore per «fatto»: l'accento */
 }
+/* Nero · Bianco: monocromo puro, l'effetto più «lusso» */
+:root[data-tema="bianco"] { --voltaico: #F4F4F0; --voltaico-chiaro: #FFFFFF; --voltaico-scuro: #D4D4CE; --accento-rgb: 244, 244, 240; --accento-chiaro-rgb: 255, 255, 255; }
+/* Nero · Arancio «Brace»: energia, da sala pesi */
+:root[data-tema="brace"] { --voltaico: #FF7A1A; --voltaico-chiaro: #FFA05C; --voltaico-scuro: #E0640A; --accento-rgb: 255, 122, 26; --accento-chiaro-rgb: 255, 160, 92; }
+/* Nero · Azzurro «Ghiaccio»: tecnico, freddo, molto leggibile */
+:root[data-tema="ghiaccio"] { --voltaico: #4FD8FF; --voltaico-chiaro: #8DE7FF; --voltaico-scuro: #22BDE8; --accento-rgb: 79, 216, 255; --accento-chiaro-rgb: 141, 231, 255; }
 
 /* Regole della base scritte col blu */
-.btn-primario { box-shadow: 0 10px 30px rgba(200, 240, 60, .18), inset 0 1px 0 rgba(255, 255, 255, .25); }
-.btn-primario:active { background: #A9CF22; }
-.chip-info { background: rgba(221, 247, 122, .12); }
-.chip-ok { background: rgba(200, 240, 60, .12); color: var(--voltaico); }
-.avviso .spunta { background: rgba(200, 240, 60, .14); }
+.btn-primario { box-shadow: 0 10px 30px rgba(var(--accento-rgb), .18), inset 0 1px 0 rgba(255, 255, 255, .25); }
+.btn-primario:active { background: var(--voltaico-scuro); }
+.chip-info { background: rgba(var(--accento-chiaro-rgb), .12); }
+.chip-ok { background: rgba(var(--accento-rgb), .12); color: var(--voltaico); }
+.avviso .spunta { background: rgba(var(--accento-rgb), .14); }
+:root[data-tema="brace"] { --errore: #FF4F7B; } /* il rosso degli errori si stacca dall'arancio */

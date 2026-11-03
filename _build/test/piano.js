@@ -37,12 +37,14 @@ const out = process.argv[2];
 
   // ---------- Il coach vede spostamenti ----------
   const pc = await b.newContext({ viewport: { width: 1440, height: 900 } });
+  await pc.addInitScript(() => sessionStorage.setItem('pt-coach-sessione', '1'));
   await pc.addInitScript((m) => { if (!sessionStorage.getItem('ok')) { Object.entries(JSON.parse(m)).forEach(([k, x]) => localStorage.setItem(k, x)); sessionStorage.setItem('ok', '1'); } }, memoria);
   const c = await pc.newPage(); c.on('pageerror', (e) => err.push(e.message));
   await c.goto(BASE + 'coach.html'); await c.waitForTimeout(500);
   const coda = await testo(c, '#coda');
+  await c.goto(BASE + 'coach.html#atleta/marco'); await c.waitForTimeout(400);
   v(coda.includes('Ha spostato Pull A da martedì a giovedì') && coda.includes('Ha spostato Push A da giovedì a sabato'), 'gestionale: spostamenti in coda');
-  v((await testo(c, '#marco-allenamenti')).includes('Giovedì') && (await testo(c, '#marco-allenamenti')).includes('Pull A'), 'gestionale: allenamento di giovedì è Pull A');
+  v((await testo(c, '#atleta-allenamenti')).includes('Giovedì') && (await testo(c, '#atleta-allenamenti')).includes('Pull A'), 'gestionale: allenamento di giovedì è Pull A');
 
   // ---------- Martedì: Cambia giorno ----------
   p = await nuovo();

@@ -119,7 +119,7 @@
 .cal-griglia { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px 4px; }
 .cal-lettera { text-align: center; font: 600 12px/20px var(--testo); color: var(--fumo); }
 .cal-g, .cal-vuoto { aspect-ratio: 1; max-height: 46px; display: grid; place-items: center; border-radius: 50%; font: 600 15px/1 var(--testo); color: var(--fumo); justify-self: center; width: 100%; max-width: 46px; }
-.cal-fatto { background: rgba(200, 240, 60, .2); color: var(--voltaico); }
+.cal-fatto { background: rgba(var(--accento-rgb), .2); color: var(--voltaico); }
 .cal-previsto { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .13); color: var(--gesso); }
 .cal-saltato { box-shadow: inset 0 0 0 1px var(--linea-2); background: var(--notte-2); color: var(--fumo); }
 .cal-nonfatto { box-shadow: inset 0 0 0 1.5px var(--errore); color: var(--errore); }
@@ -158,3 +158,18 @@
 .progressione { margin: -8px 0 0; font: 600 13px/18px var(--testo); color: var(--voltaico); }
 .progressione.stessa { color: var(--ardesia); font-weight: 500; }
 .conto-sett { color: var(--voltaico); font-weight: 700; }
+
+/* Profilo: account di prova (Marco, appena iscritta, avanzato) */
+.account-prova { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.voce-account { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--linea); background: var(--notte-1); text-align: left; }
+.voce-account b { font: 600 15px/20px var(--testo); }
+.voce-account span { font: 500 13px/18px var(--testo); color: var(--fumo); }
+.voce-account.attivo { border-color: var(--voltaico); }
+.voce-account.attivo b::after { content: ' · stai usando questo'; font-weight: 500; color: var(--voltaico); font-size: 13px; }
+.iniziali-avatar { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--notte-3); font: 700 14px/1 var(--testo); color: var(--gesso); box-shadow: 0 0 0 1.5px rgba(242, 244, 248, .35); }
+/* Colore dell'app (temi) */
+.temi { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.scelte-tema { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.tema { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 6px; border-radius: 14px; border: 1px solid var(--linea); background: var(--notte-1); font: 600 13px/1 var(--testo); color: var(--ardesia); }
+.tema .campione { width: 30px; height: 30px; border-radius: 50%; box-shadow: 0 0 0 3px #000, 0 0 0 4px var(--linea-2); }
+.tema[aria-checked="true"] { border-color: var(--voltaico); color: var(--gesso); }

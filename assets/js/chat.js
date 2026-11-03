@@ -8,9 +8,9 @@
   function messaggi() {
     const quando = (giorno, ora) => { const d = A.data(giorno); const [h, m] = ora.split(':'); d.setHours(+h, +m); return d.getTime(); };
     const lista = D.chat.filter((m) => m.giorno <= A.oggi).map((m) => ({ ...m, istante: quando(m.giorno, m.ora) }));
-    const fb = A.leggi(D.chiaveFeedback) || (A.oggi > D.feedbackPredefinito.giorno ? { ...D.feedbackPredefinito, istante: quando(D.feedbackPredefinito.giorno, D.feedbackPredefinito.ora) } : null);
+    const fb = A.leggi(D.chiaveFeedback) || (D.feedbackPredefinito && A.oggi > D.feedbackPredefinito.giorno ? { ...D.feedbackPredefinito, istante: quando(D.feedbackPredefinito.giorno, D.feedbackPredefinito.ora) } : null);
     if (fb) lista.push({ da: 'coach', tipo: 'feedback', istante: fb.istante, f: fb });
-    return lista.concat(A.leggi('pt-chat') || []).sort((a, b) => a.istante - b.istante);
+    return lista.concat(A.leggi(D.k('pt-chat')) || []).sort((a, b) => a.istante - b.istante);
   }
 
   function etichettaGiorno(t) {
@@ -72,9 +72,9 @@
   }
 
   function aggiungi(msg) {
-    const chat = A.leggi('pt-chat') || [];
+    const chat = A.leggi(D.k('pt-chat')) || [];
     chat.push({ da: 'atleta', istante: A.istante(), ...msg });
-    A.scrivi('pt-chat', chat);
+    A.scrivi(D.k('pt-chat'), chat);
     contesto = '';
     history.replaceState(null, '', location.pathname + location.search + '#coach');
     disegna();

@@ -8,7 +8,7 @@
   function hero(sessione) {
     const testata = `
       <div class="testata">
-        <a class="profilo" href="#profilo" aria-label="Il tuo profilo"><img class="avatar" src="${D.atleta.foto}" alt=""></a>
+        <a class="profilo" href="#profilo" aria-label="Il tuo profilo">${D.atleta.foto ? `<img class="avatar" src="${D.atleta.foto}" alt="">` : `<span class="avatar iniziali-avatar">${esc(D.atleta.nome[0] + (D.atleta.cognome || ' ')[0])}</span>`}</a>
         <div class="saluto"><b>Ciao ${esc(D.atleta.nome)}</b><span>Settimana ${D.atleta.settimana} di ${D.atleta.settimane}</span></div>
       </div>`;
 
@@ -57,7 +57,7 @@
               <span class="riga"><span class="nome">${esc(prossimo.nome)}</span><span class="info num">${prossimo.esercizi} esercizi · ~${prossimo.minuti} min</span></span>
             </span>
             <span class="vai">Anteprima</span>
-            <svg width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5" fill="none" stroke="#DDF77A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5L6.5 7l-5 5.5" fill="none" style="stroke:var(--voltaico-chiaro)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>` : ''}
         </div>
       </section>`;
@@ -68,7 +68,7 @@
     const periodo = inizio.getMonth() === fine.getMonth()
       ? `${inizio.getDate()}–${fine.getDate()} ${MESI[fine.getMonth()]}`
       : `${inizio.getDate()} ${MESI[inizio.getMonth()]} – ${fine.getDate()} ${MESI[fine.getMonth()]}`;
-    const spunta = '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#DDF77A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const spunta = '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" style="stroke:var(--voltaico-chiaro)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const X = '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
     const NOMI = { fatto: 'fatto', oggi: 'oggi', previsto: 'previsto', riposo: 'riposo', nonfatto: 'non fatto', saltato: 'saltato' };
     const giorni = D.settimana.map((k, i) => {
@@ -173,7 +173,7 @@
     const nuovo = A.leggi(D.chiaveFeedback);
     if (nuovo) return { tipo: 'feedback', f: nuovo };
     if (chiave && D.carichi[chiave]) return { tipo: 'carico', c: D.carichi[chiave] };
-    if (oggi > D.feedbackPredefinito.giorno) return { tipo: 'feedback', f: D.feedbackPredefinito };
+    if (D.feedbackPredefinito && oggi > D.feedbackPredefinito.giorno) return { tipo: 'feedback', f: D.feedbackPredefinito };
     return null;
   }
 
@@ -244,13 +244,14 @@
     { id: 'panca', gruppo: 'Petto' }, { id: 'rematore', gruppo: 'Schiena' }, { id: 'squat', gruppo: 'Gambe' }, { id: 'stacco', gruppo: 'Femorali e glutei' },
     { id: 'lento', gruppo: 'Spalle', nome: 'Lento avanti', kg: 40, reps: 8, punti: [35, 37.5, 40, 40, 40, 40] },
     { id: 'curl', gruppo: 'Braccia', nome: 'Curl con bilanciere', kg: 27.5, reps: 10, punti: [25, 25, 27.5, 30, 27.5, 27.5] },
-  ].map((g) => ({ ...(D.progressi[g.id] || {}), ...g }));
+  ].map((g) => (g.punti ? { ...g, kg: Math.round(g.kg * (D.scala || 1) / 2.5) * 2.5, punti: g.punti.map((v) => Math.round(v * (D.scala || 1) / 2.5) * 2.5) } : g)) // in scala per l'atleta avanzato
+    .map((g) => ({ ...(D.progressi[g.id] || {}), ...g }));
   // In calo: sotto il massimo delle 3 settimane prima · in salita: sopra 3 settimane fa · altrimenti stabile
   function andamento(p) {
     const u = p.punti[p.punti.length - 1], prima = p.punti.slice(-4, -1), picco = Math.max(...prima);
     const perc = (a, b) => Math.round((a - b) / b * 100);
     if (u < picco) return { tipo: 'calo', testo: `▼ ${perc(u, picco)}% dal massimo di ${kg(picco)} kg`, colore: '#FF6166' };
-    if (u > p.punti[p.punti.length - 4]) return { tipo: 'salita', testo: `▲ +${perc(u, p.punti[0])}% in ${p.punti.length} settimane`, colore: '#C8F03C' };
+    if (u > p.punti[p.punti.length - 4]) return { tipo: 'salita', testo: `▲ +${perc(u, p.punti[0])}% in ${p.punti.length} settimane`, colore: 'var(--voltaico)' };
     const ferme = p.punti.slice().reverse().findIndex((v) => v !== u);
     return { tipo: 'stabile', testo: `= Stabile da ${ferme < 0 ? p.punti.length : ferme} settimane`, colore: '#A8A8A3' };
   }
@@ -269,10 +270,10 @@
             <span class="delta">${a.testo}</span>
           </div>
           <svg width="124" height="56" viewBox="-4 -4 128 52" aria-hidden="true">
-            <defs><linearGradient id="area-${p.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a.colore}" stop-opacity=".3"/><stop offset="1" stop-color="${a.colore}" stop-opacity="0"/></linearGradient></defs>
+            <defs><linearGradient id="area-${p.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${a.colore}" stop-opacity=".3"/><stop offset="1" stop-color="${a.colore}" stop-opacity="0"/></linearGradient></defs>
             <path d="M${linea.replace(/ /g, 'L')}V44H0Z" fill="url(#area-${p.id})"/>
-            <polyline points="${linea}" fill="none" stroke="${a.colore}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            <circle cx="${ux}" cy="${uy.toFixed(1)}" r="4" fill="#000000" stroke="${a.colore}" stroke-width="2"/>
+            <polyline points="${linea}" fill="none" style="stroke:${a.colore}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="${ux}" cy="${uy.toFixed(1)}" r="4" fill="#000000" style="stroke:${a.colore}" stroke-width="2"/>
           </svg>
         </div>`;
   }
@@ -326,7 +327,9 @@
       const sessione = A.leggi(A.chiaveSessione);
       const cosa = cosaDalCoach();
       const v = document.querySelector('[data-vista="oggi"]');
-      v.innerHTML = hero(sessione) + recupero() + settimana(sessione) + coach(cosa) + progresso(cosa) + schermoFoglio();
+      // Atleta nuovo: niente storico da mostrare, un benvenuto del coach al posto del progresso
+      const benvenuto = `<section class="blocco"><h2 class="etichetta" style="margin:0">Dal tuo coach</h2><div class="coach-card card"><div class="chi"><img class="avatar" src="${D.coach.foto}" alt=""><b>${esc(D.coach.nome)}</b></div><p class="nota">Ciao ${esc(D.atleta.nome)}, il tuo programma è pronto: ${esc(D.atleta.programma)}, ${D.piano.aSettimana} allenamenti a settimana. Alla prima seduta scrivi i pesi che usi: da lì in poi li aggiorno io.</p></div></section>`;
+      v.innerHTML = hero(sessione) + recupero() + settimana(sessione) + (cosa || D.storia ? coach(cosa) : benvenuto) + (D.storia ? progresso(cosa) : '') + schermoFoglio();
       v.classList.toggle('con-foglio', !!foglio);
       avviaGiro();
       document.getElementById('voce-coach').classList.toggle('novita', !!(cosa && (cosa.tipo === 'checkin' || (cosa.tipo === 'feedback' && cosa.f.istante))));

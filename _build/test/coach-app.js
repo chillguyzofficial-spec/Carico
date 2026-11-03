@@ -8,9 +8,10 @@ const verifica = (c, m) => { if (c) ok++; else { ko++; console.log('KO', m); } }
 (async () => {
   const b = await chromium.launch();
   const ctx = await b.newContext({ viewport: { width: 1440, height: 1000 } });
+  await ctx.addInitScript(() => sessionStorage.setItem('pt-coach-sessione', '1')); // accesso al gestionale
   const c = await ctx.newPage(); const err = []; c.on('pageerror', e => err.push(e.message));
   await c.goto('http://localhost:8995/coach.html'); await c.waitForTimeout(800);
-  verifica(await c.textContent('#riassunto') === '4 video da rivedere · 7 check-in · 2 atleti da contattare', 'riassunto iniziale');
+  verifica((await c.textContent('#riassunto')).startsWith('1 video da rivedere'), 'riassunto iniziale');
   await c.click('.scelta[data-p="Profondità"]');
   verifica(await c.getAttribute('.scelta.ottima', 'aria-pressed') === 'false', 'ottima si spegne');
   await c.click('.scelta[data-p="Profondità"]');
@@ -22,7 +23,7 @@ const verifica = (c, m) => { if (c) ok++; else { ko++; console.log('KO', m); } }
   verifica((await c.textContent('#tempo')) !== '0:00', 'lettore avanza');
   await c.click('#invia'); await c.waitForTimeout(300);
   verifica(await c.isVisible('#avviso.su'), 'avviso visibile');
-  verifica((await c.textContent('#riassunto')).startsWith('3 video'), 'conteggio scende');
+  verifica((await c.textContent('#riassunto')).startsWith('Nessun video'), 'conteggio scende');
   verifica(!(await c.textContent('#coda')).includes('Marco Rossi'), 'Marco fuori dalla coda');
   await c.screenshot({ path: out + '/coach-inviato.png' });
   // l'app di Marco

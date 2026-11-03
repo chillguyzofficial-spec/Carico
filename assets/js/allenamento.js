@@ -33,7 +33,7 @@
   const LIBRERIA = (() => {
     const m = new Map();
     Object.values(D.esercizi).flat().forEach((e) => {
-      if (!m.has(e.nome)) m.set(e.nome, { nome: e.nome, kg: e.prec[0][0], reps: e.reps });
+      if (!m.has(e.nome)) m.set(e.nome, { nome: e.nome, kg: e.prec[0] ? e.prec[0][0] : 0, reps: e.reps });
       (e.alt || []).forEach((n) => { if (!m.has(n)) m.set(n, { nome: n, kg: 0, reps: e.reps }); });
     });
     ALTRI.forEach((n) => { if (!m.has(n)) m.set(n, { nome: n, kg: 0, reps: 10 }); });
@@ -59,7 +59,7 @@
   // Trazioni: il peso è la zavorra («+10 kg»), a 0 è corpo libero
   const zavorra = (i) => /^Trazioni/.test(nomeDi(i));
   const pesoTesto = (i, v) => (zavorra(i) ? (v ? `+${kg(v)} kg` : 'corpo libero') : `${kg(v)} kg`);
-  const SPUNTA = (c, w = 16) => `<svg width="${w}" height="${w}" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const SPUNTA = (c, w = 16) => `<svg width="${w}" height="${w}" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" style="stroke:${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const GUIDA = window.GUIDA || {}; // spiegazioni degli esercizi (guida.js)
   const FATICA = { facile: 'Facile', giusto: 'Giusto', limite: 'Al limite' }; // «Com'è andata?» dell'esercizio, la legge il coach
   // Record: più chili del miglior carico alle ripetizioni del programma (non per esercizi cambiati o aggiunti)
@@ -132,7 +132,7 @@
     const ultima = e.prec.length ? Math.max(...e.prec.map((p) => p[0])) : null;
     const dati = e.mio ? '<span class="tuo">Aggiunto da te</span>'
       : s.nome ? `<span>Al posto di ${esc(e.nome)}</span>`
-      : `<span>Ultima ${ultima !== null ? pesoTesto(i, ultima) : '—'}</span><span class="target">Target ${pesoTesto(i, e.kg)}</span>`;
+      : `<span>Ultima ${ultima !== null ? pesoTesto(i, ultima) : '—'}</span><span class="target">${!e.kg && !zavorra(i) ? 'Peso: lo scegli tu' : 'Target ' + pesoTesto(i, e.kg)}</span>`;
     const togliOk = (r) => (e.mio || r.extra) && s.serie.length > 1;
     // «Prima»: la stessa serie la settimana scorsa (come Hevy e Strong); toccandola si ricopia
     const prima = (r, j) => (!e.mio && !s.nome && !r.extra ? e.prec[j] : null);
@@ -140,7 +140,7 @@
       <div class="riga-serie${r.fatta ? ' fatta' : ''}${r.extra ? ' extra' : ''}${mostraPR(i, r) ? ' record' : ''}">
         <span class="n-serie num">${due(j + 1)}${togliOk(r) ? `<button class="togli-x" data-togli="${i}-${j}" aria-label="Togli la serie ${j + 1}">×</button>` : ''}</span>
         ${prima(r, j) ? `<button class="prima-cella num" data-copia="${i}-${j}" aria-label="La settimana scorsa ${kg(prima(r, j)[0])} chili per ${prima(r, j)[1]}: tocca per ricopiare">${kg(prima(r, j)[0])}<i>×</i>${prima(r, j)[1]}</button>` : '<span class="prima-cella vuota" aria-hidden="true">—</span>'}
-        <input class="cella num" data-cella="kg" data-i="${i}" data-j="${j}" type="text" inputmode="decimal" value="${e.mio && !r.kg ? '' : kg(r.kg)}" placeholder="—" autocomplete="off" enterkeyhint="done" aria-label="Serie ${j + 1}, chili${zavorra(i) ? ' di zavorra' : ''}">
+        <input class="cella num" data-cella="kg" data-i="${i}" data-j="${j}" type="text" inputmode="decimal" value="${(e.mio || !D.storia) && !r.kg && !zavorra(i) ? '' : kg(r.kg)}" placeholder="—" autocomplete="off" enterkeyhint="done" aria-label="Serie ${j + 1}, chili${zavorra(i) ? ' di zavorra' : ''}">
         <input class="cella num" data-cella="reps" data-i="${i}" data-j="${j}" type="text" inputmode="numeric" value="${r.reps}" autocomplete="off" enterkeyhint="done" aria-label="Serie ${j + 1}, ripetizioni">
         <button class="sk-casella${r.fatta ? ' piena' : ''}" data-spunta="${i}-${j}" aria-pressed="${r.fatta}" aria-label="Serie ${j + 1} fatta">${r.fatta ? SPUNTA('#04140B', 18) : ''}</button>
       </div>`).join('');
@@ -174,7 +174,7 @@
         ${nota}
         ${s.nota ? `<p class="nota-tua-es"><b>La tua nota:</b> «${esc(s.nota)}»</p>` : ''}
         <div class="due-azioni">
-          <button class="btn-linea" data-video="${i}">${s.video ? `${SPUNTA('#C8F03C', 18)} Video inviato` : '<svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><rect x="1" y="1" width="14" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 6l6-3.5v11L15 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Invia video al coach'}</button>
+          <button class="btn-linea" data-video="${i}">${s.video ? `${SPUNTA('var(--voltaico)', 18)} Video inviato` : '<svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><rect x="1" y="1" width="14" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 6l6-3.5v11L15 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Invia video al coach'}</button>
           <button class="btn-linea" data-piu="${i}"><span aria-hidden="true">+</span> Aggiungi serie</button>
         </div>
         <div class="altre-azioni">
@@ -190,7 +190,7 @@
     return `
       ${testata()}
       <div class="corpo-scheda">
-        ${fatte === 0 ? `<button class="link-tutto" id="tutto">${SPUNTA('#DDF77A', 16)} Fatto tutto come previsto</button>` : ''}
+        ${fatte === 0 ? `<button class="link-tutto" id="tutto">${SPUNTA('var(--voltaico-chiaro)', 16)} Fatto tutto come previsto</button>` : ''}
         <div class="elenco-es">${S.es.map((_, i) => (i === qui ? esercizioAperto(i) : rigaChiusa(i))).join('')}</div>
         <button class="aggiungi-es" id="aggiungi"><b>+ Aggiungi un esercizio</b><span>Fuori programma: ${esc(D.coach.breve)} lo vede nel riepilogo</span></button>
         <button class="btn-primario" id="concludi"${fatte ? '' : ' disabled'}>Concludi allenamento</button>
@@ -343,7 +343,7 @@
   // Uscendo dal campo si rimette il numero salvato (campo vuoto o scritto male)
   function riscrivi(el) {
     const r = S.es[Number(el.dataset.i)].serie[Number(el.dataset.j)];
-    if (el.dataset.cella === 'kg') el.value = ex(Number(el.dataset.i)).mio && !r.kg ? '' : kg(r.kg);
+    if (el.dataset.cella === 'kg') el.value = (ex(Number(el.dataset.i)).mio || !D.storia) && !r.kg ? '' : kg(r.kg);
     else el.value = r.reps;
   }
 
@@ -368,9 +368,9 @@
     const i = videoPer, s = S.es[i], j = Math.max(0, s.serie.map((x) => x.fatta).lastIndexOf(true)), r = s.serie[j]; // l'ultima serie fatta
     s.video = { serie: j + 1, nome: file ? file.name : '', quando: Date.now() };
     salva();
-    const chat = A.leggi('pt-chat') || [];
+    const chat = A.leggi(D.k('pt-chat')) || [];
     chat.push({ da: 'atleta', istante: A.istante(), tipo: 'video', testo: 'Video della serie per la revisione.', contesto: `${nomeDi(i)} · ${all.nome} · Serie ${j + 1} · ${kg(r.kg)} kg × ${r.reps}` });
-    A.scrivi('pt-chat', chat);
+    A.scrivi(D.k('pt-chat'), chat);
     ridisegnaTenendoPosizione();
     A.avviso(`Video inviato a ${D.coach.breve}`, `${nomeDi(i)} · lo rivede entro 24 h`);
   }
