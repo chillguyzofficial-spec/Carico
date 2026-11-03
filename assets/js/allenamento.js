@@ -200,18 +200,28 @@
         ${s.nome ? `<button class="voce-foglio" data-alt=""><span class="testi"><b>Torna a ${esc(e.nome)}</b></span></button>` : ''}
         <button class="chiudi-foglio" data-chiudi>Indietro</button>`;
     } else if (foglio.tipo === 'spiega') {
+      // Grafica come la scheda: video in grande, muscoli come etichette, passi numerati in lime divisi da linee
       const g = GUIDA[nomeDi(i)], video = e.demo && !s.nome;
+      const muscoli = g.muscoli.split(' · ');
       dentro = `
-        <div class="testa-foglio"><span class="titolo">${esc(nomeDi(i))}</span><span>${esc(g.muscoli)}</span></div>
-        ${video ? `<button class="voce-foglio card" data-demo="${i}"><span class="icona-tonda"><svg width="14" height="16" viewBox="0 0 10 12"><path d="M1 1v10l8-5z" fill="#F4F4F0"/></svg></span><span class="testi"><b>Guarda il video di ${esc(D.coach.breve)}</b><span>${e.durata}</span></span></button>` : ''}
-        <div class="guida">
-          <h3>Come si fa</h3>
-          <ol>${g.passi.map((p) => `<li>${esc(p)}</li>`).join('')}</ol>
-          <h3>Da evitare</h3>
-          <ul>${g.errori.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
-          ${e.nota && !s.nome ? `<p class="guida-coach"><b>${esc(D.coach.breve)}:</b> «${esc(e.nota)}»</p>` : ''}
+        ${video ? `<button class="guida-video" data-demo="${i}" aria-label="Guarda il video di ${esc(D.coach.breve)}, ${e.durata}">
+          <img src="assets/foto/${e.demo}.webp" alt="">
+          <span class="play" aria-hidden="true"><svg width="16" height="18" viewBox="0 0 10 12"><path d="M1 1v10l8-5z" fill="#0A0A0A"/></svg></span>
+          <span class="didascalia"><b>Video di ${esc(D.coach.breve)}</b><span class="num">${e.durata}</span></span>
+        </button>` : ''}
+        <div class="guida-testa">
+          <span class="sopra">Come si fa</span>
+          <span class="titolo">${esc(nomeDi(i))}</span>
+          <div class="muscoli-chip">${muscoli.map((m, k) => `<span class="${k === 0 ? 'primo' : ''}">${esc(m)}</span>`).join('')}</div>
+          ${!e.mio ? `<span class="oggi-chip num">Oggi ${s.serie.length} × ${e.reps} · ${pesoTesto(i, e.kg)}</span>` : ''}
         </div>
-        <button class="chiudi-foglio" data-chiudi>Chiudi</button>`;
+        <ol class="guida-passi">${g.passi.map((p, k) => `<li><span class="n num">${due(k + 1)}</span><span>${esc(p)}</span></li>`).join('')}</ol>
+        <div class="guida-evita">
+          <span class="sopra">Da evitare</span>
+          ${g.errori.map((p) => `<p><span class="x" aria-hidden="true">✕</span>${esc(p)}</p>`).join('')}
+        </div>
+        ${e.nota && !s.nome ? `<div class="sk-nota guida-nota"><img class="avatar" src="${D.coach.foto}" alt="" width="44" height="44"><div><span class="sk-chi"><b>${esc(D.coach.breve)}</b> / coach</span><p>“${esc(e.nota)}”</p></div></div>` : ''}
+        <button class="btn-linea guida-chiudi" data-chiudi>Ho capito</button>`;
     } else if (foglio.tipo === 'nota') {
       dentro = `
         <div class="testa-foglio"><span class="titolo">Nota per ${esc(D.coach.breve)}</span><span>${esc(nomeDi(i))} · la legge nel gestionale insieme alle tue serie.</span></div>
@@ -230,7 +240,7 @@
         </div>
         <button class="chiudi-foglio" data-chiudi>Annulla</button>`;
     }
-    return `<div class="velo-foglio" data-chiudi></div><div class="foglio" role="dialog" aria-modal="true" aria-label="${i >= 0 ? esc(nomeDi(i)) : 'Aggiungi esercizio'}"><span class="maniglia" aria-hidden="true"></span>${dentro}</div>`;
+    return `<div class="velo-foglio" data-chiudi></div><div class="foglio${foglio.tipo === 'spiega' ? ' foglio-guida' : ''}" role="dialog" aria-modal="true" aria-label="${i >= 0 ? esc(nomeDi(i)) : 'Aggiungi esercizio'}"><span class="maniglia" aria-hidden="true"></span>${dentro}</div>`;
   }
 
   // ---------- Fine allenamento ----------

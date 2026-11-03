@@ -144,9 +144,28 @@ button.prima-cella:active { background: var(--notte-2); color: var(--gesso); }
 .come-si-fa { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px 0 6px; border-radius: 18px; border: 1px solid var(--linea-2); font: 600 14px/1 var(--testo); color: var(--gesso); }
 .come-si-fa span { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--voltaico); color: var(--su-accento); font: italic 800 14px/1 Georgia, serif; }
 .foglio { max-height: 88vh; overflow-y: auto; }
-.guida h3 { margin: 10px 4px 6px; font: 600 12px/16px var(--testo); letter-spacing: .1em; text-transform: uppercase; color: var(--fumo); }
-.guida ol, .guida ul { margin: 0; padding: 0 4px 0 26px; display: flex; flex-direction: column; gap: 8px; font: 500 16px/23px var(--testo); color: var(--gesso); }
-.guida ol li::marker { font-weight: 700; color: var(--voltaico); }
-.guida ul li::marker { color: var(--errore); }
-.guida-coach { margin: 14px 4px 0; padding: 10px 12px; border-radius: 12px; background: var(--notte-1); font: 500 15px/21px var(--testo); color: var(--ardesia); }
-.guida-coach b { color: var(--gesso); }
+/* Foglio «Come si fa»: stessa grafica della scheda (nero, lime, numeri grandi, righe divise da linee) */
+.foglio-guida { background: #0B0B0B; padding-top: 10px; gap: 0; border-top: 1px solid rgba(255, 255, 255, .1); }
+.foglio-guida .maniglia { margin-bottom: 10px; }
+.guida-video { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; border: 1px solid rgba(255, 255, 255, .12); flex: none; }
+.guida-video img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.7); }
+.guida-video::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0, 0, 0, .75) 0%, rgba(0, 0, 0, 0) 55%); }
+.guida-video .play { position: absolute; z-index: 1; left: 50%; top: 45%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: var(--voltaico); display: grid; place-items: center; padding-left: 4px; box-shadow: 0 0 0 8px rgba(200, 240, 60, .18); }
+.guida-video .didascalia { position: absolute; z-index: 1; left: 16px; right: 16px; bottom: 12px; display: flex; justify-content: space-between; align-items: baseline; font: 600 14px/1 var(--testo); color: var(--gesso); }
+.guida-video .didascalia b { font: 800 18px/1 var(--display); letter-spacing: .04em; text-transform: uppercase; }
+.guida-testa { display: flex; flex-direction: column; gap: 10px; padding: 18px 2px 16px; border-bottom: 1px solid rgba(255, 255, 255, .12); }
+.guida-testa .sopra, .guida-evita .sopra { font: 600 12px/16px var(--testo); letter-spacing: .14em; text-transform: uppercase; color: var(--voltaico); }
+.guida-testa .titolo { font: 800 44px/.9 var(--display); text-transform: uppercase; }
+.muscoli-chip { display: flex; flex-wrap: wrap; gap: 6px; }
+.muscoli-chip span { padding: 6px 11px; border-radius: 999px; border: 1px solid var(--linea-2); font: 600 13px/1 var(--testo); color: var(--ardesia); }
+.muscoli-chip span.primo { border-color: var(--voltaico); color: var(--voltaico); }
+.oggi-chip { align-self: flex-start; font: 600 13px/18px var(--testo); color: var(--fumo); letter-spacing: .04em; text-transform: uppercase; }
+.guida-passi { list-style: none; margin: 0; padding: 0; }
+.guida-passi li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 16px 2px; border-bottom: 1px solid rgba(255, 255, 255, .08); font: 500 16px/23px var(--testo); color: var(--gesso); }
+.guida-passi .n { font: 800 34px/.9 var(--display); color: var(--voltaico); }
+.guida-evita { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; padding: 16px; border-radius: 16px; background: rgba(255, 97, 102, .07); border: 1px solid rgba(255, 97, 102, .22); }
+.guida-evita .sopra { color: var(--errore); }
+.guida-evita p { margin: 0; display: grid; grid-template-columns: 22px 1fr; gap: 8px; font: 500 15px/21px var(--testo); color: var(--gesso); }
+.guida-evita .x { width: 20px; height: 20px; border-radius: 50%; background: rgba(255, 97, 102, .18); color: var(--errore); display: grid; place-items: center; font: 700 11px/1 var(--testo); margin-top: 1px; }
+.guida-nota { margin-top: 12px; }
+.guida-chiudi { margin-top: 16px; flex: none; }
